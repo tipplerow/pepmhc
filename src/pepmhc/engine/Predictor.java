@@ -40,6 +40,19 @@ public interface Predictor {
     }
 
     /**
+     * Determines whether a given prediction method is installed and
+     * available for the JVM.
+     *
+     * @param method the prediction method.
+     *
+     * @return {@code true} iff the specified prediction method is
+     * installed and available for the JVM.
+     */
+    public static boolean isInstalled(PredictionMethod method) {
+        return instance(method).isInstalled();
+    }
+
+    /**
      * Predicts the binding between an allele and a single peptide.
      *
      * @param method the enumerated prediction method.
@@ -78,6 +91,15 @@ public interface Predictor {
      * @return the prediction method for this predictor.
      */
     public abstract PredictionMethod getMethod();
+
+    /**
+     * Determines whether the underlying executable program or
+     * prediction engine is available to the JVM.
+     *
+     * @return {@code true} iff the underlying executable program
+     * or prediction engine is available to the JVM.
+     */
+    public abstract boolean isInstalled();
 
     /**
      * Predicts the binding between an allele and a single peptide.

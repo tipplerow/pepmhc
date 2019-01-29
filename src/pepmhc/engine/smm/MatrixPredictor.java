@@ -19,6 +19,10 @@ public abstract class MatrixPredictor implements Predictor {
         this.outerMap = new HashMap<String, Map<Integer, StabilizedMatrix>>();
     }
 
+    @Override public boolean isInstalled() {
+        return true;
+    }
+
     @Override public BindingRecord predict(String allele, Peptide peptide) {
         return new BindingRecord(peptide, getMatrix(allele, peptide.length()).computeIC50(peptide));
     }

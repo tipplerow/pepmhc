@@ -27,17 +27,6 @@ public final class NetMHCPredictor implements Predictor {
     public static final String EXECUTABLE_PATH_PROPERTY = "pepmhc.engine.net.netMHC";
 
     /**
-     * Determines whether the {@code netMHC} executable is installed
-     * at the location specified by the {@code EXECUTABLE_PATH_PROPERTY}.
-     *
-     * @return {@code true} iff an executable file is installed at the
-     * location specified by the {@code EXECUTABLE_PATH_PROPERTY}.
-     */
-    public static boolean isInstalled() {
-        return resolveExecutableFile().canExecute();
-    }
-
-    /**
      * Resolves the full path to the {@code netMHC} executable file.
      *
      * @return the path specified by the {@code EXECUTABLE_PATH_PROPERTY},
@@ -61,6 +50,10 @@ public final class NetMHCPredictor implements Predictor {
 
     @Override public PredictionMethod getMethod() {
         return PredictionMethod.NET_MHC;
+    }
+
+    @Override public boolean isInstalled() {
+        return resolveExecutableFile().canExecute();
     }
 
     @Override public List<BindingRecord> predict(String allele, Collection<Peptide> peptides) {

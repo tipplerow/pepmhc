@@ -18,13 +18,13 @@ public class NetMHCPanPredictorTest {
 
     @Test public void testExecutable() {
         System.out.print("NetMHCPan ");
-        System.out.print(NetMHCPanPredictor.isInstalled() ? "IS" : "is NOT");
+        System.out.print(predictor.isInstalled() ? "IS" : "is NOT");
         System.out.print(" installed.");
         System.out.println();
     }
 
     @Test public void testPredict1() {
-        if (!NetMHCPanPredictor.isInstalled())
+        if (!predictor.isInstalled())
             return;
 
         assertEquals( 8706.7, predictor.predict("HLA-A*02:01", Peptide.parse("AEFGPWQTV")).getAffinity(), 0.1);

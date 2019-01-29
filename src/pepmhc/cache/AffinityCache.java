@@ -73,7 +73,7 @@ public final class AffinityCache {
         loadTable();
     }
 
-    public static final String CACHE_DIRECTORY_PROPERTY = "pepmhc.cacheDirectory";
+    public static final String CACHE_DIRECTORY_PROPERTY = "pepmhc.cache.directory";
 
     private Connection openConnection() {
         try {

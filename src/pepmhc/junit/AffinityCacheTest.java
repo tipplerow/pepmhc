@@ -8,6 +8,7 @@ import jam.peptide.Peptide;
 import pepmhc.cache.AffinityCache;
 import pepmhc.engine.BindingRecord;
 import pepmhc.engine.PredictionMethod;
+import pepmhc.engine.Predictor;
 import pepmhc.engine.net.NetMHCPredictor;
 
 import org.junit.*;
@@ -19,15 +20,17 @@ public class AffinityCacheTest {
         System.setProperty(NetMHCPredictor.EXECUTABLE_PATH_PROPERTY, "/Users/scott/local/netMHC-4.0/netMHC");
     }
 
+    private final PredictionMethod method = PredictionMethod.NET_MHC;
+
     @Test public void testNetMHC() {
-        if (!NetMHCPredictor.isInstalled())
+        if (!Predictor.isInstalled(method))
             return;
 
-        BindingRecord record = AffinityCache.get(PredictionMethod.NET_MHC, "HLA-A*02:01", Peptide.parse("AEFGPWQTV"));
+        BindingRecord record = AffinityCache.get(method, "HLA-A*02:01", Peptide.parse("AEFGPWQTV"));
         System.out.println(record);
 
-        AffinityCache.get(PredictionMethod.NET_MHC, "HLA-A*02:01", Peptide.parse("AEFGPWQTV"));
-        AffinityCache.get(PredictionMethod.NET_MHC, "HLA-A*02:01", Peptide.parse("AEFGPWQTV"));
+        AffinityCache.get(method, "HLA-A*02:01", Peptide.parse("AEFGPWQTV"));
+        AffinityCache.get(method, "HLA-A*02:01", Peptide.parse("AEFGPWQTV"));
     }
 
     public static void main(String[] args) {
