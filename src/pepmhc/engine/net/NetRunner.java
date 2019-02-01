@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import jam.app.JamLogger;
+import jam.hla.Allele;
 import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
@@ -20,7 +21,7 @@ import pepmhc.engine.BindingRecord;
  * command-line process.
  */
 public abstract class NetRunner {
-    private final String allele;
+    private final Allele allele;
     private final Collection<Peptide> peptides;
 
     private File peptideFile;
@@ -33,7 +34,7 @@ public abstract class NetRunner {
      *
      * @param peptides the peptide targets.
      */
-    protected NetRunner(String allele, Collection<Peptide> peptides) {
+    protected NetRunner(Allele allele, Collection<Peptide> peptides) {
         this.allele = allele;
         this.peptides = peptides;
     }
@@ -49,7 +50,7 @@ public abstract class NetRunner {
      * @return the exact and complete command-line request to pass
      * to the underlying {@code ProcessBuilder}.
      */
-    protected abstract List<String> formatCommand(String allele, File peptideFile);
+    protected abstract List<String> formatCommand(Allele allele, File peptideFile);
 
     /**
      * Executes the command-line prediction process.

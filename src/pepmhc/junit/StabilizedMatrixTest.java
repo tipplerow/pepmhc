@@ -1,6 +1,7 @@
 
 package pepmhc.junit;
 
+import jam.hla.Allele;
 import jam.peptide.Peptide;
 import jam.peptide.Residue;
 
@@ -12,7 +13,7 @@ import static org.junit.Assert.*;
 
 public class StabilizedMatrixTest {
     @Test public void testSMM() {
-        StabilizedMatrix mat = StabilizedMatrix.instance(PredictionMethod.SMM, "HLA-A*01:01", 9);
+        StabilizedMatrix mat = StabilizedMatrix.instance(PredictionMethod.SMM, Allele.instance("HLA-A*01:01"), 9);
 
         assertEquals(9, mat.getPeptideLength());
         assertEquals(5.07755, mat.getIntercept(), 0.00001);

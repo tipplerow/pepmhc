@@ -4,7 +4,8 @@ package pepmhc.engine.smm;
 import java.util.List;
 import java.util.Map;
 
-import jam.app.JamHome;
+import jam.app.JamEnv;
+import jam.hla.Allele;
 import jam.io.FileUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
@@ -38,7 +39,7 @@ public final class StabilizedMatrix {
      * @return the stabilized matrix for the specified method and
      * allele.
      */
-    public static StabilizedMatrix instance(PredictionMethod method, String allele, int length) {
+    public static StabilizedMatrix instance(PredictionMethod method, Allele allele, int length) {
         return load(resolveFileName(method, allele, length));
     }
 
@@ -54,25 +55,27 @@ public final class StabilizedMatrix {
         return MatrixReader.load(fileName);
     }
 
-    private static String resolveFileName(PredictionMethod method, String allele, int length) {
+    private static String resolveFileName(PredictionMethod method, Allele allele, int length) {
         return FileUtil.join(dirName(method), baseName(allele, length));
     }
 
     private static String dirName(PredictionMethod method) {
+        String homeDir = JamEnv.getRequired("PEPMHC_HOME");
+
         switch (method) {
         case SMM:
-            return FileUtil.join(JamHome.NAME, "data", "pepmhc", "smm");
+            return FileUtil.join(homeDir, "data", "smm");
 
         case SMM_PMBEC:
-            return FileUtil.join(JamHome.NAME, "data", "pepmhc", "smm_pmbec");
+            return FileUtil.join(homeDir, "data", "smm_pmbec");
 
         default:
             throw JamException.runtime("Unsupported prediction method: [%s].", method);
         }
     }
 
-    private static String baseName(String allele, int length) {
-        return String.format("%s-%d.txt", allele.replace('*', '-'), length);
+    private static String baseName(Allele allele, int length) {
+        return String.format("%s-%d.txt", allele.longKey().replace('*', '-'), length);
     }
 
     /**

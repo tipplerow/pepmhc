@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -18,6 +17,7 @@ import java.util.Set;
 
 import jam.app.JamLogger;
 import jam.app.JamProperties;
+import jam.hla.Allele;
 import jam.io.FileUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
@@ -27,15 +27,19 @@ import pepmhc.engine.BindingRecord;
 import pepmhc.engine.Predictor;
 import pepmhc.engine.PredictionMethod;
 
+/**
+ * Maintains an in-memory and persistent cache of peptide-MHC binding
+ * affinities indexed by prediction method, HLA allele, and peptide.
+ */
 public final class AffinityCache {
-    private final String allele;
+    private final Allele allele;
     private final Predictor predictor;
     private final PredictionMethod method;
     private final Connection connection;
     private final Map<Peptide, BindingRecord> recordMap;
 
-    private static final Map<PredictionMethod, Map<String, AffinityCache>> instances =
-        new EnumMap<PredictionMethod, Map<String, AffinityCache>>(PredictionMethod.class);
+    private static final Map<PredictionMethod, Map<Allele, AffinityCache>> instances =
+        new EnumMap<PredictionMethod, Map<Allele, AffinityCache>>(PredictionMethod.class);
 
     private static final String TABLE_NAME = "affinity";
 
@@ -63,7 +67,7 @@ public final class AffinityCache {
     private static final String INSERT_RECORD_TEMPLATE =
         "INSERT INTO %s VALUES('%s', %s, %s)";
 
-    private AffinityCache(PredictionMethod method, String allele) {
+    private AffinityCache(PredictionMethod method, Allele allele) {
         this.method = method;
         this.allele = allele;
         this.predictor = Predictor.instance(method);
@@ -72,8 +76,6 @@ public final class AffinityCache {
 
         loadTable();
     }
-
-    public static final String CACHE_DIRECTORY_PROPERTY = "pepmhc.cache.directory";
 
     private Connection openConnection() {
         try {
@@ -102,7 +104,7 @@ public final class AffinityCache {
     }
 
     private String formatAllele() {
-        return allele.replace("*", "-").replace(":", "-");
+        return allele.longKey().replace("*", "-").replace(":", "-");
     }
 
     private void loadTable() {
@@ -144,20 +146,52 @@ public final class AffinityCache {
         recordMap.put(record.getPeptide(), record);
     }
 
-    public static BindingRecord get(PredictionMethod method, String allele, Peptide peptide) {
+    /**
+     * Name of the system property that specifies the directory
+     * containing the persistent database store.
+     */
+    public static final String CACHE_DIRECTORY_PROPERTY = "pepmhc.cache.directory";
+
+    /**
+     * Retrieves a binding record from the cache, computing on-demand
+     * if necessary.
+     *
+     * @param method the affinity prediction method.
+     *
+     * @param allele the allele of the binding MHC molecule.
+     *
+     * @param peptide the peptide bound to the MHC molecule.
+     *
+     * @return a binding record describing the peptide-MHC
+     * interaction.
+     */
+    public static BindingRecord get(PredictionMethod method, Allele allele, Peptide peptide) {
         return get(method, allele, List.of(peptide)).get(0);
     }
 
-    public static List<BindingRecord> get(PredictionMethod method, String allele, Collection<Peptide> peptides) {
+    /**
+     * Retrieves binding records from the cache, computing on-demand
+     * if necessary.
+     *
+     * @param method the affinity prediction method.
+     *
+     * @param allele the allele of the binding MHC molecule.
+     *
+     * @param peptides the peptides bound to the MHC molecule.
+     *
+     * @return the binding records describing the peptide-MHC
+     * interactions.
+     */
+    public static List<BindingRecord> get(PredictionMethod method, Allele allele, Collection<Peptide> peptides) {
         return instance(method, allele).get(peptides);
     }
 
-    private static AffinityCache instance(PredictionMethod method, String allele) {
-        Map<String, AffinityCache> cacheMap = instances.get(method);
+    private static AffinityCache instance(PredictionMethod method, Allele allele) {
+        Map<Allele, AffinityCache> cacheMap = instances.get(method);
 
         if (cacheMap == null) {
             JamLogger.info("Creating cache map for method [%s]...", method);
-            cacheMap = new HashMap<String, AffinityCache>();
+            cacheMap = new HashMap<Allele, AffinityCache>();
             instances.put(method, cacheMap);
         }
 

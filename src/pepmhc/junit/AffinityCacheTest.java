@@ -3,6 +3,7 @@ package pepmhc.junit;
 
 import java.util.List;
 
+import jam.hla.Allele;
 import jam.peptide.Peptide;
 
 import pepmhc.cache.AffinityCache;
@@ -20,17 +21,18 @@ public class AffinityCacheTest {
         System.setProperty(NetMHCPredictor.EXECUTABLE_PATH_PROPERTY, "/Users/scott/local/netMHC-4.0/netMHC");
     }
 
+    private final Allele allele = Allele.instance("HLA-A*02:01");
     private final PredictionMethod method = PredictionMethod.NET_MHC;
 
     @Test public void testNetMHC() {
         if (!Predictor.isInstalled(method))
             return;
 
-        BindingRecord record = AffinityCache.get(method, "HLA-A*02:01", Peptide.parse("AEFGPWQTV"));
+        BindingRecord record = AffinityCache.get(method, allele, Peptide.parse("AEFGPWQTV"));
         System.out.println(record);
 
-        AffinityCache.get(method, "HLA-A*02:01", Peptide.parse("AEFGPWQTV"));
-        AffinityCache.get(method, "HLA-A*02:01", Peptide.parse("AEFGPWQTV"));
+        AffinityCache.get(method, allele, Peptide.parse("AEFGPWQTV"));
+        AffinityCache.get(method, allele, Peptide.parse("AEFGPWQTV"));
     }
 
     public static void main(String[] args) {

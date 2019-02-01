@@ -9,6 +9,7 @@ import jam.app.JamLogger;
 import jam.io.IOUtil;
 import jam.fasta.FastaReader;
 import jam.fasta.FastaRecord;
+import jam.hla.Allele;
 import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
 
@@ -16,12 +17,10 @@ import pepmhc.engine.Predictor;
 import pepmhc.engine.PredictionMethod;
 
 public final class AllelePresentCalc {
-    private final int peptideLength;
-
-    private final String fastaFile;
-    private final String alleleCode;
-
-    private final PredictionMethod predMethod;
+    private final int pepLen;
+    private final String fastIn;
+    private final Allele allele;
+    private final PredictionMethod method;
 
     private Predictor predictor;
     private FastaReader fastaReader;
@@ -29,11 +28,11 @@ public final class AllelePresentCalc {
     private Set<Peptide> pepFragments;
     private int binderCount;
 
-    private AllelePresentCalc(String fastaFile, PredictionMethod predMethod, String alleleCode, int peptideLength) {
-        this.fastaFile = fastaFile;
-        this.predMethod = predMethod;
-        this.alleleCode = alleleCode;
-        this.peptideLength = peptideLength;
+    private AllelePresentCalc(String fastIn, PredictionMethod method, Allele allele, int pepLen) {
+        this.fastIn = fastIn;
+        this.method = method;
+        this.allele = allele;
+        this.pepLen = pepLen;
     }
 
     private static final int LOG_INTERVAL = 1000;
@@ -56,8 +55,8 @@ public final class AllelePresentCalc {
     public static final double BINDING_THRESHOLD = 500.0;
 
     private void run() {
-        predictor    = Predictor.instance(predMethod);
-        fastaReader  = FastaReader.open(fastaFile);
+        predictor    = Predictor.instance(method);
+        fastaReader  = FastaReader.open(fastIn);
         pepFragments = new HashSet<Peptide>();
         binderCount  = 0;
 
@@ -65,11 +64,11 @@ public final class AllelePresentCalc {
             processPeptide(record.getPeptide());
 
         reportWriter = IOUtil.openWriter(outputFile());
-        reportWriter.println("predMethod,alleleCode,peptideLength,fragmentCount,binderFrac");
+        reportWriter.println("method,allele,pepLen,fragmentCount,binderFrac");
         reportWriter.println(String.format("%s,%s,%d,%d,%8.6f",
-                                           predMethod,
-                                           alleleCode,
-                                           peptideLength,
+                                           method,
+                                           allele,
+                                           pepLen,
                                            pepFragments.size(),
                                            DoubleUtil.ratio(binderCount, pepFragments.size())));
 
@@ -78,7 +77,7 @@ public final class AllelePresentCalc {
     }
 
     private void processPeptide(Peptide peptide) {
-        for (Peptide fragment : peptide.nativeFragments(peptideLength))
+        for (Peptide fragment : peptide.nativeFragments(pepLen))
             processFragment(fragment);
     }
 
@@ -89,7 +88,7 @@ public final class AllelePresentCalc {
         if (pepFragments.contains(fragment))
             return;
 
-        double ic50 = predictor.predict(alleleCode, fragment).getAffinity();
+        double ic50 = predictor.predict(allele, fragment).getAffinity();
 
         if (ic50 < BINDING_THRESHOLD)
             ++binderCount;
@@ -103,9 +102,9 @@ public final class AllelePresentCalc {
     private String outputFile() {
         return String.format("%s_%s_%s_%d%s",
                              REPORT_PREFIX,
-                             predMethod,
-                             alleleCode.replace("*", ""),
-                             peptideLength,
+                             method,
+                             allele.longKey().replace("*", ""),
+                             pepLen,
                              REPORT_SUFFIX);
     }
 
@@ -119,17 +118,18 @@ public final class AllelePresentCalc {
         if (args.length != 4)
             usage();
 
-        int peptideLength;
-        String alleleCode, fastaFile;
-        PredictionMethod predMethod;
+        int pepLen;
+        String fastIn;
+        Allele allele;
+        PredictionMethod method;
 
-        fastaFile     = args[0];
-        predMethod    = PredictionMethod.valueOf(args[1].toUpperCase());
-        alleleCode    = args[2];
-        peptideLength = Integer.parseInt(args[3]);
+        fastIn = args[0];
+        method = PredictionMethod.valueOf(args[1].toUpperCase());
+        allele = Allele.instance(args[2]);
+        pepLen = Integer.parseInt(args[3]);
 
         AllelePresentCalc calculator =
-            new AllelePresentCalc(fastaFile, predMethod, alleleCode, peptideLength);
+            new AllelePresentCalc(fastIn, method, allele, pepLen);
 
         calculator.run();
     }

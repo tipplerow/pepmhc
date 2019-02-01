@@ -4,6 +4,7 @@ package pepmhc.engine;
 import java.util.Collection;
 import java.util.List;
 
+import jam.hla.Allele;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
 
@@ -64,7 +65,7 @@ public interface Predictor {
      *
      * @return the binding record for the allele and peptide.
      */
-    public static BindingRecord predict(PredictionMethod method, String allele, Peptide peptide) {
+    public static BindingRecord predict(PredictionMethod method, Allele allele, Peptide peptide) {
         return instance(method).predict(allele, peptide);
      }
 
@@ -81,7 +82,7 @@ public interface Predictor {
      *
      * @return a list of binding records for the allele and peptides.
      */
-    public static List<BindingRecord> predict(PredictionMethod method, String allele, Collection<Peptide> peptides) {
+    public static List<BindingRecord> predict(PredictionMethod method, Allele allele, Collection<Peptide> peptides) {
         return instance(method).predict(allele, peptides);
     }
 
@@ -111,7 +112,7 @@ public interface Predictor {
      *
      * @return the binding record for the allele and peptide.
      */
-    public default BindingRecord predict(String allele, Peptide peptide) {
+    public default BindingRecord predict(Allele allele, Peptide peptide) {
         return predict(allele, List.of(peptide)).get(0);
     }
 
@@ -126,5 +127,5 @@ public interface Predictor {
      *
      * @return a list of binding records for the allele and peptides.
      */
-    public abstract List<BindingRecord> predict(String allele, Collection<Peptide> peptides);
+    public abstract List<BindingRecord> predict(Allele allele, Collection<Peptide> peptides);
 }

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import jam.app.JamProperties;
+import jam.hla.Allele;
 import jam.peptide.Peptide;
 
 import pepmhc.engine.BindingRecord;
@@ -56,7 +57,7 @@ public final class NetMHCPanPredictor implements Predictor {
         return resolveExecutableFile().canExecute();
     }
 
-    @Override public List<BindingRecord> predict(String allele, Collection<Peptide> peptides) {
+    @Override public List<BindingRecord> predict(Allele allele, Collection<Peptide> peptides) {
         return NetMHCPanRunner.run(allele, peptides);
     }
 }

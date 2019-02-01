@@ -1,6 +1,7 @@
 
 package pepmhc.junit;
 
+import jam.hla.Allele;
 import jam.peptide.Peptide;
 
 import pepmhc.engine.Predictor;
@@ -14,6 +15,8 @@ public class NetMHCPanPredictorTest {
         System.setProperty(NetMHCPanPredictor.EXECUTABLE_PATH_PROPERTY, "/Users/scott/local/netMHCpan-4.0/netMHCpan");
     }
 
+    private final Allele A0101 = Allele.instance("HLA-A*01:01");
+    private final Allele A0201 = Allele.instance("HLA-A*02:01");
     private final Predictor predictor = NetMHCPanPredictor.INSTANCE;
 
     @Test public void testExecutable() {
@@ -27,8 +30,8 @@ public class NetMHCPanPredictorTest {
         if (!predictor.isInstalled())
             return;
 
-        assertEquals( 8706.7, predictor.predict("HLA-A*02:01", Peptide.parse("AEFGPWQTV")).getAffinity(), 0.1);
-        assertEquals(33803.5, predictor.predict("HLA-A*01:01", Peptide.parse("AEFGPWQTV")).getAffinity(), 0.1);
+        assertEquals( 8706.7, predictor.predict(A0201, Peptide.parse("AEFGPWQTV")).getAffinity(), 0.1);
+        assertEquals(33803.5, predictor.predict(A0101, Peptide.parse("AEFGPWQTV")).getAffinity(), 0.1);
     }
 
     public static void main(String[] args) {

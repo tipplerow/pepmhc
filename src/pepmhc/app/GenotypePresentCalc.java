@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
 import jam.app.JamApp;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
+import jam.hla.Allele;
+import jam.hla.Genotype;
 import jam.io.IOUtil;
 import jam.io.LineReader;
 import jam.lang.JamException;
@@ -46,13 +48,13 @@ public final class GenotypePresentCalc extends JamApp {
     private final PredictionMethod method;
     private final List<Set<Peptide>> peptideSamples;
 
-    private final Set<String> alleleSet;
-    private final Map<String, StatSummary> alleleSummaries;
+    private final Set<Allele> alleleSet; // All individual alleles
+    private final Map<Allele, StatSummary> alleleSummaries;
 
     // binderCache.get(trialIndex).get(allele) contains all peptides
     // from sample "trialIndex" that bind to "allele" with an affinity
     // below the threshold...
-    private final List<Map<String, Set<Peptide>>> binderCache;
+    private final List<Map<Allele, Set<Peptide>>> binderCache;
 
     private String patientKeyName;
     private LineReader genotypeReader;
@@ -77,9 +79,9 @@ public final class GenotypePresentCalc extends JamApp {
         this.method = resolvePredictionMethod();
         this.peptideSamples = new ArrayList<Set<Peptide>>();
 
-        this.alleleSet = new TreeSet<String>();
-        this.binderCache = new ArrayList<Map<String, Set<Peptide>>>();
-        this.alleleSummaries = new HashMap<String, StatSummary>();
+        this.alleleSet = new TreeSet<Allele>();
+        this.binderCache = new ArrayList<Map<Allele, Set<Peptide>>>();
+        this.alleleSummaries = new HashMap<Allele, StatSummary>();
     }
 
     /**
@@ -239,7 +241,7 @@ public final class GenotypePresentCalc extends JamApp {
             reader.next();
 
             for (String line : reader)
-                alleleSet.addAll(parseAlleleSet(line));
+                alleleSet.addAll(parseGenotype(line));
         }
         finally {
             IOUtil.close(reader);
@@ -253,11 +255,9 @@ public final class GenotypePresentCalc extends JamApp {
         return genoKey;
     }
 
-    private Set<String> parseAlleleSet(String line) {
+    private Genotype parseGenotype(String line) {
         String[] columns = RegexUtil.split(GENOTYPE_COLUMN_DELIM, line, 2);
-        String[] alleles = RegexUtil.split(GENOTYPE_ALLELE_DELIM, columns[1]);
-
-        return new TreeSet<String>(List.of(alleles));
+        return Genotype.parse(line, GENOTYPE_ALLELE_DELIM);
     }
 
     private void findBinders() {
@@ -271,13 +271,13 @@ public final class GenotypePresentCalc extends JamApp {
         if (binderCache.size() != trialIndex)
             throw new IllegalStateException("Inconsistent cache size.");
 
-        binderCache.add(new HashMap<String, Set<Peptide>>());
+        binderCache.add(new HashMap<Allele, Set<Peptide>>());
 
-        for (String allele : alleleSet)
+        for (Allele allele : alleleSet)
             findBinders(trialIndex, allele);
     }
 
-    private void findBinders(int trialIndex, String allele) {
+    private void findBinders(int trialIndex, Allele allele) {
         Set<Peptide> binderSet = new HashSet<Peptide>();
 
         List<BindingRecord> records =
@@ -298,21 +298,21 @@ public final class GenotypePresentCalc extends JamApp {
     }
 
     private void processAlleles() {
-        for (String allele : alleleSet)
+        for (Allele allele : alleleSet)
             alleleSummaries.put(allele, processAllele(allele));
 
         writeAlleleReport();
     }
 
-    private StatSummary processAllele(String allele) {
+    private StatSummary processAllele(Allele allele) {
         return computeRateSummary(Set.of(allele));
     }
 
-    private StatSummary computeRateSummary(Set<String> alleleSet) {
+    private StatSummary computeRateSummary(Set<Allele> alleleSet) {
         return StatSummary.compute(computePresentationRates(alleleSet));
     }
 
-    private double[] computePresentationRates(Set<String> alleleSet) {
+    private double[] computePresentationRates(Set<Allele> alleleSet) {
         double[] rates = new double[trialCount];
 
         for (int trialIndex = 0; trialIndex < trialCount; ++trialIndex)
@@ -322,17 +322,17 @@ public final class GenotypePresentCalc extends JamApp {
         return rates;
     }
 
-    private double computePresentationRate(int trialIndex, Set<String> alleleSet) {
+    private double computePresentationRate(int trialIndex, Set<Allele> alleleSet) {
         int totalCount = peptideSamples.get(trialIndex).size();
         int binderCount = findBinderPeptides(trialIndex, alleleSet).size();
 
         return DoubleUtil.ratio(binderCount, totalCount);
     }
 
-    private Set<Peptide> findBinderPeptides(int trialIndex, Set<String> alleleSet) {
+    private Set<Peptide> findBinderPeptides(int trialIndex, Set<Allele> alleleSet) {
         Set<Peptide> genotypeBinders = new HashSet<Peptide>();
 
-        for (String allele : alleleSet)
+        for (Allele allele : alleleSet)
             genotypeBinders.addAll(binderCache.get(trialIndex).get(allele));
 
         return genotypeBinders;
@@ -342,7 +342,7 @@ public final class GenotypePresentCalc extends JamApp {
         alleleReportWriter = IOUtil.openWriter(alleleReportFile);
         alleleReportWriter.println("allele,presentRate.mean,presentRate.sterr");
 
-        for (String allele : alleleSet)
+        for (Allele allele : alleleSet)
             alleleReportWriter.println(String.format("%s,%.8f,%.8f",
                                                      allele,
                                                      alleleSummaries.get(allele).getMean(),
@@ -388,37 +388,37 @@ public final class GenotypePresentCalc extends JamApp {
 
     private void processGenotype(String line) {
         String patientKey = parsePatientKey(line);
-        Set<String> alleleSet = parseAlleleSet(line);
+        Genotype genotype = parseGenotype(line);
 
-        processGenotype(patientKey, alleleSet);
+        processGenotype(patientKey, genotype);
     }
 
-    private void processGenotype(String patientKey, Set<String> alleleSet) {
-        if (!isCovered(alleleSet)) {
+    private void processGenotype(String patientKey, Genotype genotype) {
+        if (!isCovered(genotype)) {
             JamLogger.info("Incomplete allele coverage for patient [%s], skipping...", patientKey);
             return;
         }
 
         JamLogger.info("Processing patient [%s]...", patientKey);
 
-        double idealRates = computeIdealRate(alleleSet);
-        StatSummary rateSummary = computeRateSummary(alleleSet);
+        double idealRates = computeIdealRate(genotype);
+        StatSummary rateSummary = computeRateSummary(genotype.viewUniqueAlleles());
 
         writeReportData(patientKey, idealRates, rateSummary);
     }
 
-    private boolean isCovered(Set<String> alleleSet) {
-        for (String allele : alleleSet)
+    private boolean isCovered(Genotype genotype) {
+        for (Allele allele : genotype.viewUniqueAlleles())
             if (!binderCache.get(0).containsKey(allele))
                 return false;
 
         return true;
     }
 
-    private double computeIdealRate(Set<String> alleleSet) {
+    private double computeIdealRate(Genotype genotype) {
         double idealRate = 0.0;
 
-        for (String allele : alleleSet)
+        for (Allele allele : genotype.viewUniqueAlleles())
             idealRate += alleleSummaries.get(allele).getMean();
 
         return idealRate;
