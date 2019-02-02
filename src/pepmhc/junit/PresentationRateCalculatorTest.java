@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
 public class PresentationRateCalculatorTest {
     static {
         System.setProperty(JamRandom.SEED_PROPERTY, "123456789");
-        System.setProperty(AffinityCache.CACHE_DIRECTORY_PROPERTY, "data/test");
+        System.setProperty(AffinityCache.CACHE_DIRECTORY_PROPERTY, "data/cache");
         System.setProperty(NetMHCPredictor.EXECUTABLE_PATH_PROPERTY, "/Users/scott/local/netMHC-4.0/netMHC");
     }
 
