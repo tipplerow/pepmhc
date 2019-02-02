@@ -27,8 +27,8 @@ import jam.report.LineBuilder;
 import jam.util.ListUtil;
 import jam.util.RegexUtil;
 
+import pepmhc.binder.BindingRecord;
 import pepmhc.cache.AffinityCache;
-import pepmhc.engine.BindingRecord;
 import pepmhc.engine.PredictionMethod;
 
 public final class GenotypePresentCalc extends JamApp {

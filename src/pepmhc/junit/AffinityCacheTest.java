@@ -6,8 +6,8 @@ import java.util.List;
 import jam.hla.Allele;
 import jam.peptide.Peptide;
 
+import pepmhc.binder.BindingRecord;
 import pepmhc.cache.AffinityCache;
-import pepmhc.engine.BindingRecord;
 import pepmhc.engine.PredictionMethod;
 import pepmhc.engine.Predictor;
 import pepmhc.engine.net.NetMHCPredictor;

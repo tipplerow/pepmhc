@@ -9,7 +9,7 @@ import jam.app.JamProperties;
 import jam.hla.Allele;
 import jam.peptide.Peptide;
 
-import pepmhc.engine.BindingRecord;
+import pepmhc.binder.BindingRecord;
 import pepmhc.engine.Predictor;
 import pepmhc.engine.PredictionMethod;
 

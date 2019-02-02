@@ -23,7 +23,7 @@ import jam.lang.JamException;
 import jam.peptide.Peptide;
 import jam.util.MapUtil;
 
-import pepmhc.engine.BindingRecord;
+import pepmhc.binder.BindingRecord;
 import pepmhc.engine.Predictor;
 import pepmhc.engine.PredictionMethod;
 

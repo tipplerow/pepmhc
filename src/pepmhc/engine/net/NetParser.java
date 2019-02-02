@@ -13,7 +13,7 @@ import jam.lang.JamException;
 import jam.peptide.Peptide;
 import jam.util.RegexUtil;
 
-import pepmhc.engine.BindingRecord;
+import pepmhc.binder.BindingRecord;
 
 /**
  * Parses output written by the {@code netMHC} and {@code netMHCpan}

@@ -5,7 +5,7 @@ import java.util.List;
 
 import jam.peptide.Peptide;
 
-import pepmhc.engine.BindingRecord;
+import pepmhc.binder.BindingRecord;
 import pepmhc.engine.net.NetParser;
 
 import org.junit.*;

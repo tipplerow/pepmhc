@@ -1,5 +1,5 @@
 
-package pepmhc.engine;
+package pepmhc.binder;
 
 import jam.peptide.Peptide;
 
@@ -66,6 +66,14 @@ public final class BindingRecord {
 
     public BinderType getBinderType() {
         return BinderType.instance(affinity, percentile);
+    }
+
+    public boolean isAffinitySet() {
+        return !Double.isNaN(affinity);
+    }
+
+    public boolean isPercentileSet() {
+        return !Double.isNaN(percentile);
     }
 
     @Override public String toString() {

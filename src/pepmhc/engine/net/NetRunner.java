@@ -14,7 +14,7 @@ import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
 
-import pepmhc.engine.BindingRecord;
+import pepmhc.binder.BindingRecord;
 
 /**
  * Base class wrapper around a {@code netMHC} or {@code netMHCpan}

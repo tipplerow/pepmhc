@@ -1,5 +1,5 @@
 
-package pepmhc.engine;
+package pepmhc.binder;
 
 /**
  * Categorizes the binding of peptides to MHC molecules.

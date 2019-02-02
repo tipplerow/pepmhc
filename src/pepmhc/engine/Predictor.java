@@ -8,6 +8,7 @@ import jam.hla.Allele;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
 
+import pepmhc.binder.BindingRecord;
 import pepmhc.engine.net.NetMHCPredictor;
 import pepmhc.engine.net.NetMHCPanPredictor;
 import pepmhc.engine.smm.SMMPredictor;
