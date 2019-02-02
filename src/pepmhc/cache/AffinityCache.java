@@ -96,7 +96,9 @@ public final class AffinityCache {
     }
 
     private static String resolveDbDir() {
-        return JamProperties.getRequired(CACHE_DIRECTORY_PROPERTY);
+        String dirName = JamProperties.getRequired(CACHE_DIRECTORY_PROPERTY);
+        FileUtil.ensureDir(dirName);
+        return dirName;
     }
 
     private String formatDbFile() {
