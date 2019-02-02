@@ -1,7 +1,12 @@
 
 package pepmhc.binder;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import jam.app.JamProperties;
+import jam.peptide.Peptide;
 
 /**
  * Defines a threshold for peptide-MHC binding in terms of absolute
@@ -116,6 +121,45 @@ public final class BindingThreshold {
     }
 
     /**
+     * Counts the number of peptides that bind to an MHC molecule by
+     * metrics of this threshold.
+     *
+     * @param records the peptide-MHC binding records to examine.
+     *
+     * @return the number of peptides from the input collection that
+     * are bound by the metrics of this threshold.
+     */
+    public int countBinders(Collection<BindingRecord> records) {
+        int result = 0;
+
+        for (BindingRecord record : records)
+            if (isBound(record))
+                ++result;
+
+        return result;
+    }
+
+    /**
+     * Finds the peptides that bind to an MHC molecule by metrics of
+     * this threshold.
+     *
+     * @param records the peptide-MHC binding records to examine.
+     *
+     * @return a set containing all peptides from the input collection
+     * that are bound by the metrics of this threshold.
+     */
+    public Set<Peptide> getBinders(Collection<BindingRecord> records) {
+        Set<Peptide> binders = new HashSet<Peptide>();
+
+        for (BindingRecord record : records)
+            if (isBound(record))
+                binders.add(record.getPeptide());
+
+        return binders;
+    }
+
+
+    /**
      * Determines whether a peptide is bound to an MHC molecule by the
      * metrics of this threshold.
      *
@@ -127,12 +171,12 @@ public final class BindingThreshold {
     public boolean isBound(BindingRecord record) {
         if (isAffinityThresholdSet()
             && record.isAffinitySet()
-            && record.getAffinity() >= affinityThreshold)
+            && record.getAffinity() <= affinityThreshold)
             return true;
 
         if (isPercentileThresholdSet()
             && record.isPercentileSet()
-            && record.getPercentile() >= percentileThreshold)
+            && record.getPercentile() <= percentileThreshold)
             return true;
 
         return false;
@@ -176,3 +220,4 @@ public final class BindingThreshold {
         return !Double.isNaN(percentileThreshold);
     }
 }
+
