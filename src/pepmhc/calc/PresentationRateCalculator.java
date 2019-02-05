@@ -140,4 +140,22 @@ public final class PresentationRateCalculator {
 
         return DoubleUtil.ratio(bound, total);
     }
+
+    /**
+     * Computes the <em>ideal binding fraction</em> for a genotype:
+     * the binding fraction the genotype would have if there was no
+     * overlap in the binding repertoires of the alleles.
+     *
+     * @param genotype the genotype to test.
+     *
+     * @return the ideal binding fraction for the genotype.
+     */
+    public double computeIdeal(Genotype genotype) {
+        double ideal = 0.0;
+
+        for (Allele allele : genotype)
+            ideal += compute(allele);
+
+        return ideal;
+    }
 }
