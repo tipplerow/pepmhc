@@ -362,7 +362,7 @@ Chowell.violinHLA <- function() {
     axis(1, at = c(-0.5, 0.5), labels = c("Homo", "Hetero"))
     axis(2, at = -3:3, labels = TRUE)
 
-    mtext("HLA (z-score)", side = 2, line = 2.4, las = 0)
+    mtext("HLA Presentation (z-score)", side = 2, line = 2.4, las = 0)
     text(0.90, 2.6, "1", font = 2, cex = 1.5)
     
     par(fig = c(1.0 - XWD, 1.0, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)), new = TRUE)
