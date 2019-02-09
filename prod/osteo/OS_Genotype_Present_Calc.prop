@@ -1,0 +1,25 @@
+########################################################################
+# Property file to compute the HLA genotype peptide presentation rates
+# for the osteosarcoma data set.
+########################################################################
+
+pepmhc.app.genotypeInputFile = ${CSB_DATA_VAULT}/Osteo/OS_Genotype_Input.csv
+
+pepmhc.app.alleleReportFile  = ${CSB_DATA_VAULT}/Osteo/OS_Allele_Present.csv
+pepmhc.app.patientReportFile = ${CSB_DATA_VAULT}/Osteo/OS_Patient_Present.csv
+
+pepmhc.binder.affinityThreshold = 500.0
+
+# No percentile threshold
+# pepmhc.binder.percentileThreshold = 2.0
+
+pepmhc.cache.directory = ${PEPMHC_AFFINITY_CACHE}
+
+pepmhc.engine.predictionMethod = NET_MHC_PAN
+pepmhc.engine.net.netMHCpan    = ${NET_MHC_PAN_EXE}
+
+pepmhc.sample.peptideFile = ${ENSEMBL_HOME}/pep9.txt.gz
+pepmhc.sample.sampleCount = 10
+pepmhc.sample.sampleSize  = 10000
+
+jam.math.randomSeed = 123456789
