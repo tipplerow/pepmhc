@@ -329,6 +329,51 @@ Chowell.loadGenotypePresentation <- function() {
     read.csv(file.path(Chowell.dataDir(), "Chowell_Patient_Present.csv"))
 }
 
+Chowell.violinHLA <- function() {
+    par(las = 1)
+
+    XWD <- 0.575
+    YHT <- 0.60
+
+    cohort1 <- Chowell.loadCohort1()
+    cohort2 <- Chowell.loadCohort2()
+
+    plotViolin <- function(cohort) {
+        plot(c(-1.0, 1.0),
+             c(-3.0, 3.0),
+             axes = FALSE,
+             type = "n",
+             xlab = "",
+             ylab = "")
+        vioplot(cohort$zHLA[cohort$Homozygous == 1], at = -0.5, add = TRUE, col = "lightgreen")
+        vioplot(cohort$zHLA[cohort$Homozygous == 0], at =  0.5, add = TRUE, col = "lightblue")
+        return(0)
+        
+        vioplot(cohort$zHLA[cohort$Homozygous == 1],
+                cohort$zHLA[cohort$Homozygous == 0],
+                col = color,
+                ylim = c(-3.0, 3.0),
+                names = c("Homo", "Hetero"), add = TRUE)
+    }
+
+    par(fig = c(0.0, XWD, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)))
+    plotViolin(cohort1)
+
+    axis(1, at = c(-0.5, 0.5), labels = c("Homo", "Hetero"))
+    axis(2, at = -3:3, labels = TRUE)
+
+    mtext("HLA (z-score)", side = 2, line = 2.4, las = 0)
+    text(0.90, 2.6, "1", font = 2, cex = 1.5)
+    
+    par(fig = c(1.0 - XWD, 1.0, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)), new = TRUE)
+    plotViolin(cohort2)
+
+    axis(1, at = c(-0.5, 0.5), labels = c("Homo", "Hetero"))
+    axis(2, at = -3:3, labels = FALSE)
+
+    text(0.90, 2.6, "2", font = 2, cex = 1.5)
+}
+
 Chowell.writeGenotypeInput <- function(fileName) {
     cohort1 <- Chowell.loadCohort1()
     cohort2 <- Chowell.loadCohort2()
