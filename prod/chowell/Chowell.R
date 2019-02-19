@@ -1,10 +1,16 @@
 
-Chowell.cox1 <- function() {
+Chowell.cox1 <- function(zByType = TRUE) {
     require(survival)
-
     cohort <- Chowell.loadCohort1()
-    model1 <- coxph(Surv(OS_Months, OS_Event) ~ Homozygous + zTMB + zAGE + M1a + M1b + M1c + NSCLC + PD1, data = cohort)
-    model2 <- coxph(Surv(OS_Months, OS_Event) ~ zHLA       + zTMB + zAGE + M1a + M1b + M1c + NSCLC + PD1, data = cohort)
+
+    if (zByType) {
+        model1 <- coxph(Surv(OS_Months, OS_Event) ~ Homozygous + zTMB.By + zAGE + M1a + M1b + M1c + NSCLC + PD1, data = cohort)
+        model2 <- coxph(Surv(OS_Months, OS_Event) ~ zHLA       + zTMB.By + zAGE + M1a + M1b + M1c + NSCLC + PD1, data = cohort)
+    }
+    else {
+        model1 <- coxph(Surv(OS_Months, OS_Event) ~ Homozygous + zTMB + zAGE + M1a + M1b + M1c + NSCLC + PD1, data = cohort)
+        model2 <- coxph(Surv(OS_Months, OS_Event) ~ zHLA       + zTMB + zAGE + M1a + M1b + M1c + NSCLC + PD1, data = cohort)
+    }
 
     frame1 <- Chowell.coxFrame(model1)
     frame2 <- Chowell.coxFrame(model2)
@@ -37,7 +43,7 @@ Chowell.cox1A <- function() {
     master
 }
 
-Chowell.coxPlot1 <- function() {
+Chowell.coxPlot1 <- function(zByType = TRUE) {
     par(las = 1)
     par(fig = c(0.2, 1.0, 0.0, 1.0))
 
@@ -51,15 +57,20 @@ Chowell.coxPlot1 <- function() {
     lines(c(1, 1), c(-2, 12), lty = 3)
 
     cox1 <- Chowell.cox1()
+    errY <- 0.075
 
     plotBinary <- function(rowName, height) {
         x1 <- cox1[rowName, "HR_CI95_Lo.Binary"]
         x2 <- cox1[rowName, "HR_CI95_Up.Binary"]
-        lines(c(x1, x2), c(height, height), col = 1)
+
+        lines(c(x1, x2), c(height, height))
+        lines(c(x1, x1), c(height - errY, height + errY))
+        lines(c(x2, x2), c(height - errY, height + errY))
 
         x <- cox1[rowName, "HazardRatio.Binary"]
-        points(c(x, x), c(height, height), cex = 1.20, col = "white", pch = 15)
-        points(c(x, x), c(height, height), cex = 1.20, col = "black", pch =  1, lwd = 2)
+        ##points(c(x, x), c(height, height), cex = 1.20, col = "white", pch = 15)
+        ##points(c(x, x), c(height, height), cex = 1.20, col = "black", pch =  1, lwd = 2)
+        points(c(x, x), c(height, height), cex = 1.25, col = "black", pch = 16)
 
         text(x, height + 0.2, Chowell.signifCode(cox1[rowName, "PValue.Binary"]), cex = 1.0)
     }
@@ -67,7 +78,10 @@ Chowell.coxPlot1 <- function() {
     plotZScore <- function(rowName, height) {
         x1 <- cox1[rowName, "HR_CI95_Lo.ZScore"]
         x2 <- cox1[rowName, "HR_CI95_Up.ZScore"]
+
         lines(c(x1, x2), c(height, height), col = 1)
+        lines(c(x1, x1), c(height - errY, height + errY))
+        lines(c(x2, x2), c(height - errY, height + errY))
 
         x <- cox1[rowName, "HazardRatio.ZScore"]
         points(c(x, x), c(height, height), cex = 1.25, col = "red", pch = 15, lwd = 2)
@@ -80,8 +94,11 @@ Chowell.coxPlot1 <- function() {
     plotBinary("Homozygous", 8.0 + dy)
     plotZScore("zHLA",       8.0 - dy)
 
-    text(2.2,  8.0 + dy, "p = 0.021", adj = 0, cex = 0.8, font = 3)
-    text(0.85, 8.0 - dy, "p = 0.68",  adj = 1, cex = 0.8, font = 3)
+    pHomozygous <- cox1["Homozygous", "PValue.Binary"]
+    pHLAScore   <- cox1["zHLA", "PValue.ZScore"]
+
+    text(2.2,  8.0 + dy, sprintf("p = %5.3f", pHomozygous), adj = 0, cex = 0.8, font = 3)
+    text(0.85, 8.0 - dy, sprintf("p = %4.2f", pHLAScore),   adj = 1, cex = 0.8, font = 3)
 
     plotBinary("zTMB", 7.0 + dy)
     plotZScore("zTMB", 7.0 - dy)
@@ -117,13 +134,15 @@ Chowell.coxPlot1 <- function() {
     tx <- 0.85
     dy <- 0.13
 
-    points(px, 8.0 + dy, col = 1, pch = 1,  cex = 1.20, lwd = 2)
+    ##points(px, 8.0 + dy, col = 1, pch = 1,  cex = 1.20, lwd = 2)
+    points(px, 8.0 + dy, col = 1, pch = 16, cex = 1.25)
     points(px, 8.0 - dy, col = 2, pch = 15, cex = 1.25)
 
     text(tx, 8.0 + dy, "Homozygous", adj = 1, font = 2)
     text(tx, 8.0 - dy, "HLA Score",  adj = 1, font = 2)
 
     text(tx, 7.0, "Mutation Load", adj = 1)
+    text(tx, 6.7, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
     text(tx, 6.0, "Age", adj = 1)
     text(tx, 5.0, "Stage M1a", adj = 1)
     text(tx, 4.0, "Stage M1b", adj = 1)
@@ -132,15 +151,26 @@ Chowell.coxPlot1 <- function() {
     text(tx, 1.0, "PD-1", adj = 1)
 }
 
-Chowell.cox2 <- function() {
+Chowell.cox2 <- function(zByType = TRUE, minCount = 5) {
     require(survival)
     cohort <- Chowell.loadCohort2()
 
-    model1 <- coxph(Surv(OS_Months, OS_Event) ~ Homozygous
-                    + zTMB + Age_31_50 + Age_50_60 + Age_61_70 + Age_GT_71 + CTLA4 + PD1, data = cohort)
+    if (zByType) {
+        model1 <- coxph(Surv(OS_Months, OS_Event) ~ Homozygous
+                        + zTMB.By + Age_31_50 + Age_50_60 + Age_61_70 + Age_GT_71 + CTLA4 + PD1,
+                        data = cohort, subset = Cancer_Type.Count >= minCount)
 
-    model2 <- coxph(Surv(OS_Months, OS_Event) ~ zHLA
-                    + zTMB + Age_31_50 + Age_50_60 + Age_61_70 + Age_GT_71 + CTLA4 + PD1, data = cohort)
+        model2 <- coxph(Surv(OS_Months, OS_Event) ~ zHLA
+                        + zTMB.By + Age_31_50 + Age_50_60 + Age_61_70 + Age_GT_71 + CTLA4 + PD1,
+                        data = cohort, subset = Cancer_Type.Count >= minCount)
+    }
+    else {
+        model1 <- coxph(Surv(OS_Months, OS_Event) ~ Homozygous
+                        + zTMB + Age_31_50 + Age_50_60 + Age_61_70 + Age_GT_71 + CTLA4 + PD1, data = cohort)
+
+        model2 <- coxph(Surv(OS_Months, OS_Event) ~ zHLA
+                        + zTMB + Age_31_50 + Age_50_60 + Age_61_70 + Age_GT_71 + CTLA4 + PD1, data = cohort)
+    }
 
     frame1 <- Chowell.coxFrame(model1)
     frame2 <- Chowell.coxFrame(model2)
@@ -154,11 +184,11 @@ Chowell.cox2 <- function() {
     master
 }
 
-Chowell.coxPlot2 <- function() {
+Chowell.coxPlot2 <- function(zByType = TRUE, minCount = 5) {
     par(las = 1)
     par(fig = c(0.2, 1.0, 0.0, 1.0))
 
-    plot(c(0.4, 2.1), c(0.5, 8.5),
+    plot(c(0.4, 2.3), c(0.5, 8.5),
          log  = "x",
          type = "n",
          axes = FALSE,
@@ -168,15 +198,20 @@ Chowell.coxPlot2 <- function() {
     lines(c(1, 1), c(-2, 12), lty = 3)
 
     cox2 <- Chowell.cox2()
+    errY <- 0.075
 
     plotBinary <- function(rowName, height) {
         x1 <- cox2[rowName, "HR_CI95_Lo.Binary"]
         x2 <- cox2[rowName, "HR_CI95_Up.Binary"]
-        lines(c(x1, x2), c(height, height), col = 1)
+
+        lines(c(x1, x2), c(height, height))
+        lines(c(x1, x1), c(height - errY, height + errY))
+        lines(c(x2, x2), c(height - errY, height + errY))
 
         x <- cox2[rowName, "HazardRatio.Binary"]
-        points(c(x, x), c(height, height), cex = 1.20, col = "white", pch = 15)
-        points(c(x, x), c(height, height), cex = 1.20, col = "black", pch =  1, lwd = 2)
+        ##points(c(x, x), c(height, height), cex = 1.20, col = "white", pch = 15)
+        ##points(c(x, x), c(height, height), cex = 1.20, col = "black", pch =  1, lwd = 2)
+        points(c(x, x), c(height, height), cex = 1.25, col = "black", pch = 16)
 
         text(x, height + 0.2, Chowell.signifCode(cox2[rowName, "PValue.Binary"]), cex = 1.0)
     }
@@ -184,7 +219,10 @@ Chowell.coxPlot2 <- function() {
     plotZScore <- function(rowName, height) {
         x1 <- cox2[rowName, "HR_CI95_Lo.ZScore"]
         x2 <- cox2[rowName, "HR_CI95_Up.ZScore"]
-        lines(c(x1, x2), c(height, height), col = 1)
+
+        lines(c(x1, x2), c(height, height))
+        lines(c(x1, x1), c(height - errY, height + errY))
+        lines(c(x2, x2), c(height - errY, height + errY))
 
         x <- cox2[rowName, "HazardRatio.ZScore"]
         points(c(x, x), c(height, height), cex = 1.25, col = "red", pch = 15, lwd = 2)
@@ -197,8 +235,11 @@ Chowell.coxPlot2 <- function() {
     plotBinary("Homozygous", 8.0 + dy)
     plotZScore("zHLA",       8.0 - dy)
 
-    text(1.72, 8.0 + dy, "p = 0.028", adj = 0, cex = 0.8, font = 3)
-    text(0.83, 8.0 - dy, "p = 0.46",  adj = 1, cex = 0.8, font = 3)
+    pHomozygous <- cox2["Homozygous", "PValue.Binary"]
+    pHLAScore   <- cox2["zHLA", "PValue.ZScore"]
+
+    text(1.80, 8.0 + dy, sprintf("p = %5.3f", pHomozygous), adj = 0, cex = 0.8, font = 3)
+    text(0.81, 8.0 - dy, sprintf("p = %4.2f", pHLAScore),   adj = 1, cex = 0.8, font = 3)
 
     plotBinary("zTMB", 7.0 + dy)
     plotZScore("zTMB", 7.0 - dy)
@@ -234,13 +275,14 @@ Chowell.coxPlot2 <- function() {
     tx <- 0.85
     dy <- 0.13
 
-    points(px, 8.0 + dy, col = 1, pch = 1,  cex = 1.20, lwd = 2)
+    ##points(px, 8.0 + dy, col = 1, pch = 1,  cex = 1.20, lwd = 2)
+    points(px, 8.0 + dy, col = 1, pch = 16, cex = 1.25)
     points(px, 8.0 - dy, col = 2, pch = 15, cex = 1.25)
 
     text(tx, 8.0 + dy, "Homozygous", adj = 1, font = 2)
     text(tx, 8.0 - dy, "HLA Score",  adj = 1, font = 2)
-
     text(tx, 7.0, "Mutation Load", adj = 1)
+    text(tx, 6.7, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
     text(tx, 6.0, "Age 31-50", adj = 1)
     text(tx, 5.0, "Age 50-60", adj = 1)
     text(tx, 4.0, "Age 61-70", adj = 1)
@@ -301,6 +343,9 @@ Chowell.loadCohort1 <- function() {
     cohort$zAGE <- Chowell.zscore(cohort$Age)
     cohort$zHLA <- Chowell.zscore(cohort$presentRate.mean)
 
+    cohort$logTMB <- log(cohort$MutCnt)
+
+    cohort <- merge(cohort, Chowell.zBy(cohort, "Sample", "Cancer_Type", "logTMB", "zTMB.By"))
     cohort
 }
 
@@ -319,9 +364,12 @@ Chowell.loadCohort2 <- function() {
     cohort$PD1   <- as.numeric(cohort$Drug_Class == "PD-1/PDL-1")
 
     ## Add 1 because one tumor has zero mutations...
-    cohort$zTMB <- Chowell.zscore(log(1.0 + cohort$IMPACT_MutCnt))
+    cohort$logTMB <- log(1.0 + cohort$IMPACT_MutCnt)
+
+    cohort$zTMB <- Chowell.zscore(cohort$logTMB)
     cohort$zHLA <- Chowell.zscore(cohort$presentRate.mean)
 
+    cohort <- merge(cohort, Chowell.zBy(cohort, "Sample", "Cancer_Type", "logTMB", "zTMB.By"), all.x = TRUE)
     cohort
 }
 
@@ -396,4 +444,18 @@ Chowell.signifCode <- function(p) {
 
 Chowell.zscore <- function(x) {
     (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+}
+
+Chowell.zBy <- function(dframe, keyCol, byCol, targetCol, scoreName) {
+
+    aggFunc <- function(slice) {
+        data.frame(key = slice[,keyCol], score = Chowell.zscore(slice[,targetCol]), count = nrow(slice))
+    }
+
+    result <- do.call(rbind, by(dframe, dframe[,byCol], aggFunc))
+
+    names(result) <- c(keyCol, scoreName, sprintf("%s.Count", byCol))
+    rownames(result) <- NULL
+
+    result
 }
