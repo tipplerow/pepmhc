@@ -141,8 +141,8 @@ Chowell.coxPlot1 <- function(zByType = TRUE) {
     text(tx, 8.0 + dy, "Homozygous", adj = 1, font = 2)
     text(tx, 8.0 - dy, "HLA Score",  adj = 1, font = 2)
 
-    text(tx, 7.0, "Mutation Load", adj = 1)
-    text(tx, 6.7, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
+    text(tx, 7.1, "Mutation Load", adj = 1)
+    text(tx, 6.8, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
     text(tx, 6.0, "Age", adj = 1)
     text(tx, 5.0, "Stage M1a", adj = 1)
     text(tx, 4.0, "Stage M1b", adj = 1)
@@ -281,8 +281,8 @@ Chowell.coxPlot2 <- function(zByType = TRUE, minCount = 5) {
 
     text(tx, 8.0 + dy, "Homozygous", adj = 1, font = 2)
     text(tx, 8.0 - dy, "HLA Score",  adj = 1, font = 2)
-    text(tx, 7.0, "Mutation Load", adj = 1)
-    text(tx, 6.7, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
+    text(tx, 7.1, "Mutation Load", adj = 1)
+    text(tx, 6.8, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
     text(tx, 6.0, "Age 31-50", adj = 1)
     text(tx, 5.0, "Age 50-60", adj = 1)
     text(tx, 4.0, "Age 61-70", adj = 1)
