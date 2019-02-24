@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
+import jam.app.JamEnv;
 import jam.app.JamProperties;
 import jam.hla.Allele;
 import jam.peptide.Peptide;
@@ -20,6 +21,14 @@ public final class NetMHCPanPredictor implements Predictor {
      * The single instance.
      */
     public static final NetMHCPanPredictor INSTANCE = new NetMHCPanPredictor();
+
+    /**
+     * Name of the environment variable that defines the full path to
+     * the {@code netMHCpan} executable file.  If the system property
+     * {@code pepmhc.engine.net.netMHCpan} is also defined, it will
+     * take precedence.
+     */
+    public static final String EXECUTABLE_PATH_ENV = "NET_MHC_PAN_EXE";
 
     /**
      * Name of the system property that defines the full path to the
@@ -46,7 +55,10 @@ public final class NetMHCPanPredictor implements Predictor {
      * is not set.
      */
     public static String resolveExecutableName() {
-        return JamProperties.getRequired(EXECUTABLE_PATH_PROPERTY);
+        if (JamProperties.isSet(EXECUTABLE_PATH_PROPERTY))
+            return JamProperties.getRequired(EXECUTABLE_PATH_PROPERTY);
+        else
+            return JamEnv.getRequired(EXECUTABLE_PATH_ENV);
     }
 
     @Override public PredictionMethod getMethod() {
