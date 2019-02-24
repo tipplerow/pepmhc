@@ -8,6 +8,7 @@ import jam.hla.Allele;
 import jam.io.IOUtil;
 import jam.io.LineReader;
 import jam.peptide.Peptide;
+import jam.util.ListUtil;
 
 import pepmhc.cache.AffinityCache;
 import pepmhc.engine.PredictionMethod;
@@ -19,6 +20,8 @@ public final class AffinityBank {
 
     private final List<Allele> alleles = new ArrayList<Allele>();
     private final List<Peptide> peptides = new ArrayList<Peptide>();
+
+    private final static int BATCH_SIZE = 10000;
 
     private AffinityBank(String[] args) {
         validate(args);
@@ -69,7 +72,10 @@ public final class AffinityBank {
         // Just get the results from the affinity cache, to enforce
         // calculation on demand, but ignore the returned records...
         //
-        AffinityCache.get(predMethod, allele, peptides);
+        List<List<Peptide>> subLists = ListUtil.split(peptides, BATCH_SIZE);
+
+        for (List<Peptide> subList : subLists)
+            AffinityCache.get(predMethod, allele, subList);
     }
 
     public static void main(String[] args) {
