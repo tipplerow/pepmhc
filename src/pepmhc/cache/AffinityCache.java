@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jam.app.JamEnv;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.hla.Allele;
@@ -96,7 +97,13 @@ public final class AffinityCache {
     }
 
     private static String resolveDbDir() {
-        String dirName = JamProperties.getRequired(CACHE_DIRECTORY_PROPERTY);
+        String dirName;
+
+        if (JamProperties.isSet(CACHE_DIRECTORY_PROPERTY))
+            dirName = JamProperties.getRequired(CACHE_DIRECTORY_PROPERTY);
+        else
+            dirName = JamEnv.getRequired(CACHE_DIRECTORY_ENV);
+
         FileUtil.ensureDir(dirName);
         return dirName;
     }
@@ -147,6 +154,14 @@ public final class AffinityCache {
     private void cacheRecord(BindingRecord record) {
         recordMap.put(record.getPeptide(), record);
     }
+
+    /**
+     * Name of the environment variable that specifies the directory
+     * containing the persistent database store.  The system property
+     * {@code pepmhc.cache.directory} will take precedence if both are
+     * specified.
+     */
+    public static final String CACHE_DIRECTORY_ENV = "PEPMHC_AFFINITY_CACHE";
 
     /**
      * Name of the system property that specifies the directory
