@@ -59,6 +59,14 @@ Chowell.coxPlot1 <- function(zByType = TRUE) {
     cox1 <- Chowell.cox1()
     errY <- 0.075
 
+    cex.binary <- 1.25
+    col.binary <- "red"
+    pch.binary <- 15
+
+    cex.zscore <- 1.25
+    col.zscore <- "black"
+    pch.zscore <- 16
+
     plotBinary <- function(rowName, height) {
         x1 <- cox1[rowName, "HR_CI95_Lo.Binary"]
         x2 <- cox1[rowName, "HR_CI95_Up.Binary"]
@@ -68,9 +76,7 @@ Chowell.coxPlot1 <- function(zByType = TRUE) {
         lines(c(x2, x2), c(height - errY, height + errY))
 
         x <- cox1[rowName, "HazardRatio.Binary"]
-        ##points(c(x, x), c(height, height), cex = 1.20, col = "white", pch = 15)
-        ##points(c(x, x), c(height, height), cex = 1.20, col = "black", pch =  1, lwd = 2)
-        points(c(x, x), c(height, height), cex = 1.25, col = "black", pch = 16)
+        points(c(x, x), c(height, height), cex = cex.binary, col = col.binary, pch = pch.binary)
 
         text(x, height + 0.2, Chowell.signifCode(cox1[rowName, "PValue.Binary"]), cex = 1.0)
     }
@@ -84,7 +90,7 @@ Chowell.coxPlot1 <- function(zByType = TRUE) {
         lines(c(x2, x2), c(height - errY, height + errY))
 
         x <- cox1[rowName, "HazardRatio.ZScore"]
-        points(c(x, x), c(height, height), cex = 1.25, col = "red", pch = 15, lwd = 2)
+        points(c(x, x), c(height, height), cex = cex.zscore, col = col.zscore, pch = pch.zscore)
 
         text(x, height - 0.2, Chowell.signifCode(cox1[rowName, "PValue.ZScore"]), cex = 1.0)
     }
@@ -134,9 +140,8 @@ Chowell.coxPlot1 <- function(zByType = TRUE) {
     tx <- 0.85
     dy <- 0.13
 
-    ##points(px, 8.0 + dy, col = 1, pch = 1,  cex = 1.20, lwd = 2)
-    points(px, 8.0 + dy, col = 1, pch = 16, cex = 1.25)
-    points(px, 8.0 - dy, col = 2, pch = 15, cex = 1.25)
+    points(px, 8.0 + dy, cex = cex.binary, col = col.binary, pch = pch.binary)
+    points(px, 8.0 - dy, cex = cex.zscore, col = col.zscore, pch = pch.zscore)
 
     text(tx, 8.0 + dy, "Homozygous", adj = 1, font = 2)
     text(tx, 8.0 - dy, "HLA Score",  adj = 1, font = 2)
@@ -200,6 +205,14 @@ Chowell.coxPlot2 <- function(zByType = TRUE, minCount = 5) {
     cox2 <- Chowell.cox2()
     errY <- 0.075
 
+    cex.binary <- 1.25
+    col.binary <- "red"
+    pch.binary <- 15
+
+    cex.zscore <- 1.25
+    col.zscore <- "black"
+    pch.zscore <- 16
+
     plotBinary <- function(rowName, height) {
         x1 <- cox2[rowName, "HR_CI95_Lo.Binary"]
         x2 <- cox2[rowName, "HR_CI95_Up.Binary"]
@@ -209,9 +222,7 @@ Chowell.coxPlot2 <- function(zByType = TRUE, minCount = 5) {
         lines(c(x2, x2), c(height - errY, height + errY))
 
         x <- cox2[rowName, "HazardRatio.Binary"]
-        ##points(c(x, x), c(height, height), cex = 1.20, col = "white", pch = 15)
-        ##points(c(x, x), c(height, height), cex = 1.20, col = "black", pch =  1, lwd = 2)
-        points(c(x, x), c(height, height), cex = 1.25, col = "black", pch = 16)
+        points(c(x, x), c(height, height), cex = cex.binary, col = col.binary, pch = pch.binary)
 
         text(x, height + 0.2, Chowell.signifCode(cox2[rowName, "PValue.Binary"]), cex = 1.0)
     }
@@ -225,7 +236,7 @@ Chowell.coxPlot2 <- function(zByType = TRUE, minCount = 5) {
         lines(c(x2, x2), c(height - errY, height + errY))
 
         x <- cox2[rowName, "HazardRatio.ZScore"]
-        points(c(x, x), c(height, height), cex = 1.25, col = "red", pch = 15, lwd = 2)
+        points(c(x, x), c(height, height), cex = cex.zscore, col = col.zscore, pch = pch.zscore)
 
         text(x, height - 0.2, Chowell.signifCode(cox2[rowName, "PValue.ZScore"]), cex = 1.0)
     }
@@ -275,9 +286,8 @@ Chowell.coxPlot2 <- function(zByType = TRUE, minCount = 5) {
     tx <- 0.85
     dy <- 0.13
 
-    ##points(px, 8.0 + dy, col = 1, pch = 1,  cex = 1.20, lwd = 2)
-    points(px, 8.0 + dy, col = 1, pch = 16, cex = 1.25)
-    points(px, 8.0 - dy, col = 2, pch = 15, cex = 1.25)
+    points(px, 8.0 + dy, cex = cex.binary, col = col.binary, pch = pch.binary)
+    points(px, 8.0 - dy, cex = cex.zscore, col = col.zscore, pch = pch.zscore)
 
     text(tx, 8.0 + dy, "Homozygous", adj = 1, font = 2)
     text(tx, 8.0 - dy, "HLA Score",  adj = 1, font = 2)
