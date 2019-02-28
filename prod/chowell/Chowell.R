@@ -387,7 +387,60 @@ Chowell.loadGenotypePresentation <- function() {
     read.csv(file.path(Chowell.dataDir(), "Chowell_Patient_Present.csv"))
 }
 
+Chowell.plotOverlap <- function(size = 250) {
+    dframe <- Chowell.loadGenotypePresentation()
+
+    XWD <- 0.52
+    YHT <- 0.60
+
+    par(las = 1)
+    par(fig = c(0.0, XWD, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)))
+
+    k <- sample.int(nrow(dframe), size)
+    x <- 100 * dframe$idealRate.mean[k]
+    y <- 100 * dframe$presentRate.mean[k]
+
+    plot(x, y,
+         cex  = 0.50,
+         pch  = 16,
+         axes = FALSE,
+         type = "p",
+         xlab = "",
+         ylab = "",
+         xlim = c(0, 20),
+         ylim = c(0, 20))
+    lines(c(-10, 30), c(-10, 30), lty = 2)
+
+    axis(1, cex.axis = 0.9)
+    axis(2, cex.axis = 0.9)
+    box()
+
+    text(1, 19, "A", font = 2)
+    mtext("Non-overlapping presentation [%]", side = 1, line = 2.5, cex = 0.9)
+
+    par(xpd = TRUE)
+    text(-5.5, 10, "Actual genotype presentation [%]", cex = 0.9, srt = 90)
+    par(xpd = FALSE)
+
+    overlap <- 100 * (dframe$idealRate.mean - dframe$presentRate.mean)
+    overlap <- overlap[which(overlap < 8)]
+
+    par(fig = c(1.0 - XWD, 1.0, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)), new = TRUE)
+    truehist(overlap, h = 0.5, xlab = "", ylab = "", axes = FALSE)
+    axis(1, cex.axis = 0.9)
+    axis(2, cex.axis = 0.9)
+    box()
+
+    text(7.6, 0.475, "B", font = 2)
+    mtext("Presentation overlap loss [%]", side = 1, line = 2.5, cex = 0.9)
+
+    par(xpd = TRUE)
+    text(-2.4, 0.25, "Density", cex = 0.9, srt = 90)
+    par(xpd = FALSE)
+}
+
 Chowell.violinHLA <- function() {
+    require(vioplot)
     par(las = 1)
 
     XWD <- 0.575
@@ -417,19 +470,19 @@ Chowell.violinHLA <- function() {
     par(fig = c(0.0, XWD, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)))
     plotViolin(cohort1)
 
-    axis(1, at = c(-0.5, 0.5), labels = c("Homo", "Hetero"))
+    axis(1, at = c(-0.5, 0.5), labels = c("Homozygous", "Heterozygous"))
     axis(2, at = -3:3, labels = TRUE)
 
     mtext("HLA Presentation (z-score)", side = 2, line = 2.4, las = 0)
-    text(0.90, 2.6, "1", font = 2, cex = 1.5)
+    text(0.90, 2.6, "1", font = 2, cex = 1)
     
     par(fig = c(1.0 - XWD, 1.0, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)), new = TRUE)
     plotViolin(cohort2)
 
-    axis(1, at = c(-0.5, 0.5), labels = c("Homo", "Hetero"))
+    axis(1, at = c(-0.5, 0.5), labels = c("Homozygous", "Heterozygous"))
     axis(2, at = -3:3, labels = FALSE)
 
-    text(0.90, 2.6, "2", font = 2, cex = 1.5)
+    text(0.90, 2.6, "2", font = 2, cex = 1)
 }
 
 Chowell.writeGenotypeInput <- function(fileName) {
