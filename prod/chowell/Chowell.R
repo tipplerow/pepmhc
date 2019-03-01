@@ -1,4 +1,46 @@
 
+Chowell.countHomozygous <- function() {
+    genotype <- read.csv(file.path(Chowell.dataDir(), "Chowell_Genotype_Input.csv"))
+    alleleList <- strsplit(genotype$HLA_Class_I_Alleles, " ")
+
+    homozygous <- character(0)
+    heterozygous <- character(0)
+
+    findHomozygous <- function(x) {
+        if (x[1] == x[2])
+            homozygous <<- c(homozygous, x[1])
+        else
+            heterozygous <<- c(heterozygous, x[1], x[2])
+
+        if (x[3] == x[4])
+            homozygous <<- c(homozygous, x[3])
+        else
+            heterozygous <<- c(heterozygous, x[3], x[4])
+
+        if (x[5] == x[6])
+            homozygous <<- c(homozygous, x[5])
+        else
+            heterozygous <<- c(heterozygous, x[5], x[6])
+    }
+
+    lapply(alleleList, findHomozygous)
+
+    homoCount   <- tapply(homozygous,   homozygous,   length)
+    heteroCount <- tapply(heterozygous, heterozygous, length)
+
+    homoFrame   <- data.frame(allele = names(homoCount),   homoCount   = homoCount)
+    heteroFrame <- data.frame(allele = names(heteroCount), heteroCount = heteroCount)
+
+    result <- merge(homoFrame, heteroFrame, all = TRUE)
+
+    result$homoCount <- Filter.replaceNA(result$homoCount, 0)
+    result$heteroCount <- Filter.replaceNA(result$heteroCount, 0)
+
+    result$homoRatio <- result$homoCount / result$heteroCount
+    result
+}
+
+
 Chowell.cox1 <- function(zByType = TRUE) {
     require(survival)
     cohort <- Chowell.loadCohort1()
@@ -321,6 +363,19 @@ Chowell.dataDir <- function() {
         JamLog.error("Environment variable CSB_DATA_VAULT is not set.");
 
     file.path(homeDir, "Chowell")
+}
+
+Chowell.homoPresent <- function() {
+    allelePresent <- Chowell.loadAllelePresentation()
+
+    allelePresent$allele <- gsub("HLA-", "", allelePresent$allele)
+    allelePresent$allele <- gsub("\\*",  "", allelePresent$allele)
+    allelePresent$allele <- gsub(":",    "", allelePresent$allele)
+
+    homozygousCount <- Chowell.countHomozygous();
+
+    workspace <- merge(allelePresent, homozygousCount)
+    workspace
 }
 
 Chowell.loadAllelePresentation <- function() {
