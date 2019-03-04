@@ -540,6 +540,19 @@ Chowell.violinHLA <- function() {
     text(0.90, 2.6, "2", font = 2, cex = 1)
 }
 
+Chowell.writeGenotypeFlat <- function(fileName) {
+    cohort1 <- Chowell.loadCohort1()
+    cohort2 <- Chowell.loadCohort2()
+
+    alleles <- c(cohort1$HLA_Class_I_Alleles, cohort2$HLA_Class_I_Alleles)
+    alleles <- strsplit(alleles, ",")
+    alleles <- lapply(alleles, function(x) paste(sort(unique(x)), collapse = ","))
+    alleles <- unlist(alleles)
+    alleles <- sort(unique(alleles))
+
+    writeLines(alleles, fileName)
+}
+
 Chowell.writeGenotypeInput <- function(fileName) {
     cohort1 <- Chowell.loadCohort1()
     cohort2 <- Chowell.loadCohort2()
