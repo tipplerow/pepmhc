@@ -21,7 +21,7 @@ public final class AffinityBank {
     private final List<Allele> alleles = new ArrayList<Allele>();
     private final List<Peptide> peptides = new ArrayList<Peptide>();
 
-    private final static int BATCH_SIZE = 10000;
+    private final static int BATCH_SIZE = 100000;
 
     private AffinityBank(String[] args) {
         validate(args);
