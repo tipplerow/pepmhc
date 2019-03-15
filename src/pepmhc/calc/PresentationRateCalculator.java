@@ -8,6 +8,7 @@ import jam.hla.Allele;
 import jam.hla.Genotype;
 import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
+import jam.peptide.ReferencePeptidome;
 
 import pepmhc.binder.BindingRecord;
 import pepmhc.binder.BindingThreshold;
@@ -22,6 +23,8 @@ public final class PresentationRateCalculator {
     private final BindingThreshold threshold;
     private final Collection<Peptide> peptides;
 
+    private static PresentationRateCalculator global = null;
+
     private PresentationRateCalculator(PredictionMethod method,
                                        BindingThreshold threshold,
                                        Collection<Peptide> peptides) {
@@ -30,6 +33,20 @@ public final class PresentationRateCalculator {
         this.threshold = threshold;
     }
 
+    /**
+     * Returns a calculator for the global prediction method, binding
+     * threshold, and reference thymic peptidome.
+     *
+     * @return a calculator for the global prediction method, binding
+     * threshold, and peptide sample.
+     */
+    public static PresentationRateCalculator global() {
+        if (global == null)
+            global = new PresentationRateCalculator(PredictionMethod.global(),
+                                                    BindingThreshold.global(),
+                                                    ReferencePeptidome.THYMIC9.getPeptides());
+        return global;
+    }
     /**
      * Returns a presentation rate calculator with a fixed prediction
      * method, binding threshold, and peptide collection.

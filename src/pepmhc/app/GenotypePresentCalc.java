@@ -2,13 +2,7 @@
 package pepmhc.app;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -20,21 +14,17 @@ import jam.hla.Genotype;
 import jam.io.IOUtil;
 import jam.io.LineReader;
 import jam.lang.JamException;
-import jam.math.DoubleUtil;
-import jam.math.StatSummary;
-import jam.peptide.Peptide;
 import jam.report.LineBuilder;
-import jam.util.ListUtil;
 import jam.util.RegexUtil;
 
-import pepmhc.calc.PresentationStatCalculator;
+import pepmhc.calc.PresentationRateCalculator;
 
 public final class GenotypePresentCalc extends JamApp {
     private final String genotypeInputFile;
     private final String alleleReportFile;
     private final String patientReportFile;
 
-    private final PresentationStatCalculator calculator;
+    private final PresentationRateCalculator calculator;
 
     // All unique alleles from all genotypes...
     private final Set<Allele> alleles;
@@ -52,7 +42,7 @@ public final class GenotypePresentCalc extends JamApp {
         this.patientReportFile = resolvePatientReportFile();
 
         this.alleles = new TreeSet<Allele>();
-        this.calculator = PresentationStatCalculator.global();
+        this.calculator = PresentationRateCalculator.global();
     }
 
     /**
@@ -109,7 +99,7 @@ public final class GenotypePresentCalc extends JamApp {
         readAlleles();
 
         alleleReportWriter = IOUtil.openWriter(alleleReportFile);
-        alleleReportWriter.println("allele,presentRate.mean,presentRate.sterr");
+        alleleReportWriter.println("allele,presentRate");
 
         try {
             for (Allele allele : alleles)
@@ -148,12 +138,7 @@ public final class GenotypePresentCalc extends JamApp {
     }
 
     private void reportAllele(Allele allele) {
-        StatSummary summary = calculator.compute(allele);
-
-        alleleReportWriter.println(String.format("%s,%.8f,%.8f",
-                                                 allele,
-                                                 summary.getMean(),
-                                                 summary.getError()));
+        alleleReportWriter.println(String.format("%s,%.8f", allele, calculator.compute(allele)));
     }
 
     private void processGenotypes() {
@@ -181,10 +166,8 @@ public final class GenotypePresentCalc extends JamApp {
         LineBuilder builder = LineBuilder.csv();
 
         builder.append(patientKeyName);
-        builder.append("presentRate.mean");
-        builder.append("presentRate.sterr");
-        builder.append("idealRate.mean");
-        builder.append("idealRate.sterr");
+        builder.append("actualRate");
+        builder.append("idealRate");
 
         patientReportWriter.println(builder);
     }
@@ -199,20 +182,18 @@ public final class GenotypePresentCalc extends JamApp {
     private void processGenotype(String patientKey, Genotype genotype) {
         JamLogger.info("Processing patient [%s]...", patientKey);
 
-        StatSummary rateSummary  = calculator.compute(genotype);
-        StatSummary idealSummary = calculator.computeIdeal(genotype);
+        double actualRate = calculator.compute(genotype);
+        double idealRate  = calculator.computeIdeal(genotype);
 
-        writeReportData(patientKey, rateSummary, idealSummary);
+        writeReportData(patientKey, actualRate, idealRate);
     }
 
-    private void writeReportData(String patientKey, StatSummary rateSummary, StatSummary idealSummary) {
+    private void writeReportData(String patientKey, double actualRate, double idealRate) {
         LineBuilder builder = LineBuilder.csv();
         builder.append(patientKey);
 
-        builder.append(rateSummary.getMean(), "%.8f");
-        builder.append(rateSummary.getError(), "%.8f");
-        builder.append(idealSummary.getMean(), "%.8f");
-        builder.append(idealSummary.getError(), "%.8f");
+        builder.append(actualRate, "%.8f");
+        builder.append(idealRate, "%.8f");
     
         patientReportWriter.println(builder);
         patientReportWriter.flush();
