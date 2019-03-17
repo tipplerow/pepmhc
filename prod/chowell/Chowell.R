@@ -406,7 +406,7 @@ Chowell.loadCohort1 <- function() {
 
     cohort$zTMB <- Chowell.zscore(log(cohort$MutCnt))
     cohort$zAGE <- Chowell.zscore(cohort$Age)
-    cohort$zHLA <- Chowell.zscore(cohort$presentRate.mean)
+    cohort$zHLA <- Chowell.zscore(cohort$actualRate)
 
     cohort$logTMB <- log(cohort$MutCnt)
 
@@ -432,7 +432,7 @@ Chowell.loadCohort2 <- function() {
     cohort$logTMB <- log(1.0 + cohort$IMPACT_MutCnt)
 
     cohort$zTMB <- Chowell.zscore(cohort$logTMB)
-    cohort$zHLA <- Chowell.zscore(cohort$presentRate.mean)
+    cohort$zHLA <- Chowell.zscore(cohort$actualRate)
 
     cohort <- merge(cohort, Chowell.zBy(cohort, "Sample", "Cancer_Type", "logTMB", "zTMB.By"), all.x = TRUE)
     cohort
@@ -442,7 +442,7 @@ Chowell.loadGenotypePresentation <- function() {
     read.csv(file.path(Chowell.dataDir(), "Chowell_Patient_Present.csv"))
 }
 
-Chowell.plotOverlap <- function(size = 250) {
+Chowell.plotOverlap <- function(size = 500) {
     dframe <- Chowell.loadGenotypePresentation()
 
     XWD <- 0.52
@@ -452,8 +452,8 @@ Chowell.plotOverlap <- function(size = 250) {
     par(fig = c(0.0, XWD, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)))
 
     k <- sample.int(nrow(dframe), size)
-    x <- 100 * dframe$idealRate.mean[k]
-    y <- 100 * dframe$presentRate.mean[k]
+    x <- 100 * dframe$idealRate[k]
+    y <- 100 * dframe$actualRate[k]
 
     plot(x, y,
          cex  = 0.50,
@@ -462,23 +462,23 @@ Chowell.plotOverlap <- function(size = 250) {
          type = "p",
          xlab = "",
          ylab = "",
-         xlim = c(0, 20),
-         ylim = c(0, 20))
-    lines(c(-10, 30), c(-10, 30), lty = 2)
+         xlim = c(0, 40),
+         ylim = c(0, 40))
+    lines(c(-10, 50), c(-10, 50), lty = 2)
 
     axis(1, cex.axis = 0.9)
     axis(2, cex.axis = 0.9)
     box()
 
-    text(1, 19, "A", font = 2)
+    text(2, 38, "A", font = 2)
     mtext("Non-overlapping presentation [%]", side = 1, line = 2.5, cex = 0.9)
 
     par(xpd = TRUE)
-    text(-5.5, 10, "Actual genotype presentation [%]", cex = 0.9, srt = 90)
+    text(-12, 20, "Actual genotype presentation [%]", cex = 0.9, srt = 90)
     par(xpd = FALSE)
 
-    overlap <- 100 * (dframe$idealRate.mean - dframe$presentRate.mean)
-    overlap <- overlap[which(overlap < 8)]
+    overlap <- 100 * (dframe$idealRate - dframe$actualRate)
+    overlap <- overlap[which(overlap < 20)]
 
     par(fig = c(1.0 - XWD, 1.0, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)), new = TRUE)
     truehist(overlap, h = 0.5, xlab = "", ylab = "", axes = FALSE)
@@ -486,11 +486,11 @@ Chowell.plotOverlap <- function(size = 250) {
     axis(2, cex.axis = 0.9)
     box()
 
-    text(7.6, 0.475, "B", font = 2)
+    text(18.5, 0.20, "B", font = 2)
     mtext("Presentation overlap loss [%]", side = 1, line = 2.5, cex = 0.9)
 
     par(xpd = TRUE)
-    text(-2.4, 0.25, "Density", cex = 0.9, srt = 90)
+    text(-6.3, 0.11, "Density", cex = 0.9, srt = 90)
     par(xpd = FALSE)
 }
 
