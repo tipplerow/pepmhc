@@ -48,18 +48,27 @@ Miao.compileMaster <- function() {
 
     master <- merge(master, mutBurden, by = "pair_id")
 
+    neoDetail <- Miao.loadNeoDetail()
+    neoBurden <- Miao.computeNAB(neoDetail)
+
+    master <- merge(master, neoBurden, by = "Tumor_Sample_Barcode")
+
     ## Remove these cancer types with only one observation...
     master <- subset(master, !(cancer_type %in% c("Anal", "Sarcoma")))
 
-    ## Compute z-scores for HLA presentation and tumor mutational
-    ## burden...
+    ## Compute z-scores for HLA presentation, tumor mutational burden,
+    ## and neoantigen burden...
     master$zAGE <- Miao.zscore(master$age_start_io)
-    master$zHLA <- Miao.zscore(master$presentRate.mean)
+    master$zHLA <- Miao.zscore(master$actualRate)
 
     master$logTMB <- log(master$nonSilentCount)
     master$zTMB   <- Miao.zscore(master$logTMB)
 
     master <- merge(master, Miao.zBy(master, "pair_id", "cancer_type", "logTMB", "zTMB.By"))
+
+    ## Compute the "excess neoantigen binding rate" (relative to the
+    ## overall binding rate of the HLA genotype)...
+    master$xNBR <- Miao.zscore(master$neoAgBindingRate / master$actualRate)
 
     ## Events have occurred if the observation is censored...
     master$os_event <- master$os_censor
@@ -75,6 +84,32 @@ Miao.compileMaster <- function() {
     master$Both <- as.numeric(master$drug_type == "anti-CTLA-4 + anti-PD-1/PD-L1")
 
     master
+}
+
+Miao.computeNAB <- function(neoDetail) {
+    ##
+    ## Find the HLA allele with the strongest binding for each
+    ## neopeptide...
+    ##
+    neoDetail <-
+        neoDetail[order(neoDetail$Tumor_Sample_Barcode,
+                        neoDetail$pep_mut,
+                        neoDetail$affinity_mut),]
+
+    neoDetail <-
+        neoDetail[!duplicated(neoDetail[,c("Tumor_Sample_Barcode", "pep_mut")]),]
+
+    aggFunc <- function(slice) {
+        data.frame(Tumor_Sample_Barcode = slice$Tumor_Sample_Barcode[1],
+                   neoPeptideTotal      = nrow(slice),
+                   neoAgBindingCount    = sum(slice$affinity_mut <= 500),
+                   neoAgBindingRate     = mean(slice$affinity_mut <= 500))
+    }
+
+    result <- do.call(rbind, by(neoDetail, neoDetail$Tumor_Sample_Barcode, aggFunc))
+    rownames(result) <- NULL
+
+    result
 }
 
 Miao.computeTMB <- function(mutDetail) {
@@ -120,6 +155,31 @@ Miao.cox <- function() {
 
     ##merged <- merged[c("zHLA", "zTMB", "Bladder", "HNSCC", "Lung"),]
     merged <- merged[c("zHLA", "zTMB", "Bladder", "HNSCC", "Lung", "PD1", "Both"),]
+    merged
+}
+
+Miao.coxNBR <- function() {
+    require(survival)
+    master <- Miao.loadMaster()
+
+    coxOS <-
+        coxph(Surv(os_days, os_event) ~
+                  zTMB.By + xNBR + Bladder + HNSCC + Lung + PD1 + Both, data = master)
+
+    coxPFS <-
+        coxph(Surv(pfs_days, pfs_event) ~
+                  zTMB.By + xNBR + Bladder + HNSCC + Lung + PD1 + Both, data = master)
+
+    coxOS  <- Miao.coxFrame(coxOS)
+    coxPFS <- Miao.coxFrame(coxPFS)
+
+    merged <- merge(coxOS, coxPFS, all = TRUE, by = "Covariate", suffixes = c(".OS", ".PFS"))
+
+    rownames(merged) <- merged$Covariate
+    merged$Covariate <- NULL
+
+    ##merged <- merged[c("zHLA", "zTMB", "Bladder", "HNSCC", "Lung"),]
+    merged <- merged[c("xNBR", "zTMB", "Bladder", "HNSCC", "Lung", "PD1", "Both"),]
     merged
 }
 
