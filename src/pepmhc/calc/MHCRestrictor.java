@@ -7,6 +7,7 @@ import java.util.HashSet;
 import jam.hla.Allele;
 import jam.hla.Genotype;
 import jam.peptide.Peptide;
+import jam.peptide.Peptidome;
 
 import pepmhc.binder.BindingRecord;
 import pepmhc.binder.BindingThreshold;
@@ -62,10 +63,9 @@ public final class MHCRestrictor {
      *
      * @param peptides the set of peptides being restricted.
      *
-     * @return a new collection containing all peptides that the
-     * genotype presents.
+     * @return all peptides that the genotype presents.
      */
-    public Collection<Peptide> restrict(Genotype genotype, Collection<Peptide> peptides) {
+    public Peptidome restrict(Genotype genotype, Collection<Peptide> peptides) {
         //
         // A peptide may bind to multiple alleles, so to avoid
         // over-counting, collect the binder peptides from each
@@ -76,6 +76,6 @@ public final class MHCRestrictor {
         for (Allele allele : genotype)
             binders.addAll(threshold.getBinders(AffinityCache.get(method, allele, peptides)));
         
-        return binders;
+        return Peptidome.create(binders);
     }
 }
