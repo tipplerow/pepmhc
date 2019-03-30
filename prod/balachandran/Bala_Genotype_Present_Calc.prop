@@ -1,0 +1,15 @@
+########################################################################
+# Property file to compute the HLA genotype peptide presentation rates
+# for the Balachandran data set.
+########################################################################
+
+pepmhc.app.genotypeInputFile = ${CSB_DATA_VAULT}/Balachandran/Balachandran_Genotype_Input.csv
+pepmhc.app.alleleReportFile  = ${CSB_DATA_VAULT}/Balachandran/Balachandran_Allele_Present.csv
+pepmhc.app.patientReportFile = ${CSB_DATA_VAULT}/Balachandran/Balachandran_Patient_Present.csv
+
+pepmhc.binder.affinityThreshold = 500.0
+
+# No percentile threshold
+# pepmhc.binder.percentileThreshold = 2.0
+
+pepmhc.engine.predictionMethod = NET_MHC_PAN
