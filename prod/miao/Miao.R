@@ -1,4 +1,21 @@
 
+Miao.barplotA <- function(skip = 2) {
+    dframe <- Miao.loadAllelePresentation()
+    dframe <- dframe[grep("HLA-A", dframe$allele),]
+    dframe <- dframe[order(-dframe$presentRate),]
+    dframe <- dframe[seq(1, nrow(dframe), skip),]
+
+    par(las = 2)
+    par(fig = c(0.05, 1.0, 0.15, 0.85))
+
+    barplot(dframe$presentRate,
+            names.arg = substr(dframe$allele, 5, 11),
+            cex.names = 0.9,
+            ylab = "Presentation rate",
+            ylim = c(0.0, 0.10),
+            srt = 45)
+}
+
 Miao.collectGenotype <- function() {
     patient <- Miao.loadPatientDetail()
     neoDetail <- Miao.loadNeoDetail()
