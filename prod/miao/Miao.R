@@ -362,7 +362,8 @@ Miao.coxPlot <- function(survType = "OS") {
     plotCoeff("Both",    2.0)
     box()
 
-    text(2.0, 8.0, sprintf("p = %.2f", cox1["zHLA", sprintf("PValue.%s", survType)]), adj = 0, font = 3)
+    text(4.5, 8.0, sprintf("p = %.2f", cox1["zHLA",    sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
+    text(4.5, 7.0, sprintf("p = %.3f", cox1["zTMB.By", sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
 
     par(fig = c(0.0, 0.36, 0.0, 1.0), new = TRUE)
     plot(c(0.0, 1.0), c(1.5, 8.5),
