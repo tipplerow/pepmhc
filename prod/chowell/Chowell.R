@@ -98,7 +98,7 @@ Chowell.coxPlot1 <- function(zByType = TRUE) {
     axis(1, at = c(0.5, 1.0, 2.0, 4.0))
     lines(c(1, 1), c(-2, 12), lty = 3)
 
-    cox1 <- Chowell.cox1()
+    cox1 <- Chowell.cox1(zByType)
     errY <- 0.075
 
     cex.binary <- 1.25
@@ -145,11 +145,14 @@ Chowell.coxPlot1 <- function(zByType = TRUE) {
     pHomozygous <- cox1["Homozygous", "PValue.Binary"]
     pHLAScore   <- cox1["zHLA", "PValue.ZScore"]
 
-    text(2.2,  8.0 + dy, sprintf("p = %5.3f", pHomozygous), adj = 0, cex = 0.8, font = 3)
-    text(0.85, 8.0 - dy, sprintf("p = %4.2f", pHLAScore),   adj = 1, cex = 0.8, font = 3)
+    text(2.9, 8.13, sprintf("p = %5.3f", pHomozygous), adj = 0, cex = 0.8, font = 3)
+    text(2.9, 7.87, sprintf("p = %4.2f", pHLAScore),   adj = 0, cex = 0.8, font = 3)
 
     plotBinary("zTMB", 7.0 + dy)
     plotZScore("zTMB", 7.0 - dy)
+
+    text(2.9, 7.13, sprintf("p = %7.5f", cox1["zTMB", "PValue.Binary"]), adj = 0, cex = 0.8, font = 3)
+    text(2.9, 6.87, sprintf("p = %7.5f", cox1["zTMB", "PValue.ZScore"]), adj = 0, cex = 0.8, font = 3)
 
     plotBinary("zAGE", 6.0 + dy)
     plotZScore("zAGE", 6.0 - dy)
@@ -244,7 +247,7 @@ Chowell.coxPlot2 <- function(zByType = TRUE, minCount = 5) {
     axis(1, at = c(0.5, 1.0, 2.0))
     lines(c(1, 1), c(-2, 12), lty = 3)
 
-    cox2 <- Chowell.cox2()
+    cox2 <- Chowell.cox2(zByType, minCount)
     errY <- 0.075
 
     cex.binary <- 1.25
@@ -291,11 +294,14 @@ Chowell.coxPlot2 <- function(zByType = TRUE, minCount = 5) {
     pHomozygous <- cox2["Homozygous", "PValue.Binary"]
     pHLAScore   <- cox2["zHLA", "PValue.ZScore"]
 
-    text(1.80, 8.0 + dy, sprintf("p = %5.3f", pHomozygous), adj = 0, cex = 0.8, font = 3)
-    text(0.81, 8.0 - dy, sprintf("p = %4.2f", pHLAScore),   adj = 1, cex = 0.8, font = 3)
+    text(1.8, 8.13, sprintf("p = %5.3f", pHomozygous), adj = 0, cex = 0.8, font = 3)
+    text(1.8, 7.87, sprintf("p = %4.2f", pHLAScore),   adj = 0, cex = 0.8, font = 3)
 
     plotBinary("zTMB", 7.0 + dy)
     plotZScore("zTMB", 7.0 - dy)
+
+    text(1.8, 7.13, sprintf("p = %6.4f", cox2["zTMB", "PValue.Binary"]), adj = 0, cex = 0.8, font = 3)
+    text(1.8, 6.87, sprintf("p = %6.4f", cox2["zTMB", "PValue.ZScore"]), adj = 0, cex = 0.8, font = 3)
 
     plotBinary("Age_31_50", 6.0 + dy)
     plotZScore("Age_31_50", 6.0 - dy)
@@ -363,6 +369,21 @@ Chowell.dataDir <- function() {
         JamLog.error("Environment variable CSB_DATA_VAULT is not set.");
 
     file.path(homeDir, "Chowell")
+}
+
+Chowell.histGenotype <- function() {
+    dframe <- Chowell.loadGenotypePresentation()
+    dframe <- subset(dframe, actualRate < 0.3)
+
+    par(las = 1)
+    par(fig = c(0.05, 1.0, 0.15, 0.85))
+
+    truehist(dframe$actualRate,
+             h = 0.01,
+             xlim = c(0.0, 0.3),
+             xlab = "Presentation rate",
+             ylab = "Density")
+    box()
 }
 
 Chowell.homoPresent <- function() {
