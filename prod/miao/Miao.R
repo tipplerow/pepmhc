@@ -130,9 +130,11 @@ Miao.compileMaster <- function(threshold = 100) {
     master <- merge(master, Miao.zBy(master, "pair_id", "cancer_type", "NAP.Fitted",  "NAP.Fitted.zBy"))
     master <- merge(master, Miao.zBy(master, "pair_id", "cancer_type", "NAP.Excess",  "NAP.Excess.zBy"))
 
-    ## Events have occurred if the observation is censored...
-    master$os_event <- master$os_censor
-    master$pfs_event <- master$pfs_censor
+    ## Death occurred if the overall survival is censored...
+    master$os_event <- 1 - master$os_censor
+
+    ## Progression occurred if the PFS duration is shorter than the overall duration...
+    master$pfs_event <- as.numeric(master$pfs_days < master$os_days)
 
     ## Melanoma will be the reference...
     master$Bladder <- as.numeric(master$cancer_type == "Bladder")
@@ -191,17 +193,19 @@ Miao.computeTMB <- function(mutDetail) {
     result
 }
 
-Miao.cox <- function() {
+Miao.cox <- function(master = NULL) {
     require(survival)
-    master <- Miao.loadMaster()
+
+    if (is.null(master))
+        master <- Miao.loadMaster()
 
     coxOS <-
         coxph(Surv(os_days, os_event) ~
-                  zTMB.By + zHLA + Bladder + HNSCC + Lung + PD1 + Both, data = master)
+                  zTMB.By + zHLA.By + Bladder + HNSCC + Lung + PD1, data = master)
 
     coxPFS <-
         coxph(Surv(pfs_days, pfs_event) ~
-                  zTMB.By + zHLA + Bladder + HNSCC + Lung + PD1 + Both, data = master)
+                  zTMB.By + zHLA.By + Bladder + HNSCC + Lung + PD1 + Both, data = master)
 
     coxOS  <- Miao.coxFrame(coxOS)
     coxPFS <- Miao.coxFrame(coxPFS)
@@ -216,17 +220,19 @@ Miao.cox <- function() {
     merged
 }
 
-Miao.coxNPR <- function(threshold = 100) {
+Miao.coxNAP <- function(master = NULL, threshold = 100) {
     require(survival)
-    master <- Miao.loadMaster(threshold)
+
+    if (is.null(master))
+        master <- Miao.loadMaster(threshold)
 
     coxOS <-
         coxph(Surv(os_days, os_event) ~
-                  zTMB.By + xNPR + Bladder + HNSCC + Lung + PD1 + Both, data = master)
+                  NAP.Actual.zBy + zHLA.By + Bladder + HNSCC + Lung + PD1, data = master)
 
     coxPFS <-
         coxph(Surv(pfs_days, pfs_event) ~
-                  zTMB.By + xNPR + Bladder + HNSCC + Lung + PD1 + Both, data = master)
+                  NAP.Actual.zBy + zHLA.By + Bladder + HNSCC + Lung + PD1 + Both, data = master)
 
     coxOS  <- Miao.coxFrame(coxOS)
     coxPFS <- Miao.coxFrame(coxPFS)
@@ -237,7 +243,7 @@ Miao.coxNPR <- function(threshold = 100) {
     merged$Covariate <- NULL
 
     ##merged <- merged[c("zHLA", "zTMB", "Bladder", "HNSCC", "Lung"),]
-    merged <- merged[c("xNPR", "zTMB", "Bladder", "HNSCC", "Lung", "PD1", "Both"),]
+    merged <- merged[c("zHLA", "NAP", "Bladder", "HNSCC", "Lung", "PD1", "Both"),]
     merged
 }
 
@@ -286,9 +292,11 @@ Miao.coxModel2 <- function(threshold = 100) {
     list(actual = actual, excess = excess)
 }
 
-Miao.coxModel4 <- function(threshold = 100) {
+Miao.coxModel4 <- function(master = NULL, threshold = 100) {
     require(survival)
-    master <- Miao.loadMaster(threshold)
+
+    if (is.null(master))
+        master <- Miao.loadMaster(threshold)
 
     cox1 <-
         coxph(Surv(os_days, os_event) ~
@@ -323,7 +331,7 @@ Miao.coxModel4 <- function(threshold = 100) {
     list(cox1 = cox1, cox2 = cox2, cox3 = cox3, cox4 = cox4)
 }
 
-Miao.coxPlot <- function(survType = "OS") {
+Miao.coxPlot <- function(master = NULL, survType = "PFS") {
     par(las = 1)
     par(fig = c(0.2, 1.0, 0.0, 1.0))
 
@@ -336,7 +344,7 @@ Miao.coxPlot <- function(survType = "OS") {
     axis(1, at = c(0.2, 0.5, 1.0, 2.0, 4.0, 8.0))
     lines(c(1, 1), c(-2, 12), lty = 3)
 
-    cox1 <- Miao.cox()
+    cox1 <- Miao.cox(master)
     errY <- 0.075
 
     plotCoeff <- function(rowName, height) {
@@ -362,8 +370,8 @@ Miao.coxPlot <- function(survType = "OS") {
     plotCoeff("Both",    2.0)
     box()
 
-    text(4.5, 8.0, sprintf("p = %.2f", cox1["zHLA",    sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
-    text(4.5, 7.0, sprintf("p = %.3f", cox1["zTMB.By", sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
+    text(4.5, 8.0, sprintf("p = %.2f", cox1["zHLA", sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
+    text(4.5, 7.0, sprintf("p = %.3f", cox1["zTMB", sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
 
     par(fig = c(0.0, 0.36, 0.0, 1.0), new = TRUE)
     plot(c(0.0, 1.0), c(1.5, 8.5),
@@ -374,14 +382,81 @@ Miao.coxPlot <- function(survType = "OS") {
 
     tx <- 0.85
 
-    text(tx, 8.0, "HLA Score", adj = 1)
+    par(xpd = TRUE)
+    text(tx, 8.1, "HLA Score", adj = 1)
+    text(tx, 7.8, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
     text(tx, 7.1, "Mutation Load", adj = 1)
     text(tx, 6.8, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
     text(tx, 6.0, "Bladder", adj = 1)
     text(tx, 5.0, "HNSCC", adj = 1)
     text(tx, 4.0, "Lung", adj = 1)
     text(tx, 3.0, "PD-1", adj = 1)
-    text(tx, 2.0, "PD-1 + CTLA-4", adj = 1, cex = 0.8)
+    text(tx, 2.0, "PD-1 + CTLA-4", adj = 1, cex = 1.0)
+    par(xpd = FALSE)
+}
+
+Miao.coxPlotNAP <- function(master = NULL, survType = "PFS") {
+    par(las = 1)
+    par(fig = c(0.2, 1.0, 0.0, 1.0))
+
+    plot(c(0.2, 8.0), c(1.5, 8.5),
+         log  = "x",
+         type = "n",
+         axes = FALSE,
+         xlab = "Hazard ratio",
+         ylab = "")
+    axis(1, at = c(0.2, 0.5, 1.0, 2.0, 4.0, 8.0))
+    lines(c(1, 1), c(-2, 12), lty = 3)
+
+    cox1 <- Miao.coxNAP(master)
+    errY <- 0.075
+
+    plotCoeff <- function(rowName, height) {
+        x1 <- cox1[rowName, sprintf("HR_CI95_Lo.%s", survType)]
+        x2 <- cox1[rowName, sprintf("HR_CI95_Up.%s", survType)]
+
+        lines(c(x1, x2), c(height, height))
+        lines(c(x1, x1), c(height - errY, height + errY))
+        lines(c(x2, x2), c(height - errY, height + errY))
+
+        x <- cox1[rowName, sprintf("HazardRatio.%s", survType)]
+        points(c(x, x), c(height, height), cex = 1.25, col = "black", pch = 16)
+
+        text(x, height + 0.2, Miao.signifCode(cox1[rowName, sprintf("PValue.%s", survType)]), cex = 1.0)
+    }
+
+    plotCoeff("zHLA",    8.0)
+    plotCoeff("NAP",     7.0)
+    plotCoeff("Bladder", 6.0)
+    plotCoeff("HNSCC",   5.0)
+    plotCoeff("Lung",    4.0)
+    plotCoeff("PD1",     3.0)
+    plotCoeff("Both",    2.0)
+    box()
+
+    text(4.5, 8.0, sprintf("p = %.3f", cox1["zHLA", sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
+    text(4.5, 7.0, sprintf("p = %.3f", cox1["NAP",  sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
+
+    par(fig = c(0.0, 0.36, 0.0, 1.0), new = TRUE)
+    plot(c(0.0, 1.0), c(1.5, 8.5),
+         type = "n",
+         axes = FALSE,
+         xlab = "",
+         ylab = "")
+
+    tx <- 0.85
+
+    par(xpd = TRUE)
+    text(tx, 8.1, "HLA Score", adj = 1)
+    text(tx, 7.8, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
+    text(tx, 7.1, "Neoantigen Load", adj = 1)
+    text(tx, 6.8, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
+    text(tx, 6.0, "Bladder", adj = 1)
+    text(tx, 5.0, "HNSCC", adj = 1)
+    text(tx, 4.0, "Lung", adj = 1)
+    text(tx, 3.0, "PD-1", adj = 1)
+    text(tx, 2.0, "PD-1 + CTLA-4", adj = 1)
+    par(xpd = FALSE)
 }
 
 Miao.coxPlot2 <- function(threshold = 100) {
@@ -629,6 +704,25 @@ Miao.masterFileName <- function(threshold = 100) {
     file.path(Miao.dataDir(), sprintf("Miao_Master_%03d.csv", threshold))
 }
 
+Miao.plotExcessNeo <- function(master = NULL) {
+    if (is.null(master))
+        master <- Miao.loadMaster()
+
+    par(las = 1)
+    par(fig = c(0.05, 1.0, 0.15, 0.85))
+
+    JamPlot.logXY(xlim = c(1, 10000),
+                  ylim = c(1, 10000),
+                  xlab = "TMB * HLA",
+                  ylab = "Presented neoantigen count")
+
+    x <- master$nonSilentCount * master$actualRate
+    y <- master$neoAgBindingCount
+
+    points(x, y)
+    JamPlot.loglogline(x, y, 10 ^ seq(-1, 4, 0.1))
+}
+
 Miao.pValueString <- function(p) {
     fmt <- sprintf("%%.%df", 1 + ceiling(-log10(p)))
     sprintf(fmt, p)
@@ -662,12 +756,12 @@ Miao.zscore <- function(x) {
 Miao.zBy <- function(dframe, keyCol, byCol, targetCol, scoreName) {
 
     aggFunc <- function(slice) {
-        data.frame(key = slice[,keyCol], score = Miao.zscore(slice[,targetCol]), count = nrow(slice))
+        data.frame(key = slice[,keyCol], score = Miao.zscore(slice[,targetCol]))
     }
 
     result <- do.call(rbind, by(dframe, dframe[,byCol], aggFunc))
 
-    names(result) <- c(keyCol, scoreName, sprintf("%s.Count", byCol))
+    names(result) <- c(keyCol, scoreName)
     rownames(result) <- NULL
 
     result
