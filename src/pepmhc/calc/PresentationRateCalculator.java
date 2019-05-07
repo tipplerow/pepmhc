@@ -149,7 +149,7 @@ public final class PresentationRateCalculator {
         //
         Collection<Peptide> binders = new HashSet<Peptide>();
 
-        for (Allele allele : genotype)
+        for (Allele allele : genotype.viewUniqueAlleles())
             binders.addAll(threshold.getBinders(AffinityCache.get(method, allele, peptides)));
         
         int bound = binders.size();
@@ -170,7 +170,7 @@ public final class PresentationRateCalculator {
     public double computeIdeal(Genotype genotype) {
         double ideal = 0.0;
 
-        for (Allele allele : genotype)
+        for (Allele allele : genotype.viewUniqueAlleles())
             ideal += compute(allele);
 
         return ideal;
