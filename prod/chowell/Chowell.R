@@ -405,6 +405,10 @@ Chowell.loadAllelePresentation <- function() {
 
 Chowell.loadCohort <- function(fileName) {
     cohort <- read.table(fileName, sep = "\t", header = TRUE, strip.white = TRUE)
+
+    cohort$AlleleCount <-
+        unlist(lapply(strsplit(cohort$HLA_Class_I_Alleles, ","), function(x) length(unique(x))))
+
     cohort
 }
 

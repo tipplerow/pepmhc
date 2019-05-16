@@ -38,6 +38,12 @@ Miao.collectGenotype <- function() {
     genoFrame$Genotype <-
         gsub(":", "", genoFrame$Genotype)
 
+    genoFrame$AlleleCount <-
+        unlist(lapply(strsplit(genoFrame$Genotype, " "), function(x) length(unique(x))))
+
+    genoFrame$Homozygous <-
+        as.numeric(genoFrame$AlleleCount < 6)
+
     genoFrame
 }
 
@@ -549,8 +555,8 @@ Miao.coxPlot2 <- function(threshold = 100) {
     text(tx, 5.0, "Bladder", adj = 1)
     text(tx, 4.0, "HNSCC", adj = 1)
     text(tx, 3.0, "Lung", adj = 1)
-    text(tx, 2.0, "PD1", adj = 1)
-    text(tx, 1.0, "PD1 + CTLA-4", adj = 1, cex = 0.95)
+    text(tx, 2.0, "PD-1", adj = 1)
+    text(tx, 1.0, "PD-1 + CTLA-4", adj = 1, cex = 0.95)
 }
 
 Miao.coxPlot4 <- function(threshold = 100) {
@@ -657,8 +663,144 @@ Miao.coxPlot4 <- function(threshold = 100) {
     text(tx, 5.0, "Bladder", adj = 1)
     text(tx, 4.0, "HNSCC", adj = 1)
     text(tx, 3.0, "Lung", adj = 1)
-    text(tx, 2.0, "PD1", adj = 1)
-    text(tx, 1.0, "PD1 + CTLA-4", adj = 1)
+    text(tx, 2.0, "PD-1", adj = 1)
+    text(tx, 1.0, "PD-1 + CTLA-4", adj = 1)
+    par(xpd = FALSE)
+}
+
+Miao.coxHomo <- function(master = NULL, threshold = 100) {
+    require(survival)
+
+    if (is.null(master))
+        master <- Miao.loadMaster(threshold)
+
+    model1 <- coxph(Surv(pfs_days, pfs_event) ~ Homozygous + zTMB.By + Bladder + HNSCC + Lung + PD1 + Both, data = master)
+    model2 <- coxph(Surv(pfs_days, pfs_event) ~ zHLA.By    + zTMB.By + Bladder + HNSCC + Lung + PD1 + Both, data = master)
+
+    frame1 <- Miao.coxFrame(model1)
+    frame2 <- Miao.coxFrame(model2)
+
+    master <- merge(frame1, frame2, all = TRUE, by = "Covariate", suffixes = c(".Binary", ".ZScore"))
+
+    rownames(master) <- master$Covariate
+    master$Covariate <- NULL
+
+    master <- master[c("Homozygous", "zHLA", "zTMB", "Bladder", "HNSCC", "Lung", "PD1", "Both"),]
+    master
+}
+
+Miao.coxHomoPlot <- function(master = NULL, threshold = 100) {
+    par(las = 1)
+    par(fig = c(0.2, 1.0, 0.0, 1.0))
+
+    plot(c(0.2, 8.0), c(1.5, 8.5),
+         log  = "x",
+         type = "n",
+         axes = FALSE,
+         xlab = "Hazard ratio",
+         ylab = "")
+    axis(1, at = c(0.2, 0.5, 1.0, 2.0, 4.0, 8.0))
+    lines(c(1, 1), c(-2, 12), lty = 3)
+
+    cox <- Miao.coxHomo(master, threshold)
+    errY <- 0.075
+
+    cex.binary <- 1.25
+    col.binary <- "red"
+    pch.binary <- 15
+
+    cex.zscore <- 1.25
+    col.zscore <- "black"
+    pch.zscore <- 16
+
+    plotBinary <- function(rowName, height) {
+        x1 <- cox[rowName, "HR_CI95_Lo.Binary"]
+        x2 <- cox[rowName, "HR_CI95_Up.Binary"]
+
+        lines(c(x1, x2), c(height, height))
+        lines(c(x1, x1), c(height - errY, height + errY))
+        lines(c(x2, x2), c(height - errY, height + errY))
+
+        x <- cox[rowName, "HazardRatio.Binary"]
+        points(c(x, x), c(height, height), cex = cex.binary, col = col.binary, pch = pch.binary)
+
+        text(x, height + 0.2, Miao.signifCode(cox[rowName, "PValue.Binary"]), cex = 1.0)
+    }
+
+    plotZScore <- function(rowName, height) {
+        x1 <- cox[rowName, "HR_CI95_Lo.ZScore"]
+        x2 <- cox[rowName, "HR_CI95_Up.ZScore"]
+
+        lines(c(x1, x2), c(height, height))
+        lines(c(x1, x1), c(height - errY, height + errY))
+        lines(c(x2, x2), c(height - errY, height + errY))
+
+        x <- cox[rowName, "HazardRatio.ZScore"]
+        points(c(x, x), c(height, height), cex = cex.zscore, col = col.zscore, pch = pch.zscore)
+
+        text(x, height - 0.2, Miao.signifCode(cox[rowName, "PValue.ZScore"]), cex = 1.0)
+    }
+
+    dy <- 0.1
+
+    plotBinary("Homozygous", 8.0 + dy)
+    plotZScore("zHLA",       8.0 - dy)
+
+    pHomozygous <- cox["Homozygous", "PValue.Binary"]
+    pHLAScore   <- cox["zHLA", "PValue.ZScore"]
+
+    xp <- 4.8
+
+    text(xp, 8.13, sprintf("p = %.2f", pHomozygous), adj = 0, cex = 0.8, font = 3)
+    text(xp, 7.87, sprintf("p = %.2f", pHLAScore),   adj = 0, cex = 0.8, font = 3)
+
+    plotBinary("zTMB", 7.0 + dy)
+    plotZScore("zTMB", 7.0 - dy)
+
+    text(xp, 7.13, sprintf("p = %.3f", cox["zTMB", "PValue.Binary"]), adj = 0, cex = 0.8, font = 3)
+    text(xp, 6.87, sprintf("p = %.3f", cox["zTMB", "PValue.ZScore"]), adj = 0, cex = 0.8, font = 3)
+
+    plotBinary("Bladder", 6.0 + dy)
+    plotZScore("Bladder", 6.0 - dy)
+
+    plotBinary("HNSCC", 5.0 + dy)
+    plotZScore("HNSCC", 5.0 - dy)
+
+    plotBinary("Lung", 4.0 + dy)
+    plotZScore("Lung", 4.0 - dy)
+
+    plotBinary("PD1", 3.0 + dy)
+    plotZScore("PD1", 3.0 - dy)
+
+    plotBinary("Both", 2.0 + dy)
+    plotZScore("Both", 2.0 - dy)
+
+    box()
+
+    par(fig = c(0.0, 0.36, 0.0, 1.0), new = TRUE)
+    plot(c(0.0, 1.0), c(1.5, 8.5),
+         type = "n",
+         axes = FALSE,
+         xlab = "",
+         ylab = "")
+
+    px <- 0.99
+    tx <- 0.85
+    dy <- 0.13
+
+    points(px, 8.0 + dy, cex = cex.binary, col = col.binary, pch = pch.binary)
+    points(px, 8.0 - dy, cex = cex.zscore, col = col.zscore, pch = pch.zscore)
+
+    par(xpd = TRUE)
+    text(tx, 8.0 + dy, "Homozygous", adj = 1, font = 2)
+    text(tx, 8.0 - dy, "HLA Score",  adj = 1, font = 2)
+    text(tx, 7.1, "Mutation Load", adj = 1)
+    text(tx, 6.8, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
+    text(tx, 6.0, "Bladder", adj = 1)
+    text(tx, 5.0, "HNSCC", adj = 1)
+    text(tx, 4.0, "Lung", adj = 1)
+    text(tx, 3.0, "PD-1", adj = 1)
+    text(tx, 2.0, "PD-1 + CTLA-4", adj = 1)
     par(xpd = FALSE)
 }
 
