@@ -515,7 +515,72 @@ Chowell.plotOverlap <- function(size = 500) {
     par(xpd = FALSE)
 }
 
-Chowell.violinHLA <- function() {
+Chowell.plotOverlapHomo <- function() {
+    chow1 <- Chowell.loadCohort1()
+    chow2 <- Chowell.loadCohort2()
+
+    par(las = 1)
+    par(fig = c(0.05, 1.0, 0.15, 0.85))
+
+    plot(chow1$idealRate,
+         chow1$actualRate,
+         xlim = c(0.0, 0.50),
+         ylim = c(0.0, 0.30),
+         xlab = "Assumed non-overlapping presentation rate",
+         ylab = "True genotype presentation rate",
+         pch  = 16,
+         col  = ifelse(chow1$Homozygous, 2, 1))
+}
+
+Chowell.violinHLARate <- function() {
+    require(vioplot)
+    par(las = 1)
+
+    XWD  <- 0.575
+    YHT  <- 0.60
+    y.at <- c(0.0, 0.1, 0.2, 0.3)
+    ylim <- c(0.0, 0.3)
+
+    cohort1 <- Chowell.loadCohort1()
+    cohort2 <- Chowell.loadCohort2()
+
+    plotViolin <- function(cohort) {
+        plot(c(-1.0, 1.0),
+             ylim,
+             axes = FALSE,
+             type = "n",
+             xlab = "",
+             ylab = "")
+        vioplot(cohort$actualRate[cohort$Homozygous == 1], at = -0.5, add = TRUE, col = "lightgreen")
+        vioplot(cohort$actualRate[cohort$Homozygous == 0], at =  0.5, add = TRUE, col = "lightblue")
+        return(0)
+        
+        vioplot(cohort$zHLA[cohort$Homozygous == 1],
+                cohort$zHLA[cohort$Homozygous == 0],
+                col = color,
+                ylim = c(-3.0, 3.0),
+                names = c("Homo", "Hetero"), add = TRUE)
+    }
+
+    par(fig = c(0.0, XWD, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)))
+    plotViolin(cohort1)
+
+    axis(1, at = c(-0.5, 0.5), labels = c("Homozygous", "Heterozygous"))
+    axis(2, at = y.at, labels = TRUE)
+
+    mtext("HLA Presentation Rate", side = 2, line = 2.4, las = 0)
+    text(0.90, 0.28, "1", font = 2, cex = 1)
+    
+    par(fig = c(1.0 - XWD, 1.0, 0.5 * (1.0 - YHT), 0.5 * (1.0 + YHT)), new = TRUE)
+    plotViolin(cohort2)
+
+    axis(1, at = c(-0.5, 0.5), labels = c("Homozygous", "Heterozygous"))
+    axis(2, at = y.at, labels = FALSE)
+
+    text(0.90, 0.28, "2", font = 2, cex = 1)
+}
+
+Chowell.violinHLAZ <- function() {
     require(vioplot)
     par(las = 1)
 
