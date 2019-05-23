@@ -6,17 +6,17 @@ import java.util.List;
 import jam.peptide.Peptide;
 
 import pepmhc.binder.BindingRecord;
-import pepmhc.engine.net.NetParser;
+import pepmhc.engine.net.NetMHCParser;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class NetParserTest {
+public class NetMHCParserTest {
     private static final String NET_MHC_FILE = "data/test/netMHC.out";
     private static final String NET_MHC_PAN_FILE = "data/test/netMHCpan.out";
 
     @Test public void testNetMHC() {
-        List<BindingRecord> records = NetParser.parse(NET_MHC_FILE);
+        List<BindingRecord> records = NetMHCParser.parse(NET_MHC_FILE);
 
         assertEquals(10, records.size());
 
@@ -31,7 +31,7 @@ public class NetParserTest {
     }
 
     @Test public void testNetMHCPan() {
-        List<BindingRecord> records = NetParser.parse(NET_MHC_PAN_FILE);
+        List<BindingRecord> records = NetMHCParser.parse(NET_MHC_PAN_FILE);
 
         assertEquals(10, records.size());
 
@@ -46,6 +46,6 @@ public class NetParserTest {
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("pepmhc.junit.NetParserTest");
+        org.junit.runner.JUnitCore.main("pepmhc.junit.NetMHCParserTest");
     }
 }

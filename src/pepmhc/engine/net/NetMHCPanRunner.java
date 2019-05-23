@@ -1,6 +1,7 @@
 
 package pepmhc.engine.net;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.util.Collection;
 import java.util.List;
@@ -41,5 +42,9 @@ public final class NetMHCPanRunner extends NetRunner {
 
     private static String formatAllele(Allele allele) {
         return allele.longKey().replace("*", "");
+    }
+
+    @Override protected List<BindingRecord> parseOutput(BufferedReader reader) {
+        return NetMHCParser.parse(reader);
     }
 }

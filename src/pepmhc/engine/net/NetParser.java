@@ -2,7 +2,6 @@
 package pepmhc.engine.net;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +15,10 @@ import jam.util.RegexUtil;
 import pepmhc.binder.BindingRecord;
 
 /**
- * Parses output written by the {@code netMHC} and {@code netMHCpan}
- * binding predictor programs.
+ * Parses output written by the {@code netMHC}, {@code netMHCpan}, and
+ * {@code netMHCstabpan} programs.
  */
-public final class NetParser {
+public abstract class NetParser {
     private final BufferedReader reader;
     private final List<BindingRecord> records = new ArrayList<BindingRecord>();
 
@@ -27,56 +26,52 @@ public final class NetParser {
 
     private static final Pattern DATA_LINE_DELIM = RegexUtil.MULTI_WHITE_SPACE;
 
-    private static final int PEPTIDE_FIELD_INDEX = 2;
-    private static final int AFFINITY_FIELD_INDEX = 12;
-    private static final int PERCENTILE_FIELD_INDEX = 13;
-
-    private NetParser(BufferedReader reader) {
+    /**
+     * Wraps a parser around an open stream reader.
+     *
+     * @param reader an open stream reader.
+     *
+     * @throws RuntimeException if the file cannot be opened.
+     */
+    protected NetParser(BufferedReader reader) {
         this.reader = reader;
     }
 
     /**
-     * Parses an output file written by {@code netMHC} or {@code netMHCpan}.
+     * Returns the zero-offset index of the field containing the
+     * peptide structure.
      *
-     * @param file the path to the output file to parse.
-     *
-     * @return a list containing every binding record in the output file.
-     *
-     * @throws RuntimeException if any I/O errors occur.
+     * @return the zero-offset index of the field containing the
+     * peptide structure.
      */
-    public static List<BindingRecord> parse(File file) {
-        return parse(IOUtil.openReader(file));
-    }
+    public abstract int getPeptideFieldIndex();
 
     /**
-     * Parses an output file written by {@code netMHC} or {@code netMHCpan}.
+     * Returns the zero-offset index of the field containing the
+     * binding affinity.
      *
-     * @param fileName the name to the output file to parse.
-     *
-     * @return a list containing every binding record in the output file.
-     *
-     * @throws RuntimeException if any I/O errors occur.
+     * @return the zero-offset index of the field containing the
+     * binding affinity.
      */
-    public static List<BindingRecord> parse(String fileName) {
-        return parse(IOUtil.openReader(fileName));
-    }
+    public abstract int getAffinityFieldIndex();
 
     /**
-     * Parses an output file written by {@code netMHC} or {@code netMHCpan}.
+     * Returns the zero-offset index of the field containing the
+     * affinity percentile.
      *
-     * @param reader a buffered reader opened to the beginning of the output
-     * file; the reader is closed before returning from this method.
+     * @return the zero-offset index of the field containing the
+     * affinity percentile.
+     */
+    public abstract int getPercentileFieldIndex();
+
+    /**
+     * Parses the file opened by the constructor.
      *
-     * @return a list containing every binding record in the output file.
+     * @return the binding records present in the output file.
      *
      * @throws RuntimeException if any I/O errors occur.
      */
-    public static List<BindingRecord> parse(BufferedReader reader) {
-        NetParser parser = new NetParser(reader);
-        return parser.parse();
-    }
-
-    private List<BindingRecord> parse() {
+    public List<BindingRecord> parse() {
         try {
             skipHeader();
             parseData();
@@ -130,12 +125,12 @@ public final class NetParser {
     private void parseLine(String line) {
         String[] fields = DATA_LINE_DELIM.split(line.trim());
 
-        if (fields.length <= PERCENTILE_FIELD_INDEX)
+        if (fields.length <= getPercentileFieldIndex())
             throw JamException.runtime("Invalid data line [%s].", line);
 
-        Peptide peptide    = Peptide.parse(fields[PEPTIDE_FIELD_INDEX]);
-        double  affinity   = Double.valueOf(fields[AFFINITY_FIELD_INDEX]);
-        double  percentile = Double.valueOf(fields[PERCENTILE_FIELD_INDEX]);
+        Peptide peptide    = Peptide.parse(fields[getPeptideFieldIndex()]);
+        double  affinity   = Double.valueOf(fields[getAffinityFieldIndex()]);
+        double  percentile = Double.valueOf(fields[getPercentileFieldIndex()]);
 
         records.add(new BindingRecord(peptide, affinity, percentile));
     }

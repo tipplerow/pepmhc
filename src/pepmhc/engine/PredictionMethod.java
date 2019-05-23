@@ -7,7 +7,7 @@ import jam.app.JamProperties;
  * Enumerates peptide-MHC binding affinity prediction methods.
  */
 public enum PredictionMethod {
-    NET_MHC, NET_MHC_PAN, SMM, SMM_PMBEC;
+    NET_MHC, NET_MHC_PAN, NET_MHC_STAB_PAN, SMM, SMM_PMBEC;
 
     private static PredictionMethod global = null;
 
