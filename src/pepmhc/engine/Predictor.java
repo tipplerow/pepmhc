@@ -11,6 +11,7 @@ import jam.peptide.Peptide;
 import pepmhc.binder.BindingRecord;
 import pepmhc.engine.net.NetMHCPredictor;
 import pepmhc.engine.net.NetMHCPanPredictor;
+import pepmhc.engine.net.NetStabPredictor;
 import pepmhc.engine.smm.SMMPredictor;
 import pepmhc.engine.smm.SMMPmbecPredictor;
 
@@ -29,6 +30,9 @@ public interface Predictor {
 
         case NET_MHC_PAN:
             return NetMHCPanPredictor.INSTANCE;
+
+        case NET_MHC_STAB_PAN:
+            return NetStabPredictor.INSTANCE;
 
         case SMM:
             return SMMPredictor.INSTANCE;
