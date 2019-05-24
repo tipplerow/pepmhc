@@ -1,6 +1,7 @@
 
 package pepmhc.binder;
 
+import jam.math.DoubleRange;
 import jam.peptide.Peptide;
 
 /**
@@ -45,11 +46,8 @@ public final class BindingRecord {
     }
 
     private void validate() {
-        if (affinity <= 0.0)
-            throw new IllegalArgumentException("Invalid binding affinity.");
-
-        if (!Double.isNaN(percentile) && (percentile < 0.0 || percentile > 100.0))
-            throw new IllegalArgumentException("Invalid percentile rank.");
+        DoubleRange.NON_NEGATIVE.validate("binding affinity", affinity);
+        DoubleRange.PERCENTILE.validate("percentile rank", percentile);
     }
 
     public Peptide getPeptide() {
