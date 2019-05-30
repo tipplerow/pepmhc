@@ -386,6 +386,27 @@ Chowell.histGenotype <- function() {
     box()
 }
 
+Chowell.homoA <- function(cohort) {
+    .chowell.homoAllele(cohort, 1)
+}
+
+Chowell.homoB <- function(cohort) {
+    .chowell.homoAllele(cohort, 13)
+}
+
+Chowell.homoC <- function(cohort) {
+    .chowell.homoAllele(cohort, 25)
+}
+
+.chowell.homoAllele <- function(cohort, index) {
+    alleles <- cohort$HLA_Class_I_Alleles
+
+    stopifnot(all(nchar(alleles) == 35))
+
+    as.numeric(substr(alleles, index,     index + 4) ==
+               substr(alleles, index + 6, index + 10))
+}
+
 Chowell.homoPresent <- function() {
     allelePresent <- Chowell.loadAllelePresentation()
 
@@ -429,6 +450,18 @@ Chowell.loadCohort1 <- function() {
     cohort$NSCLC <- as.numeric(cohort$Cancer_Type == "Non-Small Cell Lung Cancer")
     cohort$PD1   <- as.numeric(cohort$Drug_Class == "PD-1")
 
+    cohort$homoA <- Chowell.homoA(cohort)
+    cohort$homoB <- Chowell.homoB(cohort)
+    cohort$homoC <- Chowell.homoC(cohort)
+
+    stopifnot(all(cohort$Homozygous == pmin(1, cohort$homoA + cohort$homoB + cohort$homoC)))
+
+    cohort$homo1 <- as.numeric(cohort$homoA + cohort$homoB + cohort$homoC == 1)
+    cohort$homo2 <- as.numeric(cohort$homoA + cohort$homoB + cohort$homoC == 2)
+    cohort$homo3 <- as.numeric(cohort$homoA + cohort$homoB + cohort$homoC == 3)
+
+    stopifnot(all(cohort$Homozygous == cohort$homo1 + cohort$homo2 + cohort$homo3))
+
     cohort$zTMB <- Chowell.zscore(log(cohort$MutCnt))
     cohort$zAGE <- Chowell.zscore(cohort$Age)
     cohort$zHLA <- Chowell.zscore(cohort$actualRate)
@@ -444,6 +477,18 @@ Chowell.loadCohort2 <- function() {
 
     cohort <- Chowell.loadCohort(file.path(Chowell.dataDir(), "Chowell_Cohort2.tsv"))
     cohort <- merge(cohort, present, by = "Sample")
+
+    cohort$homoA <- Chowell.homoA(cohort)
+    cohort$homoB <- Chowell.homoB(cohort)
+    cohort$homoC <- Chowell.homoC(cohort)
+
+    stopifnot(all(cohort$Homozygous == pmin(1, cohort$homoA + cohort$homoB + cohort$homoC)))
+
+    cohort$homo1 <- as.numeric(cohort$homoA + cohort$homoB + cohort$homoC == 1)
+    cohort$homo2 <- as.numeric(cohort$homoA + cohort$homoB + cohort$homoC == 2)
+    cohort$homo3 <- as.numeric(cohort$homoA + cohort$homoB + cohort$homoC == 3)
+
+    stopifnot(all(cohort$Homozygous == cohort$homo1 + cohort$homo2 + cohort$homo3))
 
     cohort$Age_31_50 <- as.numeric(cohort$Age_Group == "31-50")
     cohort$Age_50_60 <- as.numeric(cohort$Age_Group == "50-60")
@@ -534,6 +579,13 @@ Chowell.plotOverlapHomo <- function() {
          ylab = "True genotype presentation rate",
          pch  = 16,
          col  = ifelse(chow1$Homozygous, 2, 1))
+}
+
+Chowell.signifCode <- function(p) {
+    ifelse(p < 0.001, "***",
+    ifelse(p < 0.01,  "**",
+    ifelse(p < 0.05,  "*",
+    ifelse(p < 0.1,   ".", " "))))
 }
 
 Chowell.violinHLARate <- function() {
@@ -654,13 +706,6 @@ Chowell.writeGenotypeInput <- function(fileName) {
     master$HLA_Class_I_Alleles <- gsub(",", " ", master$HLA_Class_I_Alleles)
 
     write.csv(master, fileName, quote = FALSE, row.names = FALSE)
-}
-
-Chowell.signifCode <- function(p) {
-    ifelse(p < 0.001, "***",
-    ifelse(p < 0.01,  "**",
-    ifelse(p < 0.05,  "*",
-    ifelse(p < 0.1,   ".", " "))))
 }
 
 Chowell.zscore <- function(x) {

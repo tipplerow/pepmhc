@@ -226,6 +226,24 @@ Miao.cox <- function(master = NULL) {
     merged
 }
 
+Miao.coxHomo123 <- function(master = NULL) {
+    require(survival)
+
+    if (is.null(master))
+        master <- Miao.loadMaster()
+
+    coxPFS <-
+        coxph(Surv(pfs_days, pfs_event) ~
+                  homo1 + homo2 + homo3 + zTMB.By + zHLA.By + Bladder + HNSCC + Lung + PD1 + Both, data = master)
+
+    coxPFS <- Miao.coxFrame(coxPFS)
+
+    rownames(coxPFS) <- coxPFS$Covariate
+    coxPFS$Covariate <- NULL
+
+    coxPFS
+}
+
 Miao.coxNAP <- function(master = NULL, threshold = 100) {
     require(survival)
 
@@ -398,6 +416,76 @@ Miao.coxPlot <- function(master = NULL, survType = "PFS") {
     text(tx, 4.0, "Lung", adj = 1)
     text(tx, 3.0, "PD-1", adj = 1)
     text(tx, 2.0, "PD-1 + CTLA-4", adj = 1, cex = 1.0)
+    par(xpd = FALSE)
+}
+
+Miao.coxPlotHomo123 <- function(master = NULL) {
+    par(las = 1)
+    par(fig = c(0.2, 1.0, 0.0, 1.0))
+
+    plot(c(0.2, 8.0), c(0.5, 10.5),
+         log  = "x",
+         type = "n",
+         axes = FALSE,
+         xlab = "Hazard ratio",
+         ylab = "")
+    axis(1, at = c(0.2, 0.5, 1.0, 2.0, 4.0, 8.0))
+    lines(c(1, 1), c(-2, 12), lty = 3)
+
+    cox <- Miao.coxHomo123(master)
+    errY <- 0.075
+
+    plotCoeff <- function(rowName, height) {
+        x1 <- cox[rowName, "HR_CI95_Lo"]
+        x2 <- cox[rowName, "HR_CI95_Up"]
+
+        lines(c(x1, x2), c(height, height))
+        lines(c(x1, x1), c(height - errY, height + errY))
+        lines(c(x2, x2), c(height - errY, height + errY))
+
+        x <- cox[rowName, "HazardRatio"]
+        points(c(x, x), c(height, height), cex = 1.25, col = "black", pch = 16)
+
+        text(x, height + 0.2, Miao.signifCode(cox[rowName, "PValue"]), cex = 1.0)
+    }
+
+    plotCoeff("homo1",  10.0)
+    plotCoeff("homo2",   9.0)
+    plotCoeff("homo3",   8.0)
+    plotCoeff("zHLA.By", 7.0)
+    plotCoeff("zTMB.By", 6.0)
+    plotCoeff("Bladder", 5.0)
+    plotCoeff("HNSCC",   4.0)
+    plotCoeff("Lung",    3.0)
+    plotCoeff("PD1",     2.0)
+    plotCoeff("Both",    1.0)
+    box()
+
+    ##text(4.5, 8.0, sprintf("p = %.2f", cox1["zHLA", sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
+    ##text(4.5, 7.0, sprintf("p = %.3f", cox1["zTMB", sprintf("PValue.%s", survType)]), adj = 0, font = 3, cex = 0.85)
+
+    par(fig = c(0.0, 0.36, 0.0, 1.0), new = TRUE)
+    plot(c(0.0, 1.0), c(0.5, 10.5),
+         type = "n",
+         axes = FALSE,
+         xlab = "",
+         ylab = "")
+
+    tx <- 0.85
+
+    par(xpd = TRUE)
+    text(tx, 10.0, "Homozygosity: 1", adj = 1)
+    text(tx, 9.0, "Homozygosity: 2", adj = 1)
+    text(tx, 8.0, "Homozygosity: 3", adj = 1)
+    text(tx, 7.1, "HLA Score", adj = 1)
+    text(tx, 6.8, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
+    text(tx, 6.1, "Mutation Load", adj = 1)
+    text(tx, 5.8, "(z-score by cancer type)", adj = 1, font = 3, cex = 0.59)
+    text(tx, 5.0, "Bladder", adj = 1)
+    text(tx, 4.0, "HNSCC", adj = 1)
+    text(tx, 3.0, "Lung", adj = 1)
+    text(tx, 2.0, "PD-1", adj = 1)
+    text(tx, 1.0, "PD-1 + CTLA-4", adj = 1, cex = 1.0)
     par(xpd = FALSE)
 }
 
@@ -818,7 +906,17 @@ Miao.loadAllelePresentation <- function() {
 }
 
 Miao.loadMaster <- function(threshold = 100) {
-    read.csv(Miao.masterFileName(threshold))
+    master <- read.csv(Miao.masterFileName(threshold))
+
+    master$homo1 <- as.numeric(master$AlleleCount == 5)
+    master$homo2 <- as.numeric(master$AlleleCount == 4)
+    master$homo3 <- as.numeric(master$AlleleCount == 3)
+
+    master$homoA <- 1 - as.numeric(grepl("A[0-9][0-9][0-9][0-9] A", master$Genotype))
+    master$homoB <- 1 - as.numeric(grepl("B[0-9][0-9][0-9][0-9] B", master$Genotype))
+    master$homoC <- 1 - as.numeric(grepl("C[0-9][0-9][0-9][0-9] C", master$Genotype))
+
+    master
 }
 
 Miao.loadMutDetail <- function() {
