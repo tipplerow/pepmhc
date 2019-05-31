@@ -901,6 +901,31 @@ Miao.dataDir <- function() {
     file.path(homeDir, "Miao")
 }
 
+Miao.formatMissense <- function() {
+    mutDetail <- Miao.loadMutDetail()
+    mutDetail <- subset(mutDetail, Variant_Classification == "Missense_Mutation")
+    mutDetail <- mutDetail[,c("pair_id", "Hugo_Symbol", "Annotation_Transcript", "Protein_Change")]
+
+    mutDetail$Protein_Change <-
+        sub("^p\\.", "", mutDetail$Protein_Change)
+
+    patientDetail <- Miao.loadPatientDetail()
+    patientDetail <- patientDetail[,c("pair_id", "patient_id", "Tumor_Sample_Barcode")]
+
+    mutDetail <- merge(patientDetail, mutDetail, by = "pair_id")
+    mutDetail <-
+        mutDetail[,c("patient_id",
+                     "Tumor_Sample_Barcode",
+                     "Hugo_Symbol",
+                     "Annotation_Transcript",
+                     "Protein_Change")]
+
+    names(mutDetail) <-
+        c("Patient_ID", "Tumor_Sample_Barcode", "Hugo_Symbol", "Transcript_ID", "Protein_Change")
+
+    mutDetail
+}
+
 Miao.loadAllelePresentation <- function() {
     read.csv(file.path(Miao.dataDir(), "Miao_Allele_Present.csv"))
 }
@@ -987,6 +1012,15 @@ Miao.writeMaster <- function(threshold = 100) {
     masterFrame <- Miao.compileMaster(threshold)
 
     write.csv(masterFrame, fileName, quote = FALSE, row.names = FALSE)
+}
+
+Miao.writeMissense <- function() {
+    fileName <- file.path(Miao.dataDir(), "Miao_Missense.maf")
+    missenseFrame <- Miao.formatMissense()
+
+    write.table(missenseFrame, fileName,
+                quote = FALSE, sep = "\t",
+                col.names = TRUE, row.names = FALSE)
 }
 
 Miao.zscore <- function(x) {
