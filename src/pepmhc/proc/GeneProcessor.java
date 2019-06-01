@@ -8,8 +8,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import jam.app.JamLogger;
+import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblGene;
-import jam.ensembl.EnsemblMap;
+import jam.ensembl.EnsemblRecord;
 import jam.io.IOUtil;
 import jam.io.LineReader;
 import jam.peptide.Peptide;
@@ -60,11 +61,17 @@ public final class GeneProcessor {
     }
 
     private void processGene(EnsemblGene gene) {
-        Collection<Peptide> proteins = EnsemblMap.instance().get(gene);
+        Collection<EnsemblRecord> records = EnsemblDb.global().get(gene);
 
-        for (Peptide protein : proteins)
-            if (protein.isNative())
-                processProtein(protein);
+        for (EnsemblRecord record : records)
+            processRecord(record);
+    }
+
+    private void processRecord(EnsemblRecord record) {
+        Peptide protein = record.getPeptide();
+
+        if (protein.isNative())
+            processProtein(protein);
     }
 
     private void processProtein(Peptide protein) {
