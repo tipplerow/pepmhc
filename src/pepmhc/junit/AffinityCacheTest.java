@@ -1,8 +1,6 @@
 
 package pepmhc.junit;
 
-import java.util.List;
-
 import jam.hla.Allele;
 import jam.peptide.Peptide;
 
