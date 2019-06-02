@@ -9,36 +9,34 @@ import java.util.TreeSet;
 
 import jam.app.JamLogger;
 import jam.ensembl.EnsemblDb;
-import jam.ensembl.EnsemblGene;
 import jam.ensembl.EnsemblRecord;
 import jam.io.IOUtil;
 import jam.io.LineReader;
+import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 
 import pepmhc.chop.NetChop;
 import pepmhc.tap.TAP;
 
 /**
- * Reads an input file containing Ensembl gene identifiers and writes
- * an output file containing all unique 9-mer peptides predicted to be
- * cleaved by a proteasome and transported into the ER by TAP and thus
- * presented for possible MHC binding.
+ * Reads an input file containing HUGO symbols and writes an output
+ * file containing all unique 9-mer and 10-mer peptides predicted to
+ * be cleaved by a proteasome and transported into the ER by TAP and
+ * thus presented for possible MHC binding.
  */
 public final class GeneProcessor {
     private final String inputFile;
     private final String outputFile;
-    private final boolean mutate;
     private final Set<String> fragments;
 
-    private GeneProcessor(String inputFile, String outputFile, boolean mutate) {
-        this.mutate = mutate;
+    private GeneProcessor(String inputFile, String outputFile) {
         this.inputFile = inputFile;
         this.outputFile = outputFile;
         this.fragments = new TreeSet<String>();
     }
 
     private static final int LOG_INTERVAL = 1;
-    private static final int PEPTIDE_LENGTH = 9;
+    private static final int[] PEPTIDE_LENGTHS = new int[] { 9, 10 };
 
     private void run() {
         generateFragments();
@@ -49,9 +47,9 @@ public final class GeneProcessor {
         int processed = 0;
         LineReader reader = LineReader.open(inputFile);
 
-        for (String gene : reader) {
+        for (String hugo : reader) {
             ++processed;
-            processGene(EnsemblGene.instance(gene));
+            processGene(HugoSymbol.instance(hugo));
 
             if (processed % LOG_INTERVAL == 0)
                 JamLogger.info("Processed [%d] genes...", processed);
@@ -60,8 +58,8 @@ public final class GeneProcessor {
         reader.close();
     }
 
-    private void processGene(EnsemblGene gene) {
-        Collection<EnsemblRecord> records = EnsemblDb.global().get(gene);
+    private void processGene(HugoSymbol hugo) {
+        Collection<EnsemblRecord> records = EnsemblDb.global().get(hugo);
 
         for (EnsemblRecord record : records)
             processRecord(record);
@@ -75,10 +73,7 @@ public final class GeneProcessor {
     }
 
     private void processProtein(Peptide protein) {
-        if (mutate)
-            protein = protein.mutate();
-
-        List<Peptide> cleaved = NetChop.chop(protein, PEPTIDE_LENGTH);
+        List<Peptide> cleaved = NetChop.chop(protein, PEPTIDE_LENGTHS);
         List<Peptide> transported = TAP.INSTANCE.transport(cleaved);
 
         for (Peptide fragment : transported)
@@ -96,23 +91,19 @@ public final class GeneProcessor {
     }
 
     private static void usage() {
-        System.err.println("Usage: java pepmhc.proc.GeneProcessor INPUT_FILE OUTPUT_FILE [MUTATE]");
+        System.err.println("Usage: java pepmhc.proc.GeneProcessor INPUT_FILE OUTPUT_FILE");
         System.exit(1);
     }
 
     public static void main(String[] args) {
-        if (args.length < 2 || args.length > 3)
+        if (args.length != 2)
             usage();
 
         String inputFile = args[0];
         String outputFile = args[1];
-        boolean mutate = false;
-
-        if (args.length == 3)
-            mutate = Boolean.parseBoolean(args[2]);
 
         GeneProcessor processor =
-            new GeneProcessor(inputFile, outputFile, mutate);
+            new GeneProcessor(inputFile, outputFile);
 
         processor.run();
     }
