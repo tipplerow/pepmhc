@@ -15,7 +15,7 @@ final class StabilityBatchProcess extends BatchProcess<Peptide, StabilityRecord>
     private final Allele allele;
     private final Predictor predictor;
 
-    private final static int BATCH_SIZE = 10000;
+    private final static int BATCH_SIZE = 100000;
 
     private StabilityBatchProcess(Allele allele, Collection<Peptide> peptides) {
         super(peptides, BATCH_SIZE);
