@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import jam.app.JamEnv;
+import jam.app.JamProperties;
 import jam.io.FileUtil;
 import jam.peptide.Peptide;
 
@@ -18,10 +19,12 @@ import pepmhc.engine.smm.StabilizedMatrix;
  * 1741--1749 (2003).
  */
 public final class TAP {
+    private final double threshold;
     private final StabilizedMatrix matrix;
 
     private TAP() {
         this.matrix = StabilizedMatrix.load(resolveMatrixFile());
+        this.threshold = resolveThreshold();
     }
 
     private static String resolveMatrixFile() {
@@ -35,10 +38,23 @@ public final class TAP {
     public static final double SCORE_ALPHA = 0.2;
 
     /**
-     * The optimal threshold for epitope prediction as reported by
-     * Peters: 98% of known epitopes fall below this threshold.
+     * Name of the system property that defines the threshold score
+     * for transport: peptides must score BELOW this threshold to be
+     * transported.
      */
-    public static final double SCORE_THRESHOLD = 1.0;
+    public static final String THRESHOLD_SCORE_PROPERTY = "pepmhc.tap.thresholdScore";
+
+    /**
+     * Default value for the threshold score for transport: 
+     * Peters reports that 98% of known epitopes fall below this
+     * threshold.
+     */
+    public static final double THRESHOLD_SCORE_DEFAULT = 1.0;
+
+    private static double resolveThreshold() {
+        return JamProperties.getOptionalDouble(THRESHOLD_SCORE_PROPERTY,
+                                               THRESHOLD_SCORE_DEFAULT);
+    }
 
     /**
      * The single global instance.
@@ -57,7 +73,7 @@ public final class TAP {
      * nine or greater.
      */
     public boolean isTransported(Peptide peptide) {
-        return score(peptide) <= SCORE_THRESHOLD;
+        return score(peptide) <= threshold;
     }
 
     /**
