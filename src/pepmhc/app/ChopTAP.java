@@ -2,12 +2,15 @@
 package pepmhc.app;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
 import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblRecord;
+import jam.ensembl.TranscriptBiotype;
+import jam.io.IOUtil;
 import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 
@@ -21,24 +24,26 @@ import pepmhc.tap.TAP;
  */
 public final class ChopTAP {
     private final EnsemblDb db;
+    private final PrintWriter writer;
 
     private static final int[] PEPTIDE_LENGTHS = new int[] { 9, 10 };
 
-    private ChopTAP(EnsemblDb db) {
+    private ChopTAP(EnsemblDb db, PrintWriter writer) {
         this.db = db;
+        this.writer = writer;
     }
 
-    public static void run(EnsemblDb db) {
-        ChopTAP chopTAP = new ChopTAP(db);
+    public static void run(EnsemblDb db, PrintWriter writer) {
+        ChopTAP chopTAP = new ChopTAP(db, writer);
         chopTAP.run();
     }
 
-    public static void run(File fastaFile) {
-        run(EnsemblDb.create(fastaFile));
+    public static void run(File fastaFile, File outputFile) {
+        run(EnsemblDb.create(fastaFile), IOUtil.openWriter(outputFile));
     }
 
-    public static void run(String fastaFile) {
-        run(new File(fastaFile));
+    public static void run(String fastaFile, String outputFile) {
+        run(new File(fastaFile), new File(outputFile));
     }
 
     private void run() {
@@ -47,7 +52,7 @@ public final class ChopTAP {
     }
 
     private void writeHeader() {
-        System.out.println("Hugo_Symbol\tPeptide");
+        writer.println("Hugo_Symbol\tPeptide");
     }
 
     private void processSymbols() {
@@ -63,7 +68,9 @@ public final class ChopTAP {
 
     private void writePeptides(HugoSymbol symbol, Collection<String> peptides) {
         for (String peptide : peptides)
-            System.out.println(symbol.getKey() + "\t" + peptide);
+            writer.println(symbol.getKey() + "\t" + peptide);
+
+        writer.flush();
     }
 
     private Collection<String> generatePeptides(HugoSymbol symbol) {
@@ -77,6 +84,9 @@ public final class ChopTAP {
     }
 
     private Collection<String> generatePeptides(EnsemblRecord record) {
+        if (!record.getTranscriptBiotype().equals(TranscriptBiotype.PROTEIN_CODING))
+            return Collections.emptyList();
+
         Peptide peptide = record.getPeptide();
 
         if (!peptide.isNative())
@@ -89,14 +99,14 @@ public final class ChopTAP {
     }
 
     private static void usage() {
-        System.err.println("Usage: java [JVMOPTIONS] pepmhc.app.ChopTAP <ENSEMBL_FILE>");
+        System.err.println("Usage: java [JVMOPTIONS] pepmhc.app.ChopTAP <ENSEMBL_FILE> <OUTPUT_FILE>");
         System.exit(1);
     }
 
     public static void main(String[] args) {
-        if (args.length != 1)
+        if (args.length != 2)
             usage();
 
-        run(args[0]);
+        run(args[0], args[1]);
     }
 }
