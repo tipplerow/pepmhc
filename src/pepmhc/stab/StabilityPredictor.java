@@ -1,13 +1,18 @@
 
 package pepmhc.stab;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import jam.app.JamEnv;
 import jam.hla.Allele;
+import jam.io.LineReader;
 import jam.peptide.Peptide;
 
 import pepmhc.engine.Predictor;
@@ -28,12 +33,54 @@ public final class StabilityPredictor {
     private List<StabilityRecord> stab10;
     private List<StabilityRecord> stab11;
 
-    private final static PredictionMethod METHOD = PredictionMethod.NET_MHC_STAB_PAN;
+    private static Set<Allele> coverage = null;
+
+    private static final String COVERAGE_FILE = "data/allele/coverage_netMHCstabpan.txt";
+
+    private static final PredictionMethod METHOD = PredictionMethod.NET_MHC_STAB_PAN;
 
     private StabilityPredictor(Allele allele, Collection<Peptide> peptides) {
         this.allele = allele;
         this.peptides = peptides;
         this.stabRecords = new ArrayList<StabilityRecord>(peptides.size());
+    }
+
+    /**
+     * Identifies alleles covered by this stability predictor.
+     *
+     * @param allele an allele of interest.
+     *
+     * @return {@code true} iff the specified allele is covered by
+     * this stability predictor.
+     */
+    public static boolean isCovered(Allele allele) {
+        return viewCoverage().contains(allele);
+    }
+
+    /**
+     * Returns the set of alleles covered by this stability predictor.
+     *
+     * @return the set of alleles covered by this stability predictor.
+     */
+    public static Set<Allele> viewCoverage() {
+        if (coverage == null)
+            coverage = loadCoverage();
+
+        return coverage;
+    }
+
+    private static Set<Allele> loadCoverage() {
+        Set<Allele> alleles = new HashSet<Allele>();
+        LineReader  reader  = LineReader.open(resolveCoverageFile());
+
+        for (String allele : reader)
+            alleles.add(Allele.instance(allele));
+
+        return Collections.unmodifiableSet(alleles);
+    }
+
+    private static File resolveCoverageFile() {
+        return new File(JamEnv.getRequired("PEPMHC_HOME"), COVERAGE_FILE);
     }
 
     /**
