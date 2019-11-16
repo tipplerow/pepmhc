@@ -10,9 +10,9 @@ import java.util.TreeSet;
 import jam.app.JamLogger;
 import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblRecord;
+import jam.hugo.HugoSymbol;
 import jam.io.IOUtil;
 import jam.io.LineReader;
-import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 
 import pepmhc.chop.NetChop;
@@ -59,7 +59,7 @@ public final class GeneProcessor {
     }
 
     private void processGene(HugoSymbol hugo) {
-        Collection<EnsemblRecord> records = EnsemblDb.global().get(hugo);
+        Collection<EnsemblRecord> records = EnsemblDb.reference().get(hugo);
 
         for (EnsemblRecord record : records)
             processRecord(record);

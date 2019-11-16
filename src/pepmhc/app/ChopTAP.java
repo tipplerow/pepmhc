@@ -10,8 +10,8 @@ import java.util.TreeSet;
 import jam.ensembl.EnsemblDb;
 import jam.ensembl.EnsemblRecord;
 import jam.ensembl.TranscriptBiotype;
+import jam.hugo.HugoSymbol;
 import jam.io.IOUtil;
-import jam.peptide.HugoSymbol;
 import jam.peptide.Peptide;
 
 import pepmhc.chop.NetChop;
