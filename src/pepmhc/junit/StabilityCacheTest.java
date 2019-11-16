@@ -4,9 +4,9 @@ package pepmhc.junit;
 import jam.hla.Allele;
 import jam.peptide.Peptide;
 
-import pepmhc.stab.StabilityCache;
-import pepmhc.stab.StabilityPredictor;
-import pepmhc.stab.StabilityRecord;
+import jam.stab.NetStab;
+import jam.stab.StabilityCache;
+import jam.stab.StabilityRecord;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -19,7 +19,7 @@ public class StabilityCacheTest {
     private final Allele allele = Allele.instance("HLA-A*02:01");
 
     @Test public void testNetMHC() {
-        if (!StabilityPredictor.isInstalled())
+        if (!NetStab.isInstalled())
             return;
 
         StabilityRecord record = StabilityCache.get(allele, Peptide.parse("AEFGPWQTV"));

@@ -152,7 +152,7 @@ public final class StabilityCache {
 
     /**
      * Name of the environment variable that specifies the directory
-     * containing the persistent database store.  The system property
+     * containing the persistent database store. The system property
      * {@code pepmhc.stab.cacheDir} will take precedence if both are
      * specified.
      */
@@ -215,7 +215,7 @@ public final class StabilityCache {
 
         if (!missing.isEmpty()) {
             // Compute stability for each missing peptide...
-            List<StabilityRecord> records = StabilityPredictor.predict(allele, missing);
+            List<StabilityRecord> records = NetStab.run(allele, missing);
 
             // Add the new records to the cache and the database
             // table...

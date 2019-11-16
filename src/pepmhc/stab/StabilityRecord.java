@@ -1,13 +1,13 @@
 
 package pepmhc.stab;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import jam.math.DoubleRange;
 import jam.peptide.Peptide;
-
-import pepmhc.binder.BindingRecord;
+import jam.util.MapUtil;
 
 /**
  * Encapsulates the result of a peptide-MHC stability measurement or
@@ -54,56 +54,51 @@ public final class StabilityRecord {
     }
 
     /**
-     * Converts a binding record into a stability record.
+     * Creates a map of stability records indexed by peptide.
      *
-     * @param bindingRecord a binding record that actually has a
-     * half-life in its affinity attribute.
+     * @param records the records to map.
      *
-     * @return the stability record corresponding to the given binding
-     * record.
+     * @return a map of stability records indexed by peptide.
+     *
+     * @throws RuntimeException if the collection contains a duplicate
+     * peptide.
      */
-    public static StabilityRecord convert(BindingRecord bindingRecord) {
-        return new StabilityRecord(bindingRecord.getPeptide(),
-                                   bindingRecord.getAffinity(),
-                                   bindingRecord.getPercentile());
+    public static Map<Peptide, StabilityRecord> map(Collection<StabilityRecord> records) {
+        Map<Peptide, StabilityRecord> map = new HashMap<Peptide, StabilityRecord>(records.size());
+
+        for (StabilityRecord record : records)
+            MapUtil.putUnique(map, record.getPeptide(), record);
+
+        return map;
     }
 
     /**
-     * Converts a list of binding records into stability records.
+     * Returns the MHC-bound peptide.
      *
-     * @param bindingRecords a list of binding records that actually
-     * have half-lives in their affinity attributes.
-     *
-     * @return the stability records corresponding to the given
-     * binding records.
+     * @return the MHC-bound peptide.
      */
-    public static List<StabilityRecord> convert(List<BindingRecord> bindingRecords) {
-        List<StabilityRecord> stabilityRecords = new ArrayList<StabilityRecord>(bindingRecords.size());
-
-        for (BindingRecord bindingRecord : bindingRecords)
-            stabilityRecords.add(convert(bindingRecord));
-
-        return stabilityRecords;
-    }
-
     public Peptide getPeptide() {
         return peptide;
     }
 
+    /**
+     * Returns the half-life of the MHC-bound state (hours).
+     *
+     * @return the half-life of the MHC-bound state (hours).
+     */
     public double getHalfLife() {
         return halfLife;
     }
 
+    /**
+     * Returns the percentile rank of the half-life (relative to other
+     * peptides of the same length bound to the same allele).
+     *
+     * @return the percentile rank of the half-life (relative to other
+     * peptides of the same length bound to the same allele).
+     */
     public double getPercentile() {
         return percentile;
-    }
-
-    public boolean isHalfLifeSet() {
-        return !Double.isNaN(halfLife);
-    }
-
-    public boolean isPercentileSet() {
-        return !Double.isNaN(percentile);
     }
 
     @Override public String toString() {
