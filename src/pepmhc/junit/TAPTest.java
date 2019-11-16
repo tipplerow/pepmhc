@@ -4,11 +4,9 @@ package pepmhc.junit;
 import java.util.ArrayList;
 import java.util.List;
 
-import jam.io.LineReader;
-import jam.io.ObjectReader;
+import jam.io.TableReader;
 import jam.math.StatUtil;
 import jam.peptide.Peptide;
-import jam.util.RegexUtil;
 import jam.vector.VectorView;
 
 import pepmhc.tap.TAP;
@@ -21,40 +19,40 @@ public class TAPTest {
     private static final String IEDB_FILE    = "data/test/IEDB.csv";
 
     @Test public void testDiezCorr() {
-        List<Double> measured = new ArrayList<Double>();
-        List<Double> predicted = new ArrayList<Double>();
+        List<Double> measuredList = new ArrayList<Double>();
+        List<Double> predictedList = new ArrayList<Double>();
 
-        LineReader reader = LineReader.open(DIEZ_S1_FILE);
-        reader.next(); // Skip header line
+        TableReader reader = TableReader.open(DIEZ_S1_FILE);
 
-        for (String line : reader) {
-            String[] fields = RegexUtil.split(RegexUtil.COMMA, line, 2);
-            Peptide peptide = Peptide.parse(fields[0]);
+        for (List<String> fields : reader) {
+            Peptide peptide = Peptide.parse(fields.get(0));
 
-            measured.add(Double.parseDouble(fields[1]));
-            predicted.add(TAP.INSTANCE.score(peptide));
+            double measured  = Double.parseDouble(fields.get(1));
+            double predicted = TAP.consensus().score(peptide);
+
+            measuredList.add(measured);
+            predictedList.add(predicted);
         }
 
         reader.close();
-        assertTrue(StatUtil.cor(VectorView.wrap(measured), VectorView.wrap(predicted)) > 0.75);
+        assertTrue(StatUtil.cor(VectorView.wrap(measuredList), VectorView.wrap(predictedList)) > 0.75);
     }
 
     @Test public void testIEDBCorr() {
         List<Double> IEDB = new ArrayList<Double>();
         List<Double> ours = new ArrayList<Double>();
 
-        LineReader reader = LineReader.open(IEDB_FILE);
-        reader.next(); // Skip header line
+        TableReader reader = TableReader.open(IEDB_FILE);
 
-        for (String line : reader) {
-            String[] fields = RegexUtil.split(RegexUtil.COMMA, line, 2);
-            Peptide peptide = Peptide.parse(fields[0]);
+        for (List<String> fields : reader) {
+            Peptide peptide = Peptide.parse(fields.get(0));
 
-            IEDB.add(Double.parseDouble(fields[1]));
-            ours.add(TAP.INSTANCE.score(peptide));
+            IEDB.add(Double.parseDouble(fields.get(1)));
+            ours.add(TAP.consensus().score(peptide));
         }
 
         reader.close();
+        // IEDB flips the sign...
         assertTrue(StatUtil.cor(VectorView.wrap(IEDB), VectorView.wrap(ours)) < -0.95);
     }
 

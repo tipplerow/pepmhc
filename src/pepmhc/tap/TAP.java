@@ -8,58 +8,137 @@ import java.util.List;
 import jam.app.JamEnv;
 import jam.app.JamProperties;
 import jam.io.FileUtil;
+import jam.math.DoubleRange;
 import jam.peptide.Peptide;
-
-import pepmhc.engine.smm.StabilizedMatrix;
+import jam.peptide.Residue;
 
 /**
  * Predicts peptides that will be transported into the endoplasmic
  * reticulum by the transporter associated with antigen processing
- * (TAP) using a method reported by Peters et al., J. Immunol. 171,
- * 1741--1749 (2003).
+ * (TAP).  The method was developed by Peters et al. 
+ * <em>J. Immunol.</em> <b>171</b>, 1741-1749 (2003).
  */
 public final class TAP {
+    private final double alpha;
     private final double threshold;
-    private final StabilizedMatrix matrix;
+    private final TAPMatrix matrix;
 
-    private TAP() {
-        this.matrix = StabilizedMatrix.load(resolveMatrixFile());
-        this.threshold = resolveThreshold();
+    private static TAP consensus = null;
+
+    private TAP(TAPMatrix matrix, double alpha, double threshold) {
+        this.alpha = alpha;
+        this.matrix = matrix;
+        this.threshold = threshold;
+
+        ALPHA_RANGE.validate("Alpha factor", alpha);
+        THRESHOLD_SCORE_RANGE.validate("Score threshold", threshold);
     }
 
-    private static String resolveMatrixFile() {
-        return FileUtil.join(JamEnv.getRequired("PEPMHC_HOME"), "data", "tap", "consensus.txt");
-    }
+    /**
+     * Name of the system property that defines the shrinkage factor
+     * for the contribution of N-terminal residues.
+     */
+    public static final String ALPHA_PROPERTY = "pepmhc.tap.alpha";
 
     /**
      * The optimal shrinkage factor for the contribution of N-terminal
      * residues to the binding score as reported by Peters.
      */
-    public static final double SCORE_ALPHA = 0.2;
+    public static final double ALPHA_DEFAULT = 0.2;
+
+    /**
+     * Valid range of alpha shrinkage factors.
+     */
+    public static final DoubleRange ALPHA_RANGE = DoubleRange.FRACTIONAL;
 
     /**
      * Name of the system property that defines the threshold score
-     * for transport: peptides must score BELOW this threshold to be
+     * for transport. Peptides must score BELOW this threshold to be
      * transported.
      */
     public static final String THRESHOLD_SCORE_PROPERTY = "pepmhc.tap.thresholdScore";
 
     /**
-     * Default value for the threshold score for transport: 
-     * Peters reports that 98% of known epitopes fall below this
-     * threshold.
+     * Default value for the threshold score for transport.  Peters
+     * reports that 98% of known epitopes fall below 1.0, while the
+     * value -1.0 provides a reasonable trade-off between the false
+     * positive and false negative rate.
      */
     public static final double THRESHOLD_SCORE_DEFAULT = 1.0;
 
+    /**
+     * Valid range of score thresholds.
+     */
+    public static final DoubleRange THRESHOLD_SCORE_RANGE = DoubleRange.closed(-2.0, 2.0);
+
+    /**
+     * Creates a new TAP scorer.
+     *
+     * @param alpha the alpha shrinkage factor for N-terminal
+     * residues.
+     *
+     * @param threshold the score threshold for transport.
+     */
+    public TAP(double alpha, double threshold) {
+        this(TAPMatrix.consensus(), alpha, threshold);
+    }
+
+    /**
+     * Returns the consensus TAP scorer.
+     *
+     * @return the consensus TAP scorer.
+     */
+    public static TAP consensus() {
+        if (consensus == null)
+            consensus = createConsensus();
+
+        return consensus;
+    }
+
+    private static TAP createConsensus() {
+        return new TAP(TAPMatrix.consensus(), resolveAlpha(), resolveThreshold());
+    }
+
+    private static double resolveAlpha() {
+        return JamProperties.getOptionalDouble(ALPHA_PROPERTY,
+                                               ALPHA_RANGE,
+                                               ALPHA_DEFAULT);
+    }
+
     private static double resolveThreshold() {
         return JamProperties.getOptionalDouble(THRESHOLD_SCORE_PROPERTY,
+                                               THRESHOLD_SCORE_RANGE,
                                                THRESHOLD_SCORE_DEFAULT);
     }
 
     /**
-     * The single global instance.
+     * Returns the alpha shrinkage factor for N-terminal residues.
+     *
+     * @return the alpha shrinkage factor for N-terminal residues.
      */
-    public static final TAP INSTANCE = new TAP();
+    public double getAlpha() {
+        return alpha;
+    }
+
+    /**
+     * Returns the score threshold required for successful TAP
+     * transport.
+     *
+     * @return the score threshold required for successful TAP
+     * transport.
+     */
+    public double getThreshold() {
+        return threshold;
+    }
+
+    /**
+     * Returns the underlying scoring matrix.
+     *
+     * @return the underlying scoring matrix.
+     */
+    public TAPMatrix getMatrix() {
+        return matrix;
+    }
 
     /**
      * Identifies peptides that will be transported by TAP.
@@ -73,7 +152,7 @@ public final class TAP {
      * nine or greater.
      */
     public boolean isTransported(Peptide peptide) {
-        return score(peptide) <= threshold;
+        return peptide.isNative() && score(peptide) <= threshold;
     }
 
     /**
@@ -92,18 +171,21 @@ public final class TAP {
         // J. Immunol. 171, 1741--1749 (2003) with L = 9 and
         // alpha = 0.2.
         //
-        if (peptide.length() < 9)
+        int L = peptide.length();
+
+        if (L < 9)
             throw new IllegalArgumentException("Peptide must have at least nine residues.");
 
         // Start with the contribution from the C terminus...
-        double result = matrix.getElement(peptide.at(peptide.length() - 1), 8);
+        int    cterm = L - 1;
+        double score = matrix.get(peptide.at(cterm), TAPPosition.CTerm);
 
-        // Add the rescaled contributions from the first three
-        // N-terminal residues...
-        for (int nterm = 0; nterm < 3; ++nterm)
-            result += SCORE_ALPHA * matrix.getElement(peptide.at(nterm), nterm);
+        // Add the alpha-scaled contributions from the N-terminal residues...
+        score += alpha * matrix.get(peptide.at(0), TAPPosition.NTerm1);
+        score += alpha * matrix.get(peptide.at(1), TAPPosition.NTerm2);
+        score += alpha * matrix.get(peptide.at(2), TAPPosition.NTerm3);
 
-        return result;
+        return score;
     }
 
     /**

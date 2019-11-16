@@ -74,7 +74,7 @@ public final class GeneProcessor {
 
     private void processProtein(Peptide protein) {
         List<Peptide> cleaved = NetChop.chop(protein, PEPTIDE_LENGTHS);
-        List<Peptide> transported = TAP.INSTANCE.transport(cleaved);
+        List<Peptide> transported = TAP.consensus().transport(cleaved);
 
         for (Peptide fragment : transported)
             fragments.add(fragment.formatString());

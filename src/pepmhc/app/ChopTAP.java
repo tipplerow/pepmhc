@@ -93,7 +93,7 @@ public final class ChopTAP {
             return Collections.emptyList();
 
         Collection<Peptide> chopped = NetChop.chop(peptide, PEPTIDE_LENGTHS);
-        Collection<Peptide> transported = TAP.INSTANCE.transport(chopped);
+        Collection<Peptide> transported = TAP.consensus().transport(chopped);
 
         return Peptide.formatString(transported);
     }
