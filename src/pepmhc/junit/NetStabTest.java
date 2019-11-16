@@ -3,7 +3,7 @@ package pepmhc.junit;
 
 import jam.hla.Allele;
 import jam.peptide.Peptide;
-import jam.stab.NetStab;
+import pepmhc.stab.NetStab;
 
 import org.junit.*;
 import static org.junit.Assert.*;

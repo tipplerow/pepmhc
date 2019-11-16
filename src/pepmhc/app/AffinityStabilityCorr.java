@@ -9,12 +9,12 @@ import jam.hla.Allele;
 import jam.io.IOUtil;
 import jam.io.LineReader;
 import jam.peptide.Peptide;
-import jam.stab.StabilityCache;
-import jam.stab.StabilityRecord;
 
 import pepmhc.binder.BindingRecord;
 import pepmhc.cache.AffinityCache;
 import pepmhc.engine.PredictionMethod;
+import pepmhc.stab.StabilityCache;
+import pepmhc.stab.StabilityRecord;
 
 public final class AffinityStabilityCorr {
     private final Allele allele;

@@ -4,9 +4,9 @@ package pepmhc.junit;
 import jam.hla.Allele;
 import jam.peptide.Peptide;
 
-import jam.stab.NetStab;
-import jam.stab.StabilityCache;
-import jam.stab.StabilityRecord;
+import pepmhc.stab.NetStab;
+import pepmhc.stab.StabilityCache;
+import pepmhc.stab.StabilityRecord;
 
 import org.junit.*;
 import static org.junit.Assert.*;
