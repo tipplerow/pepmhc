@@ -1,0 +1,8 @@
+pepmhc.agpro.cleavageLength = 9, 10
+
+pepmhc.agpro.useNetChop = true
+pepmhc.agpro.useTAP     = true
+
+pepmhc.agpro.netChopThreshold  = 0.5
+pepmhc.agpro.tapAlpha          = 0.2
+pepmhc.agpro.tapScoreThreshold = 1.0
