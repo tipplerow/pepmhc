@@ -14,17 +14,25 @@ import jam.hla.Genotype;
 import jam.io.IOUtil;
 import jam.io.LineReader;
 import jam.lang.JamException;
+import jam.peptide.Peptide;
+import jam.peptide.Peptidome;
 import jam.report.LineBuilder;
 import jam.util.RegexUtil;
 
+import pepmhc.binder.BindingThreshold;
 import pepmhc.calc.PresentationRateCalculator;
+import pepmhc.engine.PredictionMethod;
 
 public final class GenotypePresentCalc extends JamApp {
+    private final String peptideInputFile;
     private final String genotypeInputFile;
     private final String alleleReportFile;
     private final String patientReportFile;
 
     private final PresentationRateCalculator calculator;
+
+    // The reference peptides...
+    private final Set<Peptide> peptides;
 
     // All unique alleles from all genotypes...
     private final Set<Allele> alleles;
@@ -37,12 +45,18 @@ public final class GenotypePresentCalc extends JamApp {
     private GenotypePresentCalc(String... propFiles) {
         super(propFiles);
 
+        this.peptideInputFile  = resolvePeptideInputFile();
         this.genotypeInputFile = resolveGenotypeInputFile();
         this.alleleReportFile  = resolveAlleleReportFile();
         this.patientReportFile = resolvePatientReportFile();
 
         this.alleles = new TreeSet<Allele>();
-        this.calculator = PresentationRateCalculator.global();
+        this.peptides = Peptidome.load(peptideInputFile);
+
+        this.calculator =
+            PresentationRateCalculator.instance(PredictionMethod.global(),
+                                                BindingThreshold.global(),
+                                                peptides);
     }
 
     /**
@@ -57,12 +71,19 @@ public final class GenotypePresentCalc extends JamApp {
 
     /**
      * Name of the system property that specifies the full path name
+     * of the peptide input file (a flat file containing one peptide
+     * per line and no header).
+     */
+    public static final String PEPTIDE_INPUT_FILE_PROPERTY = "pepmhc.app.peptideInputFile";
+
+    /**
+     * Name of the system property that specifies the full path name
      * of the genotype input file.
      *
-     * The genotype file must contain two comma-separated columns. The
-     * first column must contain a key identifying the patient to whom
-     * the genotype belongs; the second column must list the alleles
-     * contained in the genotype separated by white space.
+     * <p>The genotype file must contain two comma-separated columns.
+     * The first column must contain a key identifying the patient to
+     * whom the genotype belongs; the second column must list the
+     * alleles contained in the genotype separated by white space.
      */
     public static final String GENOTYPE_INPUT_FILE_PROPERTY = "pepmhc.app.genotypeInputFile";
 
@@ -77,6 +98,10 @@ public final class GenotypePresentCalc extends JamApp {
      * patient report file (written to the report directory.)
      */
     public static final String PATIENT_REPORT_FILE_PROPERTY = "pepmhc.app.patientReportFile";
+
+    private static String resolvePeptideInputFile() {
+        return JamProperties.getRequired(PEPTIDE_INPUT_FILE_PROPERTY);
+    }
 
     private static String resolveGenotypeInputFile() {
         return JamProperties.getRequired(GENOTYPE_INPUT_FILE_PROPERTY);

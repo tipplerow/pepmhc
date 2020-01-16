@@ -8,7 +8,6 @@ import jam.hla.Allele;
 import jam.hla.Genotype;
 import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
-import jam.peptide.ReferencePeptidome;
 
 import pepmhc.binder.BindingRecord;
 import pepmhc.binder.BindingThreshold;
@@ -34,20 +33,6 @@ public final class PresentationRateCalculator {
     }
 
     /**
-     * Returns a calculator for the global prediction method, binding
-     * threshold, and reference thymic peptidome.
-     *
-     * @return a calculator for the global prediction method, binding
-     * threshold, and peptide sample.
-     */
-    public static PresentationRateCalculator global() {
-        if (global == null)
-            global = new PresentationRateCalculator(PredictionMethod.global(),
-                                                    BindingThreshold.global(),
-                                                    ReferencePeptidome.THYMIC9.getPeptides());
-        return global;
-    }
-    /**
      * Returns a presentation rate calculator with a fixed prediction
      * method, binding threshold, and peptide collection.
      *
@@ -55,7 +40,7 @@ public final class PresentationRateCalculator {
      *
      * @param threshold the affinity/percentile threshold for binding.
      *
-     * @param peptides a reference peptide collection to examine.
+     * @param peptides the peptide collection to examine.
      *
      * @return a presentation rate calculator for the specified
      * prediction method, binding threshold, and peptide collection.
@@ -67,15 +52,14 @@ public final class PresentationRateCalculator {
     }
 
     /**
-     * Computes the fraction of reference peptides that bind to an
-     * allele according to a given prediction method and binding
-     * threshold.
+     * Computes the fraction of peptides that bind to an allele
+     * according to a given prediction method and binding threshold.
      *
      * @param method the affinity prediction method.
      *
      * @param threshold the affinity/percentile threshold for binding.
      *
-     * @param peptides the reference peptide collection to examine.
+     * @param peptides the peptide collection to examine.
      *
      * @param allele the allele to test.
      *
@@ -91,15 +75,14 @@ public final class PresentationRateCalculator {
     }
 
     /**
-     * Computes the fraction of reference peptides that bind to a
-     * genotype according to a given prediction method and binding
-     * threshold.
+     * Computes the fraction of peptides that bind to a genotype
+     * according to a given prediction method and binding threshold.
      *
      * @param method the affinity prediction method.
      *
      * @param threshold the affinity/percentile threshold for binding.
      *
-     * @param peptides the reference peptide collection to examine.
+     * @param peptides the peptide collection to examine.
      *
      * @param genotype the genotype to test.
      *
@@ -115,13 +98,12 @@ public final class PresentationRateCalculator {
     }
 
     /**
-     * Computes the fraction of reference peptides that bind to a
-     * given allele.
+     * Computes the fraction of peptides that bind to a given allele.
      *
      * @param allele the allele to test.
      *
-     * @return the fraction of reference peptides that bind to the
-     * specified allele.
+     * @return the fraction of peptides that bind to the specified
+     * allele.
      */
     public double compute(Allele allele) {
         Collection<BindingRecord> records = AffinityCache.get(method, allele, peptides);
@@ -133,13 +115,13 @@ public final class PresentationRateCalculator {
     }
 
     /**
-     * Computes the fraction of reference peptides that bind to a
-     * given genotype.
+     * Computes the fraction of peptides that bind to a given
+     * genotype.
      *
      * @param genotype the genotype to test.
      *
-     * @return the fraction of reference peptides that bind to the
-     * specified genotype.
+     * @return the fraction of peptides that bind to the specified
+     * genotype.
      */
     public double compute(Genotype genotype) {
         //
