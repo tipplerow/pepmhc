@@ -39,7 +39,7 @@ public final class ChopTAP {
     }
 
     public static void run(File fastaFile, File outputFile) {
-        run(EnsemblDb.create(fastaFile), IOUtil.openWriter(outputFile));
+        run(EnsemblDb.load(fastaFile), IOUtil.openWriter(outputFile));
     }
 
     public static void run(String fastaFile, String outputFile) {
