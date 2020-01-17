@@ -69,13 +69,13 @@ public final class AntigenProcessor {
     public static final String CLEAVAGE_LENGTH_PROPERTY = "pepmhc.agpro.cleavageLength";
 
     /**
-     * Name of the system property that specified whether to use the
+     * Name of the system property that specifies whether to use the
      * {@code netchop} program to predict peptide cleavage products.
      */
     public static final String USE_NETCHOP_PROPERTY = "pepmhc.agpro.useNetChop";
 
     /**
-     * Name of the system property that specified whether to use the
+     * Name of the system property that specifies whether to use the
      * TAP consensus matrix to compute binding affinity and to filter
      * cleavage products by affinity score.
      */
@@ -99,6 +99,54 @@ public final class AntigenProcessor {
      * threshold passed to the TAP predictor. (Required if using TAP).
      */
     public static final String TAP_SCORE_THRESHOLD_PROPERTY = "pepmhc.agpro.tapScoreThreshold";
+
+    /**
+     * Default value for the lengths of the peptides produced by
+     * proteasomal peptide cleavage.
+     */
+    public static final int[] CLEAVAGE_LENGTH_DEFAULT = new int[] { 9, 10 };
+
+    /**
+     * Default value specifying whether to use the {@code netchop}
+     * program to predict peptide cleavage products.
+     */
+    public static final boolean USE_NETCHOP_DEFAULT = true;
+
+    /**
+     * Default value specifying whether to use the TAP consensus
+     * matrix to compute binding affinity and to filter cleavage
+     * products by affinity score.
+     */
+    public static final boolean USE_TAP_DEFAULT = true;
+
+    /**
+     * Default value for the threshold cleavage probability passed to
+     * the {@code netchop} predictor.
+     */
+    public static final double NETCHOP_THRESHOLD_DEFAULT = 0.5;
+
+    /**
+     * Default value for the alpha shrinkage factor passed to the TAP
+     * predictor.
+     */
+    public static final double TAP_ALPHA_DEFAULT = 0.2;
+
+    /**
+     * Default value for the score selection threshold passed to the
+     * TAP predictor.
+     */
+    public static final double TAP_SCORE_THRESHOLD_DEFAULT = 1.0;
+
+    /**
+     * An antigen processor with the default configuration.
+     */
+    public static final AntigenProcessor DEFAULT =
+        new AntigenProcessor(CLEAVAGE_LENGTH_DEFAULT,
+                             USE_NETCHOP_DEFAULT,
+                             USE_TAP_DEFAULT,
+                             NETCHOP_THRESHOLD_DEFAULT,
+                             TAP_ALPHA_DEFAULT,
+                             TAP_SCORE_THRESHOLD_DEFAULT);
 
     /**
      * Creates a new <em>exhaustive</em> antigen processor: all
