@@ -2,8 +2,7 @@
 package pepmhc.agpro;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 import jam.app.JamProperties;
@@ -16,7 +15,6 @@ import jam.peptide.Peptide;
  * structures processed by the antigen processing machinery.
  */
 public final class SelfPeptideDb {
-    private final Set<Peptide> peptideSet;
     private final AntigenProcessor agProcessor;
     private final HugoPeptideTable peptideTable;
 
@@ -26,7 +24,6 @@ public final class SelfPeptideDb {
                           HugoPeptideTable peptideTable) {
         this.agProcessor  = agProcessor;
         this.peptideTable = peptideTable;
-        this.peptideSet   = peptideTable.collectUniquePeptides();
     }
 
     /**
@@ -139,7 +136,7 @@ public final class SelfPeptideDb {
      * database (is derived from one or more germline proteins).
      */
     public boolean contains(Peptide peptide) {
-        return peptideSet.contains(peptide);
+        return peptideTable.contains(peptide);
     }
 
     /**
@@ -149,7 +146,7 @@ public final class SelfPeptideDb {
      * contained in this database.
      */
     public Set<HugoSymbol> geneSet() {
-        return peptideTable.keySet();
+        return peptideTable.viewSymbols();
     }
 
     /**
@@ -157,11 +154,11 @@ public final class SelfPeptideDb {
      *
      * @param symbol the HUGO symbol of interest.
      *
-     * @return an unmodifiable list containing all peptides mapped to
-     * the specified symbol (an empty list if this database does not
-     * contain the symbol).
+     * @return an unmodifiable collection containing all peptides
+     * mapped to the specified symbol (an empty list if this database
+     * does not contain the symbol).
      */
-    public List<Peptide> lookup(HugoSymbol symbol) {
+    public Collection<Peptide> lookup(HugoSymbol symbol) {
         return peptideTable.get(symbol);
     }
 
