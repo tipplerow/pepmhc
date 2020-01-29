@@ -5,10 +5,12 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import jam.app.JamLogger;
 import jam.hla.Allele;
+import jam.hugo.HugoPeptideTable;
 import jam.io.IOUtil;
-import jam.io.LineReader;
 import jam.peptide.Peptide;
+import jam.util.ListUtil;
 
 import pepmhc.binder.BindingRecord;
 import pepmhc.cache.AffinityCache;
@@ -20,9 +22,10 @@ public final class AffinityStabilityCorr {
     private final Allele allele;
     private final String outputFile;
     private final String peptideFile;
+    private final int    sampleSize;
 
     private PrintWriter writer;
-    private final List<Peptide> peptides = new ArrayList<Peptide>();
+    private List<Peptide> peptides;
 
     private static final PredictionMethod METHOD = PredictionMethod.NET_MHC_PAN;
 
@@ -32,13 +35,21 @@ public final class AffinityStabilityCorr {
         this.allele      = Allele.instance(args[0]);
         this.peptideFile = args[1];
         this.outputFile  = args[2];
+        this.sampleSize  = resolveSampleSize(args);
     }
 
     private static void validate(String[] args) {
-        if (args.length != 3) {
-            System.err.println("Usage: pepmhc.app.AffinityStabilityCorr ALLELE PEPTIDE_FILE OUTPUT_FILE");
+        if (args.length < 3) {
+            System.err.println("Usage: pepmhc.app.AffinityStabilityCorr ALLELE PEPTIDE_FILE OUTPUT_FILE [SAMPLE_SIZE]");
             System.exit(1);
         }
+    }
+
+    private static int resolveSampleSize(String[] args) {
+        if (args.length < 4)
+            return Integer.MAX_VALUE;
+        else
+            return Integer.parseInt(args[3]);
     }
 
     private void run() {
@@ -48,6 +59,7 @@ public final class AffinityStabilityCorr {
             writeHeader();
             loadPeptides();
             processPeptides();
+            JamLogger.info("DONE!");
         }
         finally {
             IOUtil.close(writer);
@@ -63,12 +75,13 @@ public final class AffinityStabilityCorr {
     }
 
     private void loadPeptides() {
-        LineReader reader = LineReader.open(peptideFile);
+        HugoPeptideTable table = HugoPeptideTable.load(peptideFile);
+        peptides = new ArrayList<Peptide>(table.viewPeptides());
 
-        for (String line : reader)
-            peptides.add(Peptide.parse(line));
-
-        reader.close();
+        if (sampleSize < peptides.size()) {
+            ListUtil.shuffle(peptides);
+            peptides = peptides.subList(0, sampleSize);
+        }
     }
 
     private void processPeptides() {
