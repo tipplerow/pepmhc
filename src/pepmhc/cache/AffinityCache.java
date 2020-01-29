@@ -81,7 +81,11 @@ public final class AffinityCache {
     private Connection openConnection() {
         try {
             Class.forName("org.sqlite.JDBC");
-            return DriverManager.getConnection(formatURL());
+
+            Connection con = DriverManager.getConnection(formatURL());
+            con.setAutoCommit(false);
+
+            return con;
         }
         catch (Exception ex) {
             throw JamException.runtime(ex);
@@ -267,6 +271,8 @@ public final class AffinityCache {
         try (Statement statement = connection.createStatement()) {
             for (BindingRecord record : records)
                 insertRecord(statement, record);
+
+            connection.commit();
         }
         catch (SQLException ex) {
             //
