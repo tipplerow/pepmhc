@@ -167,7 +167,7 @@ public final class AffinityCache {
      * Name of the system property that specifies the directory
      * containing the persistent database store.
      */
-    public static final String CACHE_DIRECTORY_PROPERTY = "pepmhc.cache.directory";
+    public static final String CACHE_DIRECTORY_PROPERTY = "pepmhc.affinity.cacheDir";
 
     /**
      * Retrieves a binding record from the cache, computing on-demand
