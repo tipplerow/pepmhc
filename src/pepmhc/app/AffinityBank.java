@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jam.hla.Allele;
+import jam.hugo.HugoPeptideTable;
 import jam.io.IOUtil;
 import jam.io.LineReader;
 import jam.peptide.Peptide;
@@ -54,12 +55,8 @@ public final class AffinityBank {
     }
 
     private void loadPeptides() {
-        LineReader reader = LineReader.open(peptideFile);
-
-        for (String line : reader)
-            peptides.add(Peptide.parse(line));
-
-        reader.close();
+        HugoPeptideTable table = HugoPeptideTable.load(peptideFile);
+        peptides.addAll(table.viewPeptides());
     }
 
     private void processAlleles() {
