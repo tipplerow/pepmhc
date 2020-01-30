@@ -71,7 +71,7 @@ public final class AffinityStabilityCorr {
     }
 
     private void writeHeader() {
-        writer.println("peptide,affinity,halfLife");
+        writer.println("peptide,affinity,halfLife,affinityPct,stabilityPct");
     }
 
     private void loadPeptides() {
@@ -89,13 +89,16 @@ public final class AffinityStabilityCorr {
         List<StabilityRecord> stabilityRecords = StabilityCache.get(allele, peptides);
 
         for (int index = 0; index < peptides.size(); ++index)
-            writeLine(peptides.get(index),
-                      bindingRecords.get(index).getAffinity(),
-                      stabilityRecords.get(index).getHalfLife());
+            writeLine(peptides.get(index), bindingRecords.get(index), stabilityRecords.get(index));
     }
 
-    private void writeLine(Peptide peptide, double affinity, double halfLife) {
-        writer.println(String.format("%s,%.3f,%.3f", peptide.formatString(), affinity, halfLife));
+    private void writeLine(Peptide peptide, BindingRecord bindingRecord, StabilityRecord stabilityRecord) {
+        writer.println(String.format("%s,%.3f,%.3f,%.2f,%.2f",
+                                     peptide.formatString(),
+                                     bindingRecord.getAffinity(),
+                                     stabilityRecord.getHalfLife(),
+                                     bindingRecord.getPercentile(),
+                                     stabilityRecord.getPercentile()));
     }
 
     public static void main(String[] args) {
