@@ -18,6 +18,7 @@ import jam.io.FileUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
 import jam.util.ListUtil;
+import jam.util.PairKeyTable;
 
 import pepmhc.binder.BindingRecord;
 import pepmhc.engine.Predictor;
@@ -29,6 +30,8 @@ public final class AffinityProxyModel {
 
     private final double intercept;
     private final double coefficient;
+
+    private static final PairKeyTable<Allele, PredictionMethod, AffinityProxyModel> instances = PairKeyTable.hash();
 
     private AffinityProxyModel(Allele allele, PredictionMethod method, double intercept, double coefficient) {
         this.allele = allele;
@@ -131,6 +134,17 @@ public final class AffinityProxyModel {
      * affinity prediction method.
      */
     public static AffinityProxyModel instance(Allele allele, PredictionMethod method) {
+        AffinityProxyModel model = instances.get(allele, method);
+
+        if (model == null) {
+            model = create(allele, method);
+            instances.put(allele, method, model);
+        }
+
+        return model;
+    }
+
+    private static AffinityProxyModel create(Allele allele, PredictionMethod method) {
         if (exists(allele, method))
             return load(allele, method);
 
