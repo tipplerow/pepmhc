@@ -16,6 +16,7 @@ import jam.hugo.HugoPeptideTable;
 import jam.io.IOUtil;
 import jam.io.FileUtil;
 import jam.lang.JamException;
+import jam.math.JamRandom;
 import jam.peptide.Peptide;
 import jam.util.ListUtil;
 import jam.util.PairKeyTable;
@@ -32,6 +33,8 @@ public final class AffinityProxyModel {
     private final double coefficient;
 
     private static final PairKeyTable<Allele, PredictionMethod, AffinityProxyModel> instances = PairKeyTable.hash();
+
+    private static final long RANDOM_SEED = 20200131;
 
     private AffinityProxyModel(Allele allele, PredictionMethod method, double intercept, double coefficient) {
         this.allele = allele;
@@ -238,6 +241,39 @@ public final class AffinityProxyModel {
     }
 
     /**
+     * Predicts the stability for a collection of peptides.
+     *
+     * @param peptides the peptides of interest.
+     *
+     * @return a list containing the stability records for the
+     * specified peptides, in the same order as the collection
+     * iterator.
+     */
+    public List<StabilityRecord> predict(Collection<Peptide> peptides) {
+        List<BindingRecord> bindingRecords = Predictor.predict(method, allele, peptides);
+        List<StabilityRecord> stabilityRecords = new ArrayList<StabilityRecord>(peptides.size());
+
+        for (BindingRecord bindingRecord : bindingRecords)
+            stabilityRecords.add(stabilityRecord(bindingRecord));
+
+        return stabilityRecords;
+    }
+
+    /**
+     * Creates the stability record that corresponds to a binding
+     * record by converting the binding affinity to a dissociation
+     * half-life.
+     *
+     * @param bindingRecord the binding record to convert.
+     *
+     * @return the stability record that corresponds to the given
+     * binding record.
+     */
+    public StabilityRecord stabilityRecord(BindingRecord bindingRecord) {
+        return new StabilityRecord(bindingRecord.getPeptide(), halfLife(bindingRecord.getAffinity()));
+    }
+
+    /**
      * Stores the parameters of affinity proxy model in the standard
      * location defined by the {@code pepmhc} library.
      */
@@ -283,13 +319,14 @@ public final class AffinityProxyModel {
             peptideList = new ArrayList<Peptide>(peptideTable.viewPeptides());
 
             if (sampleSize < peptideList.size()) {
-                ListUtil.shuffle(peptideList);
+                JamRandom generator = JamRandom.generator(RANDOM_SEED);
+                ListUtil.shuffle(peptideList, generator);
                 peptideList = peptideList.subList(0, sampleSize);
             }
         }
 
         private void generateSampleData() {
-            List<BindingRecord> affinityRecords = Predictor.predict(method, allele, peptideList);
+            List<BindingRecord> bindingRecords = Predictor.predict(method, allele, peptideList);
             List<StabilityRecord> stabilityRecords = NetStab.run(allele, peptideList);
 
             sampleData = new double[peptideList.size()][];
@@ -298,7 +335,7 @@ public final class AffinityProxyModel {
                 //
                 // The linear regression model is: log(H) = intercept + coeff * log(A)
                 //
-                double affinity = affinityRecords.get(k).getAffinity();
+                double affinity = bindingRecords.get(k).getAffinity();
                 double halfLife = stabilityRecords.get(k).getHalfLife();
 
                 double logA = Math.log(affinity);

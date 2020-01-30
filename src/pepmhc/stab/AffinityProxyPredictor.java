@@ -46,6 +46,10 @@ public final class AffinityProxyPredictor extends StabilityPredictor {
     }
 
     @Override public List<StabilityRecord> predict(Allele allele, Collection<Peptide> peptides) {
-        return null;
+        return getModel(allele).predict(peptides);
+    }
+
+    private AffinityProxyModel getModel(Allele allele) {
+        return AffinityProxyModel.instance(allele, affinityMethod);
     }
 }
