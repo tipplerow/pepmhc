@@ -1,24 +1,12 @@
 
 package pepmhc.stab;
 
-import java.io.File;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.math3.stat.regression.SimpleRegression;
-
-import jam.app.JamEnv;
-import jam.app.JamProperties;
 import jam.hla.Allele;
-import jam.hugo.HugoPeptideTable;
-import jam.io.IOUtil;
-import jam.io.FileUtil;
-import jam.lang.JamException;
-import jam.math.JamRandom;
 import jam.peptide.Peptide;
-import jam.util.ListUtil;
 import jam.util.PairKeyTable;
 
 import pepmhc.binder.BindingRecord;
@@ -34,9 +22,25 @@ public final class AffinityProxyModel {
 
     private static final PairKeyTable<Allele, PredictionMethod, AffinityProxyModel> instances = PairKeyTable.hash();
 
-    private static final long RANDOM_SEED = 20200131;
+    /**
+     * Creates a new affinity-proxy model.
+     *
+     * @param allele the HLA allele which the model describes.
+     *
+     * @param method the affinity prediction method used to build the
+     * model.
+     *
+     * @param intercept the regression intercept for the model.
+     *
+     * @param coefficient the regression coefficient (slope) for the
+     * model.
+     *
+     * @throws IllegalArgumentException unless the coefficient is
+     * negative.
+     */
+    public AffinityProxyModel(Allele allele, PredictionMethod method, double intercept, double coefficient) {
+        validateCoefficient(coefficient);
 
-    private AffinityProxyModel(Allele allele, PredictionMethod method, double intercept, double coefficient) {
         this.allele = allele;
         this.method = method;
 
@@ -44,85 +48,22 @@ public final class AffinityProxyModel {
         this.coefficient = coefficient;
     }
 
-    /**
-     * System property naming the file that contains a HUGO-peptide
-     * table that will provide peptide fragments for model building.
-     */
-    public static final String PROXY_PEPTIDE_FILE_PROPERTY = "pepmhc.stab.proxyPeptideFile";
+    private static void validateCoefficient(double coefficient) {
+        if (coefficient >= 0.0)
+            throw new IllegalArgumentException("Coefficient must be negative.");
+    }
 
     /**
-     * System property defining the maximum number of peptides to use
-     * in model building.
-     */
-    public static final String PROXY_SAMPLE_SIZE_PROPERTY = "pepmhc.stab.proxySampleSize";
-
-    /**
-     * Default value for the maximum number of peptides to use in
-     * model building.
-     */
-    public static final int PROXY_SAMPLE_SIZE_DEFAULT = 100000;
-
-    /**
-     * Prefix for the regression intercept in the parameter file.
-     */
-    public static final String INTERCEPT_PREFIX = "Intercept:";
-
-    /**
-     * Prefix for the regression coefficient in the parameter file.
-     */
-    public static final String COEFFICIENT_PREFIX = "Coefficient:";
-
-    /**
-     * Builds an affinity-proxy model for a given HLA allele and
-     * affinity prediction method.
+     * Returns the affinity-proxy prediction engine for a given HLA
+     * allele and the default affinity prediction method.
      *
      * @param allele the HLA allele of interest.
      *
-     * @param method the affinity prediction method to use.
-     *
-     * @return an affinity-proxy model with parameters determined for
-     * the the specified HLA allele and affinity prediction method.
+     * @return the affinity-proxy prediction engine for the specified
+     * allele and the default affinity prediction method.
      */
-    public static AffinityProxyModel build(Allele allele, PredictionMethod method) {
-        SimpleRegression regression = Builder.build(allele, method);
-
-        assert regression.hasIntercept();
-        assert regression.getSlope() < 0.0;
-
-        double intercept = regression.getIntercept();
-        double coefficient = regression.getSlope();
-
-        return new AffinityProxyModel(allele, method, intercept, coefficient);
-    }
-
-    /**
-     * Determines whether a specific affinity-proxy model has been
-     * built.
-     *
-     * @param allele the HLA allele for the model.
-     *
-     * @param method the affinity prediction method for the model.
-     *
-     * @return {@code true} iff an affinity-proxy model for the
-     * specified allele and method has been built and stored.
-     */
-    public static boolean exists(Allele allele, PredictionMethod method) {
-        File file = file(allele, method);
-        return file.exists() && file.canRead();
-    }
-
-    /**
-     * Returns the parameter file for an affinity-proxy model.
-     *
-     * @param allele the HLA allele for the model.
-     *
-     * @param method the affinity prediction method for the model.
-     *
-     * @return the parameter file for the affinity-proxy model for the
-     * specified allele and method.
-     */
-    public static File file(Allele allele, PredictionMethod method) {
-        return new File(path(allele, method));
+    public static AffinityProxyModel instance(Allele allele) {
+        return instance(allele, PredictionMethod.NET_MHC_PAN);
     }
 
     /**
@@ -134,7 +75,7 @@ public final class AffinityProxyModel {
      * @param method the affinity prediction method.
      *
      * @return the affinity-proxy prediction engine for the specified
-     * affinity prediction method.
+     * allele and affinity prediction method.
      */
     public static AffinityProxyModel instance(Allele allele, PredictionMethod method) {
         AffinityProxyModel model = instances.get(allele, method);
@@ -151,70 +92,60 @@ public final class AffinityProxyModel {
         if (exists(allele, method))
             return load(allele, method);
 
-        AffinityProxyModel model = build(allele, method);
+        AffinityProxyModel model = AffinityProxyBuilder.build(allele, method);
         model.store();
 
         return model;
     }
 
-    /**
-     * Loads the affinity-proxy model for a given HLA allele and
-     * affinity prediction method.
-     *
-     * @param allele the HLA allele of interest.
-     *
-     * @param method the affinity prediction method to use.
-     *
-     * @return an affinity-proxy model with parameters loaded from the
-     * corresponding parameter file.
-     *
-     * @throws RuntimeException unless a properly formatted parameter
-     * file exists.
-     */
-    public static AffinityProxyModel load(Allele allele, PredictionMethod method) {
-        File file = file(allele, method);
-        List<String> lines = IOUtil.readLines(file);
-
-        if (lines.size() != 2)
-            throw JamException.runtime("Invalid parameter file: [%s].", file);
-
-        double intercept   = parseIntercept(lines);
-        double coefficient = parseCoefficient(lines);
-
-        return new AffinityProxyModel(allele, method, intercept, coefficient);
+    private static boolean exists(Allele allele, PredictionMethod method) {
+        return AffinityProxyDb.instance().contains(allele, method);
     }
 
-    private static double parseIntercept(List<String> lines) {
-        return parseLine(lines.get(0), INTERCEPT_PREFIX);
+    private static AffinityProxyModel load(Allele allele, PredictionMethod method) {
+        return AffinityProxyDb.instance().lookup(allele, method);
     }
 
-    private static double parseCoefficient(List<String> lines) {
-        return parseLine(lines.get(1), COEFFICIENT_PREFIX);
-    }
-
-    private static double parseLine(String line, String prefix) {
-        if (!line.startsWith(prefix))
-            throw JamException.runtime("Invalid parameter line: [%s].", line);
-
-        return Double.parseDouble(line.substring(prefix.length()));
+    private void store() {
+        AffinityProxyDb.instance().add(this);
     }
 
     /**
-     * Returns the full path name of the parameter file for an
-     * affinity-proxy model.
+     * Returns the HLA allele which this model describes.
      *
-     * @param allele the HLA allele for the model.
-     *
-     * @param method the affinity prediction method for the model.
-     *
-     * @return the full path name of the parameter file for the
-     * affinity-proxy model for the specified allele and method.
+     * @return the HLA allele which this model describes.
      */
-    public static String path(Allele allele, PredictionMethod method) {
-        String pepHome  = JamEnv.getRequired("PEPMHC_HOME");
-        String baseName = String.format("%s_%s.txt", allele.shortKey(), method);
+    public Allele getAllele() {
+        return allele;
+    }
 
-        return FileUtil.join(pepHome, "data", "proxy", baseName);
+    /**
+     * Returns the affinity prediction method used to build this
+     * model.
+     *
+     * @return the affinity prediction method used to build this
+     * model.
+     */
+    public PredictionMethod getMethod() {
+        return method;
+    }
+
+    /**
+     * Returns the regression intercept for this model.
+     *
+     * @return the regression intercept for this model.
+     */
+    public double getIntercept() {
+        return intercept;
+    }
+
+    /**
+     * Returns the regression coefficient (slope) for this model.
+     *
+     * @return the regression coefficient (slope) for this model.
+     */
+    public double getCoefficient() {
+        return coefficient;
     }
 
     /**
@@ -271,83 +202,5 @@ public final class AffinityProxyModel {
      */
     public StabilityRecord stabilityRecord(BindingRecord bindingRecord) {
         return new StabilityRecord(bindingRecord.getPeptide(), halfLife(bindingRecord.getAffinity()));
-    }
-
-    /**
-     * Stores the parameters of affinity proxy model in the standard
-     * location defined by the {@code pepmhc} library.
-     */
-    public void store() {
-        PrintWriter writer = IOUtil.openWriter(file(allele, method));
-
-        writer.println(String.format("%s %9.4f", INTERCEPT_PREFIX, intercept));
-        writer.println(String.format("%s %7.4f", COEFFICIENT_PREFIX, coefficient));
-        writer.close();
-    }
-
-    private static final class Builder {
-        private final Allele allele;
-        private final PredictionMethod method;
-
-        private double[][] sampleData;
-        private List<Peptide> peptideList;
-        private SimpleRegression regression;
-
-        private Builder(Allele allele, PredictionMethod method) {
-            this.allele = allele;
-            this.method = method;
-        }
-
-        private static SimpleRegression build(Allele allele, PredictionMethod method) {
-            Builder builder = new Builder(allele, method);
-            return builder.build();
-        }
-
-        private SimpleRegression build() {
-            selectSamplePeptides();
-            generateSampleData();
-            createRegression();
-            
-            return regression;
-        }
-
-        private void selectSamplePeptides() {
-            String peptideFile = JamProperties.getRequired(PROXY_PEPTIDE_FILE_PROPERTY);
-            int    sampleSize  = JamProperties.getOptionalInt(PROXY_SAMPLE_SIZE_PROPERTY, PROXY_SAMPLE_SIZE_DEFAULT);
-
-            HugoPeptideTable peptideTable = HugoPeptideTable.load(peptideFile);
-            peptideList = new ArrayList<Peptide>(peptideTable.viewPeptides());
-
-            if (sampleSize < peptideList.size()) {
-                JamRandom generator = JamRandom.generator(RANDOM_SEED);
-                ListUtil.shuffle(peptideList, generator);
-                peptideList = peptideList.subList(0, sampleSize);
-            }
-        }
-
-        private void generateSampleData() {
-            List<BindingRecord> bindingRecords = Predictor.predict(method, allele, peptideList);
-            List<StabilityRecord> stabilityRecords = NetStab.run(allele, peptideList);
-
-            sampleData = new double[peptideList.size()][];
-
-            for (int k = 0; k < peptideList.size(); ++k) {
-                //
-                // The linear regression model is: log(H) = intercept + coeff * log(A)
-                //
-                double affinity = bindingRecords.get(k).getAffinity();
-                double halfLife = stabilityRecords.get(k).getHalfLife();
-
-                double logA = Math.log(affinity);
-                double logH = Math.log(halfLife);
-
-                sampleData[k] = new double[] { logA, logH };
-            }
-        }
-
-        private void createRegression() {
-            regression = new SimpleRegression();
-            regression.addData(sampleData);
-        }
     }
 }
