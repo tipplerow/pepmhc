@@ -4,6 +4,7 @@ package pepmhc.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import jam.app.JamLogger;
 import jam.hla.Allele;
 import jam.hugo.HugoPeptideTable;
 import jam.io.IOUtil;
@@ -43,6 +44,7 @@ public final class AffinityBank {
         loadAlleles();
         loadPeptides();
         processAlleles();
+        JamLogger.info("DONE!");
     }
 
     private void loadAlleles() {
