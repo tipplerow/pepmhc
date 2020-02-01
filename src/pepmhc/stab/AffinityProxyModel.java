@@ -10,7 +10,7 @@ import jam.peptide.Peptide;
 import jam.util.PairKeyTable;
 
 import pepmhc.binder.BindingRecord;
-import pepmhc.engine.Predictor;
+import pepmhc.cache.AffinityCache;
 import pepmhc.engine.PredictionMethod;
 
 public final class AffinityProxyModel {
@@ -181,7 +181,7 @@ public final class AffinityProxyModel {
      * iterator.
      */
     public List<StabilityRecord> predict(Collection<Peptide> peptides) {
-        List<BindingRecord> bindingRecords = Predictor.predict(method, allele, peptides);
+        List<BindingRecord> bindingRecords = AffinityCache.get(method, allele, peptides);
         List<StabilityRecord> stabilityRecords = new ArrayList<StabilityRecord>(peptides.size());
 
         for (BindingRecord bindingRecord : bindingRecords)
