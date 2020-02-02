@@ -78,6 +78,8 @@ public final class AffinityProxyBuilder {
                 AffinityProxyModel model = build(allele, method);
                 AffinityProxyDb.instance().add(model);
             }
+
+            JamLogger.info("DONE!");
         }
         finally {
             reader.close();

@@ -26,7 +26,7 @@ public final class AffinityProxyDb {
     private static final String TABLE_NAME = "proxy_param";
 
     private static final String KEY_NAME         = "allele_method";
-    private static final String INTERCEPT_NAME   = "half_life";
+    private static final String INTERCEPT_NAME   = "intercept";
     private static final String COEFFICIENT_NAME = "coefficient";
 
     private static final String TABLE_SCHEMA =
