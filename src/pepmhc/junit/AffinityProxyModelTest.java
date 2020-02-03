@@ -20,10 +20,10 @@ public class AffinityProxyModelTest {
         AffinityProxyModel model1 = AffinityProxyModel.instance(A0101);
         AffinityProxyModel model2 = AffinityProxyModel.instance(A0201);
 
-        assertEquals( 2.593924, model1.getIntercept(),   0.000001);
-        assertEquals(-0.434550, model1.getCoefficient(), 0.000001);
-        assertEquals( 2.675812, model2.getIntercept(),   0.000001);
-        assertEquals(-0.446402, model2.getCoefficient(), 0.000001);
+        assertEquals( 2.614877, model1.getIntercept(),   0.000001);
+        assertEquals(-0.436525, model1.getCoefficient(), 0.000001);
+        assertEquals( 2.691525, model2.getIntercept(),   0.000001);
+        assertEquals(-0.448037, model2.getCoefficient(), 0.000001);
     }
 
     public static void main(String[] args) {
