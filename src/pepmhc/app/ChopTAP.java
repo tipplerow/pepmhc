@@ -38,12 +38,8 @@ public final class ChopTAP {
         chopTAP.run();
     }
 
-    public static void run(File fastaFile, File outputFile) {
-        run(EnsemblDb.load(fastaFile), IOUtil.openWriter(outputFile));
-    }
-
     public static void run(String fastaFile, String outputFile) {
-        run(new File(fastaFile), new File(outputFile));
+        run(EnsemblDb.load(fastaFile), IOUtil.openWriter(outputFile));
     }
 
     private void run() {
