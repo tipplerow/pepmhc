@@ -7,7 +7,6 @@ import java.util.Map;
 
 import jam.math.DoubleRange;
 import jam.peptide.Peptide;
-import jam.util.MapUtil;
 
 /**
  * Encapsulates the result of a peptide-MHC stability measurement or
@@ -51,25 +50,6 @@ public final class StabilityRecord {
     private void validate() {
         DoubleRange.NON_NEGATIVE.validate("half-life", halfLife);
         DoubleRange.PERCENTILE.validate("percentile rank", percentile);
-    }
-
-    /**
-     * Creates a map of stability records indexed by peptide.
-     *
-     * @param records the records to map.
-     *
-     * @return a map of stability records indexed by peptide.
-     *
-     * @throws RuntimeException if the collection contains a duplicate
-     * peptide.
-     */
-    public static Map<Peptide, StabilityRecord> map(Collection<StabilityRecord> records) {
-        Map<Peptide, StabilityRecord> map = new HashMap<Peptide, StabilityRecord>(records.size());
-
-        for (StabilityRecord record : records)
-            MapUtil.putUnique(map, record.getPeptide(), record);
-
-        return map;
     }
 
     /**
