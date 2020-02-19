@@ -194,7 +194,15 @@ public final class StabilityCache {
         return instance(allele).get(peptides);
     }
 
-    private static synchronized StabilityCache instance(Allele allele) {
+    private static StabilityCache instance(Allele allele) {
+        JamLogger.info("Requesting stability cache for allele [%s]...", allele);
+        StabilityCache cache = instanceSync(allele);
+
+        JamLogger.info("Acquired stability cache for allele [%s]...", allele);
+        return cache;
+    }
+
+    private static synchronized StabilityCache instanceSync(Allele allele) {
         StabilityCache cache = instances.get(allele);
 
         if (cache == null) {
@@ -206,7 +214,15 @@ public final class StabilityCache {
         return cache;
     }
 
-    private synchronized List<StabilityRecord> get(Collection<Peptide> peptides) {
+    private List<StabilityRecord> get(Collection<Peptide> peptides) {
+        JamLogger.info("Requesting [%d] records for allele [%s]...", peptides.size(), allele);
+        List<StabilityRecord> records = getSync(peptides);
+
+        JamLogger.info("Received [%d] records for allele [%s]...", peptides.size(), allele);
+        return records;
+    }
+
+    private synchronized List<StabilityRecord> getSync(Collection<Peptide> peptides) {
         //
         // Identify peptides from the input collection that are not
         // present in the cache ("missing" peptides)...
@@ -246,7 +262,6 @@ public final class StabilityCache {
 
     private void updateTable(List<StabilityRecord> records) {
         JamLogger.info("Adding [%s] records to the database table...", records.size());
-        
 
         try (Statement statement = connection.createStatement()) {
             for (StabilityRecord record : records)
