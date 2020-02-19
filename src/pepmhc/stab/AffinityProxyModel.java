@@ -77,7 +77,7 @@ public final class AffinityProxyModel {
      * @return the affinity-proxy prediction engine for the specified
      * allele and affinity prediction method.
      */
-    public static AffinityProxyModel instance(Allele allele, PredictionMethod method) {
+    public static synchronized AffinityProxyModel instance(Allele allele, PredictionMethod method) {
         AffinityProxyModel model = instances.get(allele, method);
 
         if (model == null) {
