@@ -25,7 +25,8 @@ public enum StabilityMethod {
         }
 
         @Override public List<StabilityRecord> predict(Allele allele, Collection<Peptide> peptides) {
-            return StabilityCache.get(allele, peptides);
+            //return StabilityCache.get(allele, peptides);
+            return StabilityStore.instance(allele).getRecords(peptides);
         }
     },
 
