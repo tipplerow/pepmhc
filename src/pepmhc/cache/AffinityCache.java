@@ -207,7 +207,7 @@ public final class AffinityCache {
         return instance(method, allele).get(peptides);
     }
 
-    private static AffinityCache instance(PredictionMethod method, Allele allele) {
+    private static synchronized AffinityCache instance(PredictionMethod method, Allele allele) {
         Map<Allele, AffinityCache> cacheMap = instances.get(method);
 
         if (cacheMap == null) {
@@ -227,7 +227,7 @@ public final class AffinityCache {
         return cache;
     }
 
-    private List<BindingRecord> get(Collection<Peptide> peptides) {
+    private synchronized List<BindingRecord> get(Collection<Peptide> peptides) {
         //
         // Identify peptides from the input collection that are not
         // present in the cache ("missing" peptides)...

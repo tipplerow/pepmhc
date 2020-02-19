@@ -194,7 +194,7 @@ public final class StabilityCache {
         return instance(allele).get(peptides);
     }
 
-    private static StabilityCache instance(Allele allele) {
+    private static synchronized StabilityCache instance(Allele allele) {
         StabilityCache cache = instances.get(allele);
 
         if (cache == null) {
@@ -206,7 +206,7 @@ public final class StabilityCache {
         return cache;
     }
 
-    private List<StabilityRecord> get(Collection<Peptide> peptides) {
+    private synchronized List<StabilityRecord> get(Collection<Peptide> peptides) {
         //
         // Identify peptides from the input collection that are not
         // present in the cache ("missing" peptides)...
