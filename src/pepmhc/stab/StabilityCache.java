@@ -44,6 +44,24 @@ public final class StabilityCache extends BindCache<StabilityRecord> {
     }
 
     /**
+     * Clears any active caches for a given HLA allele (e.g., after
+     * the allele has been processed).
+     *
+     * @param allele the allele that has been processed.
+     */
+    public static void clear(Allele allele) {
+        for (StabilityMethod method : StabilityMethod.values())
+            clear(method, allele);
+    }
+
+    private static void clear(StabilityMethod method, Allele allele) {
+        StabilityCache instance = instances.get(method, allele);
+
+        if (instance != null)
+            instance.clear();
+    }
+
+    /**
      * Returns the stability cache for a given allele and prediction
      * method.
      *
@@ -54,7 +72,7 @@ public final class StabilityCache extends BindCache<StabilityRecord> {
      * @return the stability cache for the specified allele and
      * prediction method.
      */
-    public static synchronized StabilityCache instance(StabilityMethod method, Allele allele) {
+    public static StabilityCache instance(StabilityMethod method, Allele allele) {
         StabilityCache instance = instances.get(method, allele);
 
         if (instance == null)
@@ -69,18 +87,6 @@ public final class StabilityCache extends BindCache<StabilityRecord> {
 
         instances.put(method, allele, instance);
         return instance;
-    }
-
-    /**
-     * Clears this cache: removes all cached records from memory and
-     * removes this cache from the underlying instance map.
-     */
-    @Override public void clear() {
-        super.clear();
-
-        synchronized (instances) {
-            instances.remove(getMethod(), getAllele());
-        }
     }
 
     @Override public StabilityMethod getMethod() {
