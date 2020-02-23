@@ -19,9 +19,9 @@ import jam.peptide.Peptidome;
 import jam.report.LineBuilder;
 import jam.util.RegexUtil;
 
-import pepmhc.binder.BindingThreshold;
+import pepmhc.affy.AffinityMethod;
+import pepmhc.affy.AffinityThreshold;
 import pepmhc.calc.PresentationRateCalculator;
-import pepmhc.engine.PredictionMethod;
 
 public final class GenotypePresentCalc extends JamApp {
     private final String peptideInputFile;
@@ -54,8 +54,8 @@ public final class GenotypePresentCalc extends JamApp {
         this.peptides = Peptidome.load(peptideInputFile);
 
         this.calculator =
-            PresentationRateCalculator.instance(PredictionMethod.global(),
-                                                BindingThreshold.global(),
+            PresentationRateCalculator.instance(AffinityMethod.global(),
+                                                AffinityThreshold.global(),
                                                 peptides);
     }
 

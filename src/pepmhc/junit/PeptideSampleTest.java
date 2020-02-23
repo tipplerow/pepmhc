@@ -3,7 +3,7 @@ package pepmhc.junit;
 
 import java.util.Set;
 import jam.peptide.Peptide;
-import pepmhc.cache.PeptideSample;
+import pepmhc.calc.PeptideSample;
 
 import org.junit.*;
 import static org.junit.Assert.*;

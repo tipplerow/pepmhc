@@ -5,15 +5,15 @@ import jam.hla.Allele;
 import jam.peptide.Peptide;
 import jam.peptide.Residue;
 
-import pepmhc.engine.PredictionMethod;
-import pepmhc.engine.smm.StabilizedMatrix;
+import pepmhc.affy.AffinityMethod;
+import pepmhc.affy.smm.StabilizedMatrix;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class StabilizedMatrixTest {
     @Test public void testSMM() {
-        StabilizedMatrix mat = StabilizedMatrix.instance(PredictionMethod.SMM, Allele.instance("HLA-A*01:01"), 9);
+        StabilizedMatrix mat = StabilizedMatrix.instance(AffinityMethod.SMM, Allele.instance("HLA-A*01:01"), 9);
 
         assertEquals(9, mat.getPeptideLength());
         assertEquals(5.07755, mat.getIntercept(), 0.00001);

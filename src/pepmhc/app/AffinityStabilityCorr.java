@@ -12,10 +12,11 @@ import jam.io.IOUtil;
 import jam.peptide.Peptide;
 import jam.util.ListUtil;
 
-import pepmhc.binder.BindingRecord;
-import pepmhc.cache.AffinityCache;
-import pepmhc.engine.PredictionMethod;
+import pepmhc.affy.AffinityCache;
+import pepmhc.affy.AffinityMethod;
+import pepmhc.affy.AffinityRecord;
 import pepmhc.stab.StabilityCache;
+import pepmhc.stab.StabilityMethod;
 import pepmhc.stab.StabilityRecord;
 
 public final class AffinityStabilityCorr {
@@ -27,7 +28,8 @@ public final class AffinityStabilityCorr {
     private PrintWriter writer;
     private List<Peptide> peptides;
 
-    private static final PredictionMethod METHOD = PredictionMethod.NET_MHC_PAN;
+    private static final AffinityMethod AFFINITY_METHOD = AffinityMethod.NET_MHC_PAN;
+    private static final StabilityMethod STABILITY_METHOD = StabilityMethod.NET_MHC_STAB_PAN;
 
     private AffinityStabilityCorr(String[] args) {
         validate(args);
@@ -85,19 +87,19 @@ public final class AffinityStabilityCorr {
     }
 
     private void processPeptides() {
-        List<BindingRecord>   bindingRecords   = AffinityCache.get(METHOD, allele, peptides);
-        List<StabilityRecord> stabilityRecords = StabilityCache.get(allele, peptides);
+        List<AffinityRecord> affinityRecords = AffinityCache.instance(AFFINITY_METHOD, allele).get(peptides);
+        List<StabilityRecord> stabilityRecords = StabilityCache.instance(STABILITY_METHOD, allele).get(peptides);
 
         for (int index = 0; index < peptides.size(); ++index)
-            writeLine(peptides.get(index), bindingRecords.get(index), stabilityRecords.get(index));
+            writeLine(peptides.get(index), affinityRecords.get(index), stabilityRecords.get(index));
     }
 
-    private void writeLine(Peptide peptide, BindingRecord bindingRecord, StabilityRecord stabilityRecord) {
+    private void writeLine(Peptide peptide, AffinityRecord affinityRecord, StabilityRecord stabilityRecord) {
         writer.println(String.format("%s,%.3f,%.3f,%.2f,%.2f",
                                      peptide.formatString(),
-                                     bindingRecord.getAffinity(),
+                                     affinityRecord.getAffinity(),
                                      stabilityRecord.getHalfLife(),
-                                     bindingRecord.getPercentile(),
+                                     affinityRecord.getPercentile(),
                                      stabilityRecord.getPercentile()));
     }
 

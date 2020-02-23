@@ -1,5 +1,5 @@
 
-package pepmhc.stab;
+package pepmhc.stab.net;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,6 +13,8 @@ import jam.hla.Allele;
 import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
+
+import pepmhc.stab.StabilityRecord;
 
 /**
  * Executes {@code netMHCstabpan} command-line processes.

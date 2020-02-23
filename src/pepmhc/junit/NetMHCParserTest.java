@@ -5,8 +5,8 @@ import java.util.List;
 
 import jam.peptide.Peptide;
 
-import pepmhc.binder.BindingRecord;
-import pepmhc.engine.net.NetMHCParser;
+import pepmhc.affy.AffinityRecord;
+import pepmhc.affy.net.NetMHCParser;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -16,7 +16,7 @@ public class NetMHCParserTest {
     private static final String NET_MHC_PAN_FILE = "data/test/netMHCpan.out";
 
     @Test public void testNetMHC() {
-        List<BindingRecord> records = NetMHCParser.parse(NET_MHC_FILE);
+        List<AffinityRecord> records = NetMHCParser.parse(NET_MHC_FILE);
 
         assertEquals(10, records.size());
 
@@ -31,7 +31,7 @@ public class NetMHCParserTest {
     }
 
     @Test public void testNetMHCPan() {
-        List<BindingRecord> records = NetMHCParser.parse(NET_MHC_PAN_FILE);
+        List<AffinityRecord> records = NetMHCParser.parse(NET_MHC_PAN_FILE);
 
         assertEquals(10, records.size());
 

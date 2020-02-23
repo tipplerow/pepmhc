@@ -9,21 +9,21 @@ import jam.hla.Genotype;
 import jam.peptide.Peptide;
 import jam.peptide.Peptidome;
 
-import pepmhc.binder.BindingRecord;
-import pepmhc.binder.BindingThreshold;
-import pepmhc.cache.AffinityCache;
-import pepmhc.engine.PredictionMethod;
+import pepmhc.affy.AffinityCache;
+import pepmhc.affy.AffinityMethod;
+import pepmhc.affy.AffinityRecord;
+import pepmhc.affy.AffinityThreshold;
 
 /**
  * Implements MHC restriction for HLA genotypes.
  */
 public final class MHCRestrictor {
-    private final PredictionMethod method;
-    private final BindingThreshold threshold;
+    private final AffinityMethod method;
+    private final AffinityThreshold threshold;
 
     private static MHCRestrictor global = null;
 
-    private MHCRestrictor(PredictionMethod method, BindingThreshold threshold) {
+    private MHCRestrictor(AffinityMethod method, AffinityThreshold threshold) {
         this.method = method;
         this.threshold = threshold;
     }
@@ -36,7 +36,7 @@ public final class MHCRestrictor {
      */
     public static MHCRestrictor global() {
         if (global == null)
-            global = new MHCRestrictor(PredictionMethod.global(), BindingThreshold.global());
+            global = new MHCRestrictor(AffinityMethod.global(), AffinityThreshold.global());
 
         return global;
     }
@@ -52,7 +52,7 @@ public final class MHCRestrictor {
      * @return an MHC restrictor for the specified prediction method
      * and binding threshold.
      */
-    public static MHCRestrictor instance(PredictionMethod method, BindingThreshold threshold) {
+    public static MHCRestrictor instance(AffinityMethod method, AffinityThreshold threshold) {
         return new MHCRestrictor(method, threshold);
     }
 
@@ -74,7 +74,7 @@ public final class MHCRestrictor {
         Collection<Peptide> binders = new HashSet<Peptide>();
 
         for (Allele allele : genotype)
-            binders.addAll(threshold.getBinders(AffinityCache.get(method, allele, peptides)));
+            binders.addAll(threshold.getBinders(AffinityCache.instance(method, allele).get(peptides)));
         
         return Peptidome.create(binders);
     }

@@ -12,13 +12,13 @@ import jam.io.LineReader;
 import jam.peptide.Peptide;
 import jam.util.ListUtil;
 
-import pepmhc.cache.AffinityCache;
-import pepmhc.engine.PredictionMethod;
+import pepmhc.affy.AffinityCache;
+import pepmhc.affy.AffinityMethod;
 
 public final class AffinityBank {
     private final String alleleFile;
     private final String peptideFile;
-    private final PredictionMethod predMethod;
+    private final AffinityMethod predMethod;
 
     private final List<Allele> alleles = new ArrayList<Allele>();
     private final List<Peptide> peptides = new ArrayList<Peptide>();
@@ -30,7 +30,7 @@ public final class AffinityBank {
 
         this.alleleFile  = args[0];
         this.peptideFile = args[1];
-        this.predMethod  = PredictionMethod.valueOf(args[2]);
+        this.predMethod  = AffinityMethod.valueOf(args[2]);
     }
 
     private static void validate(String[] args) {
@@ -74,7 +74,7 @@ public final class AffinityBank {
         List<List<Peptide>> subLists = ListUtil.split(peptides, BATCH_SIZE);
 
         for (List<Peptide> subList : subLists)
-            AffinityCache.get(predMethod, allele, subList);
+            AffinityCache.instance(predMethod, allele).get(subList);
     }
 
     public static void main(String[] args) {

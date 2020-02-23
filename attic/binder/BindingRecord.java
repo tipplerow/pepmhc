@@ -1,6 +1,10 @@
 
 package pepmhc.binder;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import jam.math.DoubleRange;
 import jam.peptide.Peptide;
 
@@ -48,6 +52,16 @@ public final class BindingRecord {
     private void validate() {
         DoubleRange.NON_NEGATIVE.validate("binding affinity", affinity);
         DoubleRange.PERCENTILE.validate("percentile rank", percentile);
+    }
+
+    public static Map<Peptide, BindingRecord> map(Collection<BindingRecord> records) {
+        Map<Peptide, BindingRecord> map =
+            new HashMap<Peptide, BindingRecord>(records.size());
+
+        for (BindingRecord record : records)
+            map.put(record.getPeptide(), record);
+
+        return map;
     }
 
     public Peptide getPeptide() {

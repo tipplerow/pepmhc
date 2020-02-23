@@ -3,22 +3,22 @@ package pepmhc.junit;
 
 import jam.peptide.Peptide;
 
-import pepmhc.binder.BindingRecord;
-import pepmhc.binder.BindingThreshold;
+import pepmhc.affy.AffinityRecord;
+import pepmhc.affy.AffinityThreshold;
 
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class BindingThresholdTest {
+public class AffinityThresholdTest {
     private static final Peptide peptide = Peptide.parse("AAA"); // Any peptide will do...
 
-    private static final BindingRecord lowAffinity = new BindingRecord(peptide, 10.0,    99.9);
-    private static final BindingRecord lowRank     = new BindingRecord(peptide, 10000.0,  0.1);
-    private static final BindingRecord nonBinder   = new BindingRecord(peptide, 10000.0, 99.9);
+    private static final AffinityRecord lowAffinity = new AffinityRecord(peptide, 10.0,    99.9);
+    private static final AffinityRecord lowRank     = new AffinityRecord(peptide, 10000.0,  0.1);
+    private static final AffinityRecord nonBinder   = new AffinityRecord(peptide, 10000.0, 99.9);
 
     @Test public void testAndAffinity() {
-        BindingThreshold threshold =
-            BindingThreshold.forPercentile(2.0).andAffinity(500.0);
+        AffinityThreshold threshold =
+            AffinityThreshold.forPercentile(2.0).andAffinity(500.0);
 
         assertTrue(threshold.isAffinityThresholdSet());
         assertTrue(threshold.isPercentileThresholdSet());
@@ -29,8 +29,8 @@ public class BindingThresholdTest {
     }
     
     @Test public void testAndPercentile() {
-        BindingThreshold threshold =
-            BindingThreshold.forAffinity(500.0).andPercentile(2.0);
+        AffinityThreshold threshold =
+            AffinityThreshold.forAffinity(500.0).andPercentile(2.0);
 
         assertTrue(threshold.isAffinityThresholdSet());
         assertTrue(threshold.isPercentileThresholdSet());
@@ -41,7 +41,7 @@ public class BindingThresholdTest {
     }
     
     @Test public void testForAffinity() {
-        BindingThreshold threshold = BindingThreshold.forAffinity(500.0);
+        AffinityThreshold threshold = AffinityThreshold.forAffinity(500.0);
 
         assertTrue(threshold.isAffinityThresholdSet());
         assertFalse(threshold.isPercentileThresholdSet());
@@ -52,7 +52,7 @@ public class BindingThresholdTest {
     }
 
     @Test public void testForPercentile() {
-        BindingThreshold threshold = BindingThreshold.forPercentile(2.0);
+        AffinityThreshold threshold = AffinityThreshold.forPercentile(2.0);
 
         assertFalse(threshold.isAffinityThresholdSet());
         assertTrue(threshold.isPercentileThresholdSet());
@@ -63,6 +63,6 @@ public class BindingThresholdTest {
     }
 
     public static void main(String[] args) {
-        org.junit.runner.JUnitCore.main("pepmhc.junit.BindingThresholdTest");
+        org.junit.runner.JUnitCore.main("pepmhc.junit.AffinityThresholdTest");
     }
 }

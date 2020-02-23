@@ -9,23 +9,23 @@ import jam.hla.Genotype;
 import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
 
-import pepmhc.binder.BindingRecord;
-import pepmhc.binder.BindingThreshold;
-import pepmhc.cache.AffinityCache;
-import pepmhc.engine.PredictionMethod;
+import pepmhc.affy.AffinityCache;
+import pepmhc.affy.AffinityMethod;
+import pepmhc.affy.AffinityRecord;
+import pepmhc.affy.AffinityThreshold;
 
 /**
  * Computes presentation rates for MHC alleles and genotypes.
  */
 public final class PresentationRateCalculator {
-    private final PredictionMethod method;
-    private final BindingThreshold threshold;
+    private final AffinityMethod method;
+    private final AffinityThreshold threshold;
     private final Collection<Peptide> peptides;
 
     private static PresentationRateCalculator global = null;
 
-    private PresentationRateCalculator(PredictionMethod method,
-                                       BindingThreshold threshold,
+    private PresentationRateCalculator(AffinityMethod method,
+                                       AffinityThreshold threshold,
                                        Collection<Peptide> peptides) {
         this.method = method;
         this.peptides = peptides;
@@ -45,8 +45,8 @@ public final class PresentationRateCalculator {
      * @return a presentation rate calculator for the specified
      * prediction method, binding threshold, and peptide collection.
      */
-    public static PresentationRateCalculator instance(PredictionMethod method,
-                                                      BindingThreshold threshold,
+    public static PresentationRateCalculator instance(AffinityMethod method,
+                                                      AffinityThreshold threshold,
                                                       Collection<Peptide> peptides) {
         return new PresentationRateCalculator(method, threshold, peptides);
     }
@@ -67,8 +67,8 @@ public final class PresentationRateCalculator {
      * allele according to the given prediction method and binding
      * threshold.
      */
-    public static double compute(PredictionMethod method,
-                                 BindingThreshold threshold,
+    public static double compute(AffinityMethod method,
+                                 AffinityThreshold threshold,
                                  Collection<Peptide> peptides,
                                  Allele allele) {
         return instance(method, threshold, peptides).compute(allele);
@@ -90,8 +90,8 @@ public final class PresentationRateCalculator {
      * genotype according to the given prediction method and binding
      * threshold.
      */
-    public static double compute(PredictionMethod method,
-                                 BindingThreshold threshold,
+    public static double compute(AffinityMethod method,
+                                 AffinityThreshold threshold,
                                  Collection<Peptide> peptides,
                                  Genotype genotype) {
         return instance(method, threshold, peptides).compute(genotype);
@@ -106,7 +106,7 @@ public final class PresentationRateCalculator {
      * allele.
      */
     public double compute(Allele allele) {
-        Collection<BindingRecord> records = AffinityCache.get(method, allele, peptides);
+        Collection<AffinityRecord> records = AffinityCache.instance(method, allele).get(peptides);
 
         int bound = threshold.countBinders(records);
         int total = peptides.size();
@@ -132,7 +132,7 @@ public final class PresentationRateCalculator {
         Collection<Peptide> binders = new HashSet<Peptide>();
 
         for (Allele allele : genotype.viewUniqueAlleles())
-            binders.addAll(threshold.getBinders(AffinityCache.get(method, allele, peptides)));
+            binders.addAll(threshold.getBinders(AffinityCache.instance(method, allele).get(peptides)));
         
         int bound = binders.size();
         int total = peptides.size();

@@ -1,5 +1,5 @@
 
-package pepmhc.stab;
+package pepmhc.stab.net;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +12,8 @@ import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.peptide.Peptide;
 import jam.util.RegexUtil;
+
+import pepmhc.stab.StabilityRecord;
 
 /**
  * Parses output written by the {@code netMHCstabpan} stability

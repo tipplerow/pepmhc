@@ -1,21 +1,18 @@
 
 package pepmhc.stab;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import jam.math.DoubleRange;
 import jam.peptide.Peptide;
+
+import pepmhc.bind.BindRecord;
 
 /**
  * Encapsulates the result of a peptide-MHC stability measurement or
  * prediction.
  */
-public final class StabilityRecord {
-    private final Peptide peptide;
-    private final double  halfLife;
-    private final double  percentile;
+public final class StabilityRecord extends BindRecord {
+    private final double halfLife;
+    private final double percentile;
 
     /**
      * Creates a new stability record with an unset percentile rank.
@@ -40,7 +37,8 @@ public final class StabilityRecord {
      * the same allele).
      */
     public StabilityRecord(Peptide peptide, double halfLife, double percentile) {
-        this.peptide = peptide;
+        super(peptide);
+
         this.halfLife = halfLife;
         this.percentile = percentile;
 
@@ -50,15 +48,6 @@ public final class StabilityRecord {
     private void validate() {
         DoubleRange.NON_NEGATIVE.validate("half-life", halfLife);
         DoubleRange.PERCENTILE.validate("percentile rank", percentile);
-    }
-
-    /**
-     * Returns the MHC-bound peptide.
-     *
-     * @return the MHC-bound peptide.
-     */
-    public Peptide getPeptide() {
-        return peptide;
     }
 
     /**

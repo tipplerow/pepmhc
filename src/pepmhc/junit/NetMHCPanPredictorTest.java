@@ -4,8 +4,8 @@ package pepmhc.junit;
 import jam.hla.Allele;
 import jam.peptide.Peptide;
 
-import pepmhc.engine.Predictor;
-import pepmhc.engine.net.NetMHCPanPredictor;
+import pepmhc.affy.AffinityPredictor;
+import pepmhc.affy.net.NetMHCPanPredictor;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 public class NetMHCPanPredictorTest {
     private final Allele A0101 = Allele.instance("HLA-A*01:01");
     private final Allele A0201 = Allele.instance("HLA-A*02:01");
-    private final Predictor predictor = NetMHCPanPredictor.INSTANCE;
+    private final AffinityPredictor predictor = NetMHCPanPredictor.INSTANCE;
 
     @Test public void testExecutable() {
         System.out.print("NetMHCPan ");

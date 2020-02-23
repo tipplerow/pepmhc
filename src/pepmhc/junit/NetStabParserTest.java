@@ -4,7 +4,7 @@ package pepmhc.junit;
 import java.util.List;
 
 import jam.peptide.Peptide;
-import pepmhc.stab.NetStabParser;
+import pepmhc.stab.net.NetStabParser;
 import pepmhc.stab.StabilityRecord;
 
 import org.junit.*;

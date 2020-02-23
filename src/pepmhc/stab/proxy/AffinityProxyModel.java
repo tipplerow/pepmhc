@@ -1,5 +1,5 @@
 
-package pepmhc.stab;
+package pepmhc.stab.proxy;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,20 +7,43 @@ import java.util.List;
 
 import jam.hla.Allele;
 import jam.peptide.Peptide;
-import jam.util.PairKeyTable;
 
-import pepmhc.binder.BindingRecord;
-import pepmhc.cache.AffinityCache;
-import pepmhc.engine.PredictionMethod;
+import pepmhc.affy.AffinityMethod;
+import pepmhc.affy.AffinityRecord;
+import pepmhc.affy.AffinityStore;
+
+import pepmhc.stab.StabilityRecord;
 
 public final class AffinityProxyModel {
-    private final Allele allele;
-    private final PredictionMethod method;
-
+    private final AffinityProxyKey key;
     private final double intercept;
     private final double coefficient;
 
-    private static final PairKeyTable<Allele, PredictionMethod, AffinityProxyModel> instances = PairKeyTable.hash();
+    /**
+     * Creates a new affinity-proxy model.
+     *
+     * @param key the unique key for the model.
+     *
+     * @param intercept the regression intercept for the model.
+     *
+     * @param coefficient the regression coefficient (slope) for the
+     * model.
+     *
+     * @throws IllegalArgumentException unless the coefficient is
+     * negative.
+     */
+    public AffinityProxyModel(AffinityProxyKey key, double intercept, double coefficient) {
+        validateCoefficient(coefficient);
+
+        this.key = key;
+        this.intercept = intercept;
+        this.coefficient = coefficient;
+    }
+
+    private static void validateCoefficient(double coefficient) {
+        if (coefficient >= 0.0)
+            throw new IllegalArgumentException("Coefficient must be negative.");
+    }
 
     /**
      * Creates a new affinity-proxy model.
@@ -38,76 +61,17 @@ public final class AffinityProxyModel {
      * @throws IllegalArgumentException unless the coefficient is
      * negative.
      */
-    public AffinityProxyModel(Allele allele, PredictionMethod method, double intercept, double coefficient) {
-        validateCoefficient(coefficient);
-
-        this.allele = allele;
-        this.method = method;
-
-        this.intercept = intercept;
-        this.coefficient = coefficient;
-    }
-
-    private static void validateCoefficient(double coefficient) {
-        if (coefficient >= 0.0)
-            throw new IllegalArgumentException("Coefficient must be negative.");
+    public AffinityProxyModel(Allele allele, AffinityMethod method, double intercept, double coefficient) {
+        this(AffinityProxyKey.instance(allele, method), intercept, coefficient);
     }
 
     /**
-     * Returns the affinity-proxy prediction engine for a given HLA
-     * allele and the default affinity prediction method.
+     * Returns the unique key for this model.
      *
-     * @param allele the HLA allele of interest.
-     *
-     * @return the affinity-proxy prediction engine for the specified
-     * allele and the default affinity prediction method.
+     * @return the unique key for this model.
      */
-    public static AffinityProxyModel instance(Allele allele) {
-        return instance(allele, PredictionMethod.NET_MHC_PAN);
-    }
-
-    /**
-     * Returns the affinity-proxy prediction engine for a given HLA
-     * allele and affinity prediction method.
-     *
-     * @param allele the HLA allele of interest.
-     *
-     * @param method the affinity prediction method.
-     *
-     * @return the affinity-proxy prediction engine for the specified
-     * allele and affinity prediction method.
-     */
-    public static synchronized AffinityProxyModel instance(Allele allele, PredictionMethod method) {
-        AffinityProxyModel model = instances.get(allele, method);
-
-        if (model == null) {
-            model = create(allele, method);
-            instances.put(allele, method, model);
-        }
-
-        return model;
-    }
-
-    private static AffinityProxyModel create(Allele allele, PredictionMethod method) {
-        if (exists(allele, method))
-            return load(allele, method);
-
-        AffinityProxyModel model = AffinityProxyBuilder.build(allele, method);
-        model.store();
-
-        return model;
-    }
-
-    private static boolean exists(Allele allele, PredictionMethod method) {
-        return AffinityProxyDb.instance().contains(allele, method);
-    }
-
-    private static AffinityProxyModel load(Allele allele, PredictionMethod method) {
-        return AffinityProxyDb.instance().lookup(allele, method);
-    }
-
-    private void store() {
-        AffinityProxyDb.instance().add(this);
+    public AffinityProxyKey getKey() {
+        return key;
     }
 
     /**
@@ -116,7 +80,7 @@ public final class AffinityProxyModel {
      * @return the HLA allele which this model describes.
      */
     public Allele getAllele() {
-        return allele;
+        return key.getAllele();
     }
 
     /**
@@ -126,8 +90,8 @@ public final class AffinityProxyModel {
      * @return the affinity prediction method used to build this
      * model.
      */
-    public PredictionMethod getMethod() {
-        return method;
+    public AffinityMethod getMethod() {
+        return key.getMethod();
     }
 
     /**
@@ -181,26 +145,29 @@ public final class AffinityProxyModel {
      * iterator.
      */
     public List<StabilityRecord> predict(Collection<Peptide> peptides) {
-        List<BindingRecord> bindingRecords = AffinityCache.get(method, allele, peptides);
-        List<StabilityRecord> stabilityRecords = new ArrayList<StabilityRecord>(peptides.size());
+        List<AffinityRecord> affinityRecords =
+            AffinityStore.instance(getMethod(), getAllele()).get(peptides);
 
-        for (BindingRecord bindingRecord : bindingRecords)
-            stabilityRecords.add(stabilityRecord(bindingRecord));
+        List<StabilityRecord> stabilityRecords =
+            new ArrayList<StabilityRecord>(peptides.size());
+
+        for (AffinityRecord affinityRecord : affinityRecords)
+            stabilityRecords.add(stabilityRecord(affinityRecord));
 
         return stabilityRecords;
     }
 
     /**
-     * Creates the stability record that corresponds to a binding
+     * Creates the stability record that corresponds to an affinity
      * record by converting the binding affinity to a dissociation
      * half-life.
      *
-     * @param bindingRecord the binding record to convert.
+     * @param affinityRecord the affinity record to convert.
      *
      * @return the stability record that corresponds to the given
-     * binding record.
+     * affinity record.
      */
-    public StabilityRecord stabilityRecord(BindingRecord bindingRecord) {
-        return new StabilityRecord(bindingRecord.getPeptide(), halfLife(bindingRecord.getAffinity()));
+    public StabilityRecord stabilityRecord(AffinityRecord affinityRecord) {
+        return new StabilityRecord(affinityRecord.getPeptide(), halfLife(affinityRecord.getAffinity()));
     }
 }

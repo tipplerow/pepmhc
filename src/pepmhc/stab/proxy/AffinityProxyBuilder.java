@@ -1,5 +1,5 @@
 
-package pepmhc.stab;
+package pepmhc.stab.proxy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,16 +15,25 @@ import jam.math.JamRandom;
 import jam.peptide.Peptide;
 import jam.util.ListUtil;
 
-import pepmhc.binder.BindingRecord;
-import pepmhc.cache.AffinityCache;
-import pepmhc.engine.PredictionMethod;
+import pepmhc.affy.AffinityMethod;
+import pepmhc.affy.AffinityRecord;
+import pepmhc.affy.AffinityStore;
+
+import pepmhc.stab.StabilityMethod;
+import pepmhc.stab.StabilityRecord;
+import pepmhc.stab.StabilityStore;
 
 /**
  * Estimates the parameters in affinity-proxy models.
  */
 public final class AffinityProxyBuilder {
     private final Allele allele;
-    private final PredictionMethod method;
+
+    private final AffinityMethod affinityMethod;
+    private final StabilityMethod stabilityMethod;
+
+    private final AffinityStore affinityStore;
+    private final StabilityStore stabilityStore;
 
     private final int sampleSize;
     private final String peptideFile;
@@ -35,9 +44,14 @@ public final class AffinityProxyBuilder {
 
     private static final long RANDOM_SEED = 20200131;
 
-    private AffinityProxyBuilder(Allele allele, PredictionMethod method) {
+    private AffinityProxyBuilder(Allele allele, AffinityMethod affinityMethod) {
         this.allele = allele;
-        this.method = method;
+
+        this.affinityMethod = affinityMethod;
+        this.stabilityMethod = StabilityMethod.NET_MHC_STAB_PAN;
+
+        this.affinityStore = AffinityStore.instance(affinityMethod, allele);
+        this.stabilityStore = StabilityStore.instance(stabilityMethod, allele);
 
         this.peptideFile = JamProperties.getRequired(PROXY_PEPTIDE_FILE_PROPERTY);
         this.sampleSize  = JamProperties.getRequiredInt(PROXY_SAMPLE_SIZE_PROPERTY);
@@ -65,9 +79,10 @@ public final class AffinityProxyBuilder {
      * @param fileName the name of a file containing the HLA alleles
      * of interest.
      *
-     * @param method the affinity prediction method to use.
+     * @param affinityMethod the affinity prediction method to use.
      */
-    public static void build(String fileName, PredictionMethod method) {
+    public static void build(String fileName, AffinityMethod affinityMethod) {
+        /*
         LineReader reader = LineReader.open(fileName);
 
         try {
@@ -75,7 +90,7 @@ public final class AffinityProxyBuilder {
                 Allele allele = Allele.instance(line);
                 JamLogger.info("Processing [%s]...", allele);
 
-                AffinityProxyModel model = build(allele, method);
+                AffinityProxyModel model = build(allele, affinityMethod);
                 AffinityProxyDb.instance().add(model);
             }
 
@@ -84,6 +99,7 @@ public final class AffinityProxyBuilder {
         finally {
             reader.close();
         }
+        */
     }
 
     /**
@@ -92,13 +108,13 @@ public final class AffinityProxyBuilder {
      *
      * @param allele the HLA allele of interest.
      *
-     * @param method the affinity prediction method to use.
+     * @param affinityMethod the affinity prediction method to use.
      *
      * @return an affinity-proxy model with parameters determined for
      * the the specified HLA allele and affinity prediction method.
      */
-    public static AffinityProxyModel build(Allele allele, PredictionMethod method) {
-        AffinityProxyBuilder builder = new AffinityProxyBuilder(allele, method);
+    public static AffinityProxyModel build(Allele allele, AffinityMethod affinityMethod) {
+        AffinityProxyBuilder builder = new AffinityProxyBuilder(allele, affinityMethod);
         return builder.build();
     }
 
@@ -109,7 +125,7 @@ public final class AffinityProxyBuilder {
         double intercept = regression.getIntercept();
         double coefficient = regression.getSlope();
 
-        return new AffinityProxyModel(allele, method, intercept, coefficient);
+        return new AffinityProxyModel(allele, affinityMethod, intercept, coefficient);
     }
 
     private void selectPeptides() {
@@ -127,14 +143,14 @@ public final class AffinityProxyBuilder {
     }
 
     private void addSampleData() {
-        List<BindingRecord> bindingRecords = AffinityCache.get(method, allele, peptideList);
-        List<StabilityRecord> stabilityRecords = StabilityCache.get(allele, peptideList);
+        List<AffinityRecord> affinityRecords = affinityStore.get(peptideList);
+        List<StabilityRecord> stabilityRecords = stabilityStore.get(peptideList);
 
         for (int k = 0; k < peptideList.size(); ++k) {
             //
             // The linear regression model is: log(H) = intercept + coeff * log(A)
             //
-            double affinity = bindingRecords.get(k).getAffinity();
+            double affinity = affinityRecords.get(k).getAffinity();
             double halfLife = stabilityRecords.get(k).getHalfLife();
 
             if (affinity <= 1.0E-08)
@@ -152,7 +168,7 @@ public final class AffinityProxyBuilder {
 
     private static void usage() {
         System.err.print("Usage: pepmhc.stab.AffinityProxyBuilder ");
-        System.err.print("ALLELE_FILE PRED_METHOD PEPTIDE_FILE SAMPLE_SIZE");
+        System.err.print("ALLELE_FILE AFFINITY_METHOD PEPTIDE_FILE SAMPLE_SIZE");
         System.err.println();
         System.exit(1);
     }
@@ -162,11 +178,11 @@ public final class AffinityProxyBuilder {
             usage();
             
         String alleleFile = args[0];
-        PredictionMethod predMethod = PredictionMethod.valueOf(args[1]);
+        AffinityMethod affinityMethod = AffinityMethod.valueOf(args[1]);
 
         System.setProperty(PROXY_PEPTIDE_FILE_PROPERTY, args[2]);
         System.setProperty(PROXY_SAMPLE_SIZE_PROPERTY,  args[3]);
 
-        build(alleleFile, predMethod);
+        build(alleleFile, affinityMethod);
     }
 }

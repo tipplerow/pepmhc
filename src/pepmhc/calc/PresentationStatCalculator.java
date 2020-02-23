@@ -8,9 +8,8 @@ import jam.hla.Allele;
 import jam.hla.Genotype;
 import jam.math.StatSummary;
 
-import pepmhc.binder.BindingThreshold;
-import pepmhc.cache.PeptideSample;
-import pepmhc.engine.PredictionMethod;
+import pepmhc.affy.AffinityThreshold;
+import pepmhc.affy.AffinityMethod;
 
 /**
  * Computes presentation rate statistics for MHC alleles and
@@ -21,8 +20,8 @@ public final class PresentationStatCalculator {
 
     private static PresentationStatCalculator global = null;
 
-    private PresentationStatCalculator(PredictionMethod method,
-                                       BindingThreshold threshold,
+    private PresentationStatCalculator(AffinityMethod method,
+                                       AffinityThreshold threshold,
                                        PeptideSample    peptides) {
         int sampleCount = peptides.countSamples();
 
@@ -42,8 +41,8 @@ public final class PresentationStatCalculator {
      */
     public static PresentationStatCalculator global() {
         if (global == null)
-            global = new PresentationStatCalculator(PredictionMethod.global(),
-                                                    BindingThreshold.global(),
+            global = new PresentationStatCalculator(AffinityMethod.global(),
+                                                    AffinityThreshold.global(),
                                                     PeptideSample.global());
         return global;
     }
@@ -61,8 +60,8 @@ public final class PresentationStatCalculator {
      * @return a presentation statistic calculator for the specified
      * prediction method, binding threshold, and peptide set.
      */
-    public static PresentationStatCalculator instance(PredictionMethod method,
-                                                      BindingThreshold threshold,
+    public static PresentationStatCalculator instance(AffinityMethod method,
+                                                      AffinityThreshold threshold,
                                                       PeptideSample    peptides) {
         return new PresentationStatCalculator(method, threshold, peptides);
     }
@@ -84,8 +83,8 @@ public final class PresentationStatCalculator {
      * the specified allele according to the given prediction method
      * and binding threshold.
      */
-    public static StatSummary compute(PredictionMethod method,
-                                      BindingThreshold threshold,
+    public static StatSummary compute(AffinityMethod method,
+                                      AffinityThreshold threshold,
                                       PeptideSample peptides,
                                       Allele allele) {
         return instance(method, threshold, peptides).compute(allele);
@@ -108,8 +107,8 @@ public final class PresentationStatCalculator {
      * specified genotype according to the given prediction method and
      * binding threshold.
      */
-    public static StatSummary compute(PredictionMethod method,
-                                      BindingThreshold threshold,
+    public static StatSummary compute(AffinityMethod method,
+                                      AffinityThreshold threshold,
                                       PeptideSample peptides,
                                       Genotype genotype) {
         return instance(method, threshold, peptides).compute(genotype);

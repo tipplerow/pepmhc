@@ -13,22 +13,22 @@ import jam.hla.Allele;
 import jam.math.DoubleUtil;
 import jam.peptide.Peptide;
 
-import pepmhc.engine.Predictor;
-import pepmhc.engine.PredictionMethod;
+import pepmhc.affy.AffinityMethod;
+import pepmhc.affy.AffinityPredictor;
 
 public final class AllelePresentCalc {
     private final int pepLen;
     private final String fastIn;
     private final Allele allele;
-    private final PredictionMethod method;
+    private final AffinityMethod method;
 
-    private Predictor predictor;
+    private AffinityPredictor predictor;
     private FastaReader fastaReader;
     private PrintWriter reportWriter;
     private Set<Peptide> pepFragments;
     private int binderCount;
 
-    private AllelePresentCalc(String fastIn, PredictionMethod method, Allele allele, int pepLen) {
+    private AllelePresentCalc(String fastIn, AffinityMethod method, Allele allele, int pepLen) {
         this.fastIn = fastIn;
         this.method = method;
         this.allele = allele;
@@ -55,7 +55,7 @@ public final class AllelePresentCalc {
     public static final double BINDING_THRESHOLD = 500.0;
 
     private void run() {
-        predictor    = Predictor.instance(method);
+        predictor    = method.getPredictor();
         fastaReader  = FastaReader.open(fastIn);
         pepFragments = new HashSet<Peptide>();
         binderCount  = 0;
@@ -121,10 +121,10 @@ public final class AllelePresentCalc {
         int pepLen;
         String fastIn;
         Allele allele;
-        PredictionMethod method;
+        AffinityMethod method;
 
         fastIn = args[0];
-        method = PredictionMethod.valueOf(args[1].toUpperCase());
+        method = AffinityMethod.valueOf(args[1].toUpperCase());
         allele = Allele.instance(args[2]);
         pepLen = Integer.parseInt(args[3]);
 
