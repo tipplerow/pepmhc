@@ -138,15 +138,18 @@ public final class AntigenProcessor {
     public static final double TAP_SCORE_THRESHOLD_DEFAULT = 1.0;
 
     /**
-     * An antigen processor with the default configuration.
+     * Returns a new antigen processor with the default configuration.
+     *
+     * @return a new antigen processor with the default configuration.
      */
-    public static final AntigenProcessor DEFAULT =
-        new AntigenProcessor(CLEAVAGE_LENGTH_DEFAULT,
-                             USE_NETCHOP_DEFAULT,
-                             USE_TAP_DEFAULT,
-                             NETCHOP_THRESHOLD_DEFAULT,
-                             TAP_ALPHA_DEFAULT,
-                             TAP_SCORE_THRESHOLD_DEFAULT);
+    public static AntigenProcessor defaultProcessor() {
+        return new AntigenProcessor(CLEAVAGE_LENGTH_DEFAULT,
+                                    USE_NETCHOP_DEFAULT,
+                                    USE_TAP_DEFAULT,
+                                    NETCHOP_THRESHOLD_DEFAULT,
+                                    TAP_ALPHA_DEFAULT,
+                                    TAP_SCORE_THRESHOLD_DEFAULT);
+    }
 
     /**
      * Creates a new <em>exhaustive</em> antigen processor: all
