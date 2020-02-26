@@ -87,8 +87,13 @@ public final class PeptideSourceProcessor extends JamApp {
         ++processed;
         JamLogger.info("Processing barcode [%s] (%d of %d)...", barcode.getKey(), processed, barcodes.size());
 
+        if (pepSourceManager.exists(barcode)) {
+            JamLogger.info("Peptide source already exists for barcode [%s]; skipping...", barcode.getKey());
+            return;
+        }
+
         MAFFastaList fastaList =
-            missenseManager.load(barcode);
+            missenseManager.load(barcode).sort();
 
         JamLogger.info("Found [%d] mutated peptides for barcode [%s]...", fastaList.size(), barcode.getKey());
 
