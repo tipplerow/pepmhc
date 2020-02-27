@@ -1,9 +1,12 @@
 
 package pepmhc.neo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import jam.hla.PeptideSource;
+import jam.peptide.Peptide;
 import jam.peptide.PeptideConcentrationProfile;
 
 /**
@@ -40,6 +43,22 @@ public final class ConcProfileView {
     public static ConcProfileView create(PeptideConcentrationProfile neoProfile,
                                          PeptideConcentrationProfile selfProfile) {
         return new ConcProfileView(neoProfile, selfProfile);
+    }
+
+    /**
+     * Returns a list containing all peptides (<em>neo</em> and
+     * <em>self</em>) in the concentration profiles.
+     *
+     * @return a list containing all peptides in the concentration
+     * profiles.
+     */
+    public List<Peptide> allPeptides() {
+        List<Peptide> allPeptides = new ArrayList<Peptide>();
+
+        allPeptides.addAll(neoProfile.viewPeptides());
+        allPeptides.addAll(selfProfile.viewPeptides());
+
+        return allPeptides;
     }
 
     /**
