@@ -36,22 +36,22 @@ final class PeptideSourceEngine {
         this.selfPepReference = selfPepReference;
     }
 
-    static PeptideSourceTable process(TumorBarcode barcode,
-                                      MAFFastaList fastaList,
-                                      HugoPeptideTable selfPepReference) {
+    static PeptideSourceView process(TumorBarcode barcode,
+                                     MAFFastaList fastaList,
+                                     HugoPeptideTable selfPepReference) {
         PeptideSourceEngine engine =
             new PeptideSourceEngine(barcode, fastaList, selfPepReference);
 
         return engine.process();
     }
 
-    private PeptideSourceTable process() {
+    private PeptideSourceView process() {
         processRecords();
         
         HugoPeptideTable neoPeptideTable = HugoPeptideTable.create(neoPeptideMap);
         HugoPeptideTable selfPeptideTable = HugoPeptideTable.create(selfPeptideMap);
 
-        return PeptideSourceTable.create(neoPeptideTable, selfPeptideTable);
+        return PeptideSourceView.create(neoPeptideTable, selfPeptideTable, selfPepReference);
     }
 
     private void processRecords() {

@@ -100,10 +100,10 @@ public final class PeptideSourceProcessor extends JamApp {
         if (fastaList.isEmpty())
             return;
 
-        PeptideSourceTable sourceTable =
+        PeptideSourceView sourceView =
             PeptideSourceEngine.process(barcode, fastaList, selfPeptideRef);
 
-        pepSourceManager.store(barcode, sourceTable);
+        pepSourceManager.store(barcode, sourceView);
     }
 
     private static void usage() {
