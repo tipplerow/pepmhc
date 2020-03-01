@@ -47,7 +47,9 @@ public final class StabilityRecord extends BindRecord {
 
     private void validate() {
         DoubleRange.NON_NEGATIVE.validate("half-life", halfLife);
-        DoubleRange.PERCENTILE.validate("percentile rank", percentile);
+
+        if (!Double.isNaN(percentile))
+            DoubleRange.PERCENTILE.validate("percentile rank", percentile);
     }
 
     /**
