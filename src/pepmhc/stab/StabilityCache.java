@@ -8,14 +8,14 @@ import jam.util.PairKeyTable;
 import pepmhc.bind.BindCache;
 
 /**
- * Maintains an in-memory cache of stability records backed by a
- * persistent database store.
+ * Provides a compute-on-demand service, in-memory caching, and
+ * persistent storage for peptide-MHC stability records.
  */
 public final class StabilityCache extends BindCache<StabilityRecord> {
     private static final PairKeyTable<StabilityMethod, Allele, StabilityCache> instances = PairKeyTable.hash();
 
-    private StabilityCache(StabilityStore store) {
-        super(store);
+    private StabilityCache(StabilityTable table, StabilityPredictor predictor, Allele allele) {
+        super(table, predictor, allele);
     }
 
     /**
@@ -54,11 +54,21 @@ public final class StabilityCache extends BindCache<StabilityRecord> {
             clear(method, allele);
     }
 
-    private static void clear(StabilityMethod method, Allele allele) {
+    /**
+     * Removes a stability cache from memory (but retains all
+     * persistent stability records).  method.
+     *
+     * @param method the stability prediction method.
+     *
+     * @param allele the allele of the binding MHC molecule.
+     */
+    public static synchronized void clear(StabilityMethod method, Allele allele) {
         StabilityCache instance = instances.get(method, allele);
 
         if (instance != null)
             instance.clear();
+
+        instances.remove(method, allele);
     }
 
     /**
@@ -72,7 +82,7 @@ public final class StabilityCache extends BindCache<StabilityRecord> {
      * @return the stability cache for the specified allele and
      * prediction method.
      */
-    public static StabilityCache instance(StabilityMethod method, Allele allele) {
+    public static synchronized StabilityCache instance(StabilityMethod method, Allele allele) {
         StabilityCache instance = instances.get(method, allele);
 
         if (instance == null)
@@ -83,13 +93,17 @@ public final class StabilityCache extends BindCache<StabilityRecord> {
 
     private static StabilityCache newInstance(StabilityMethod method, Allele allele) {
         StabilityCache instance =
-            new StabilityCache(StabilityStore.instance(method, allele));
+            new StabilityCache(StabilityTable.create(method, allele), method.getPredictor(), allele);
 
         instances.put(method, allele, instance);
         return instance;
     }
 
     @Override public StabilityMethod getMethod() {
-        return (StabilityMethod) super.getMethod();
+        return getPredictor().getMethod();
+    }
+
+    @Override public StabilityPredictor getPredictor() {
+        return (StabilityPredictor) super.predictor;
     }
 }

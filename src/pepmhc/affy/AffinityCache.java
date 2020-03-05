@@ -14,8 +14,8 @@ import pepmhc.bind.BindCache;
 public final class AffinityCache extends BindCache<AffinityRecord> {
     private static final PairKeyTable<AffinityMethod, Allele, AffinityCache> instances = PairKeyTable.hash();
 
-    private AffinityCache(AffinityStore store) {
-        super(store);
+    private AffinityCache(AffinityTable table, AffinityPredictor predictor, Allele allele) {
+        super(table, predictor, allele);
     }
 
     /**
@@ -65,7 +65,7 @@ public final class AffinityCache extends BindCache<AffinityRecord> {
 
     private static AffinityCache newInstance(AffinityMethod method, Allele allele) {
         AffinityCache instance =
-            new AffinityCache(AffinityStore.instance(method, allele));
+            new AffinityCache(AffinityTable.create(method, allele), method.getPredictor(), allele);
 
         instances.put(method, allele, instance);
         return instance;

@@ -1,27 +1,46 @@
 
 package pepmhc.bind;
 
+import java.util.Collection;
+import java.util.List;
+
 import jam.hla.Allele;
 import jam.peptide.Peptide;
 import jam.sql.SQLCache;
+import jam.sql.SQLTable;
 
 /**
- * Maintains an in-memory cache of peptide-MHC binding records backed
- * by a persistent database store.
+ * Provides a compute-on-demand service, in-memory caching, and
+ * persistent storage for peptide-MHC binding records.
+ *
+ * @param <R> the type of binding record (affinity or stability)
+ * to cache.
  */
 public abstract class BindCache<R extends BindRecord> extends SQLCache<Peptide, R> {
     /**
-     * Creates a new cache with a backing database store to provide
-     * persistent storage and to compute records on demand.
-     *
-     * @param store the backing database store.
+     * The allele served by this cache.
      */
-    protected BindCache(BindStore<R> store) {
-        super(store);
-    }
+    protected final Allele allele;
 
-    protected BindStore<R> getStore() {
-        return (BindStore<R>) store;
+    /**
+     * The predictor serving this cache.
+     */
+    protected final BindPredictor<R> predictor;
+
+    /**
+     * Creates a new record cache for a given allele and predictor.
+     *
+     * @param table the database table providing persistent storage.
+     *
+     * @param predictor the predictor serving this cache.
+     *
+     * @param allele the allele served by this cache.
+     */
+    protected BindCache(SQLTable<Peptide, R> table, BindPredictor<R> predictor, Allele allele) {
+        super(table);
+
+        this.allele = allele;
+        this.predictor = predictor;
     }
 
     /**
@@ -30,20 +49,16 @@ public abstract class BindCache<R extends BindRecord> extends SQLCache<Peptide, 
      * @return the HLA allele served by this cache.
      */
     public Allele getAllele() {
-        return getStore().getAllele();
+        return allele;
     }
 
     /**
      * Returns the prediction method used to compute new records.
      *
-     * @return the prediction method used to compute new records.
+     * @return the predictor method used to compute new records.
      */
     public Enum getMethod() {
-        return getStore().getPredictor().getMethod();
-    }
-
-    private String methodName() {
-        return getMethod().name();
+        return predictor.getMethod();
     }
 
     /**
@@ -52,10 +67,18 @@ public abstract class BindCache<R extends BindRecord> extends SQLCache<Peptide, 
      * @return the predictor used to compute new records.
      */
     public BindPredictor<R> getPredictor() {
-        return getStore().getPredictor();
+        return predictor;
     }
 
     @Override public String getName() {
-        return getAllele().longKey();
+        return getAllele() + ":" + getMethod();
+    }
+
+    @Override protected R compute(Peptide peptide) {
+        return compute(List.of(peptide)).get(0);
+    }
+
+    @Override protected List<R> compute(Collection<Peptide> peptides) {
+        return predictor.predict(allele, peptides);
     }
 }
