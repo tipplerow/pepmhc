@@ -1,12 +1,10 @@
 
 package pepmhc.app;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import jam.app.JamLogger;
 import jam.hla.Allele;
-import jam.io.LineReader;
 import jam.peptide.Peptide;
 import jam.util.ListUtil;
 
@@ -23,8 +21,8 @@ public final class StabilityBank {
 
     private final StabilityMethod method;
 
-    private final List<Allele> alleles = new ArrayList<Allele>();
-    private final List<Peptide> peptides = new ArrayList<Peptide>();
+    private List<Allele> alleles;
+    private List<Peptide> peptides;
 
     private final static int BATCH_SIZE = 200000;
 
@@ -51,21 +49,11 @@ public final class StabilityBank {
     }
 
     private void loadAlleles() {
-        LineReader reader = LineReader.open(alleleFile);
-
-        for (String line : reader)
-            alleles.add(Allele.instance(line));
-
-        reader.close();
+        alleles = Allele.load(alleleFile);
     }
 
     private void loadPeptides() {
-        LineReader reader = LineReader.open(peptideFile);
-
-        for (String line : reader)
-            peptides.add(Peptide.parse(line));
-
-        reader.close();
+        peptides = Peptide.load(peptideFile);
     }
 
     private void processAlleles() {

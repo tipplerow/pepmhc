@@ -178,12 +178,12 @@ public final class TAP {
 
         // Start with the contribution from the C terminus...
         int    cterm = L - 1;
-        double score = matrix.get(peptide.at(cterm), TAPPosition.CTerm);
+        double score = matrix.get(peptide.get(cterm), TAPPosition.CTerm);
 
         // Add the alpha-scaled contributions from the N-terminal residues...
-        score += alpha * matrix.get(peptide.at(0), TAPPosition.NTerm1);
-        score += alpha * matrix.get(peptide.at(1), TAPPosition.NTerm2);
-        score += alpha * matrix.get(peptide.at(2), TAPPosition.NTerm3);
+        score += alpha * matrix.get(peptide.get(0), TAPPosition.NTerm1);
+        score += alpha * matrix.get(peptide.get(1), TAPPosition.NTerm2);
+        score += alpha * matrix.get(peptide.get(2), TAPPosition.NTerm3);
 
         return score;
     }

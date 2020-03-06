@@ -10,7 +10,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class AffinityThresholdTest {
-    private static final Peptide peptide = Peptide.parse("AAA"); // Any peptide will do...
+    private static final Peptide peptide = Peptide.instance("AAA"); // Any peptide will do...
 
     private static final AffinityRecord lowAffinity = new AffinityRecord(peptide, 10.0,    99.9);
     private static final AffinityRecord lowRank     = new AffinityRecord(peptide, 10000.0,  0.1);

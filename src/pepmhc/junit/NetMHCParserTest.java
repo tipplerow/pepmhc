@@ -20,8 +20,8 @@ public class NetMHCParserTest {
 
         assertEquals(10, records.size());
 
-        assertEquals(Peptide.parse("AAAWYLWEV"), records.get(0).getPeptide());
-        assertEquals(Peptide.parse("AEFGPWQTV"), records.get(9).getPeptide());
+        assertEquals(Peptide.instance("AAAWYLWEV"), records.get(0).getPeptide());
+        assertEquals(Peptide.instance("AEFGPWQTV"), records.get(9).getPeptide());
         
         assertEquals(   10.65, records.get(0).getAffinity(), 0.01);
         assertEquals(12361.73, records.get(9).getAffinity(), 0.01);
@@ -35,8 +35,8 @@ public class NetMHCParserTest {
 
         assertEquals(10, records.size());
 
-        assertEquals(Peptide.parse("AAAWYLWEV"), records.get(0).getPeptide());
-        assertEquals(Peptide.parse("AEFGPWQTV"), records.get(9).getPeptide());
+        assertEquals(Peptide.instance("AAAWYLWEV"), records.get(0).getPeptide());
+        assertEquals(Peptide.instance("AEFGPWQTV"), records.get(9).getPeptide());
         
         assertEquals(   7.1, records.get(0).getAffinity(), 0.1);
         assertEquals(8706.7, records.get(9).getAffinity(), 0.1);

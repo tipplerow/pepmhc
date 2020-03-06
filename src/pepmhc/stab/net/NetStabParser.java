@@ -132,7 +132,7 @@ public final class NetStabParser {
         if (fields.length <= PERCENTILE_FIELD_INDEX)
             throw JamException.runtime("Invalid data line [%s].", line);
 
-        Peptide peptide    = Peptide.parse(fields[PEPTIDE_FIELD_INDEX]);
+        Peptide peptide    = Peptide.instance(fields[PEPTIDE_FIELD_INDEX]);
         double  halfLife   = Double.valueOf(fields[HALF_LIFE_FIELD_INDEX]);
         double  percentile = Double.valueOf(fields[PERCENTILE_FIELD_INDEX]);
 

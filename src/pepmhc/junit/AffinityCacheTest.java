@@ -44,10 +44,10 @@ public class AffinityCacheTest {
         if (!predictor.isInstalled())
             return;
 
-        AffinityRecord record = AffinityCache.instance(method, allele).get(Peptide.parse("AEFGPWQTV"));
+        AffinityRecord record = AffinityCache.instance(method, allele).get(Peptide.instance("AEFGPWQTV"));
 
-        AffinityCache.instance(method, allele).get(Peptide.parse("AEFGPWQTV"));
-        AffinityCache.instance(method, allele).get(Peptide.parse("AEFGPWQTV"));
+        AffinityCache.instance(method, allele).get(Peptide.instance("AEFGPWQTV"));
+        AffinityCache.instance(method, allele).get(Peptide.instance("AEFGPWQTV"));
     }
 
     public static void main(String[] args) {

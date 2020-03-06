@@ -23,9 +23,9 @@ public class StabilizedMatrixTest {
         assertEquals(-0.985, mat.getElement(Residue.valueOfCode1('D'), 2), 0.001);
         assertEquals( 0.033, mat.getElement(Residue.valueOfCode1('Y'), 3), 0.001);
 
-        assertEquals(167.70654039, mat.computeIC50(Peptide.parse("YWDRNTQIY")), 1.0E-08);
-        assertEquals(1873.0527138, mat.computeIC50(Peptide.parse("QTSYQYLII")), 1.0E-07);
-        assertEquals(11656.012379, mat.computeIC50(Peptide.parse("TSAFNKKTF")), 1.0E-06);
+        assertEquals(167.70654039, mat.computeIC50(Peptide.instance("YWDRNTQIY")), 1.0E-08);
+        assertEquals(1873.0527138, mat.computeIC50(Peptide.instance("QTSYQYLII")), 1.0E-07);
+        assertEquals(11656.012379, mat.computeIC50(Peptide.instance("TSAFNKKTF")), 1.0E-06);
     }
 
     public static void main(String[] args) {

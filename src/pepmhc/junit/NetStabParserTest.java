@@ -18,8 +18,8 @@ public class NetStabParserTest {
 
         assertEquals(10, records.size());
 
-        assertEquals(Peptide.parse("AAAWYLWEV"), records.get(0).getPeptide());
-        assertEquals(Peptide.parse("AEFGPWQTV"), records.get(9).getPeptide());
+        assertEquals(Peptide.instance("AAAWYLWEV"), records.get(0).getPeptide());
+        assertEquals(Peptide.instance("AEFGPWQTV"), records.get(9).getPeptide());
         
         assertEquals(7.61, records.get(0).getHalfLife(), 0.01);
         assertEquals(0.50, records.get(9).getHalfLife(), 0.01);

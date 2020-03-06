@@ -25,7 +25,7 @@ public class TAPTest {
         TableReader reader = TableReader.open(DIEZ_S1_FILE);
 
         for (List<String> fields : reader) {
-            Peptide peptide = Peptide.parse(fields.get(0));
+            Peptide peptide = Peptide.instance(fields.get(0));
 
             double measured  = Double.parseDouble(fields.get(1));
             double predicted = TAP.consensus().score(peptide);
@@ -45,7 +45,7 @@ public class TAPTest {
         TableReader reader = TableReader.open(IEDB_FILE);
 
         for (List<String> fields : reader) {
-            Peptide peptide = Peptide.parse(fields.get(0));
+            Peptide peptide = Peptide.instance(fields.get(0));
 
             IEDB.add(Double.parseDouble(fields.get(1)));
             ours.add(TAP.consensus().score(peptide));

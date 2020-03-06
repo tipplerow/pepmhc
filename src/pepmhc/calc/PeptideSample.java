@@ -61,7 +61,7 @@ public final class PeptideSample {
      * number in the flat file.
      */
     public static PeptideSample create(String peptideFile, int sampleCount, int sampleSize) {
-        return create(Peptide.loadFlatFile(peptideFile), sampleCount, sampleSize);
+        return create(Peptide.load(peptideFile), sampleCount, sampleSize);
     }
 
     /**

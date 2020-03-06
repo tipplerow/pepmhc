@@ -25,11 +25,11 @@ public class StabilityCacheTest {
             return;
 
         StabilityCache cache = StabilityCache.instance(method, allele);
-        StabilityRecord record = cache.get(Peptide.parse("AEFGPWQTV"));
+        StabilityRecord record = cache.get(Peptide.instance("AEFGPWQTV"));
         System.out.println(record);
 
-        cache.get(Peptide.parse("AEFGPWQTV"));
-        cache.get(Peptide.parse("AEFGPWQTV"));
+        cache.get(Peptide.instance("AEFGPWQTV"));
+        cache.get(Peptide.instance("AEFGPWQTV"));
     }
 
     public static void main(String[] args) {

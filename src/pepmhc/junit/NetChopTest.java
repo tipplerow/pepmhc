@@ -11,25 +11,25 @@ import static org.junit.Assert.*;
 
 public class NetChopTest {
     private static final Peptide PEPTIDE =
-        Peptide.parse("MAGRSGDNDEELLKAVRIIKILYKSNPYPEPKGSRQARKN" +
-                      "RRRRWRARQRQIDSISERILSTYLGRSTEPVPLQLPPLER" +
-                      "LHLDCREDCGTSGTQQSQGVETGVGRPQISVESPVILGSR" +
-                      "TKN");
+        Peptide.instance("MAGRSGDNDEELLKAVRIIKILYKSNPYPEPKGSRQARKN" +
+                         "RRRRWRARQRQIDSISERILSTYLGRSTEPVPLQLPPLER" +
+                         "LHLDCREDCGTSGTQQSQGVETGVGRPQISVESPVILGSR" +
+                         "TKN");
 
     private static final List<Peptide> FRAGMENTS =
-        List.of(Peptide.parse("SGDNDEELL"),
-                Peptide.parse("LKAVRIIKI"),
-                Peptide.parse("KAVRIIKIL"),
-                Peptide.parse("KILYKSNPY"),
-                Peptide.parse("KSNPYPEPK"),
-                Peptide.parse("ARKNRRRRW"),
-                Peptide.parse("QIDSISERI"),
-                Peptide.parse("SERILSTYL"),
-                Peptide.parse("YLGRSTEPV"),
-                Peptide.parse("GRSTEPVPL"),
-                Peptide.parse("STEPVPLQL"),
-                Peptide.parse("PLQLPPLER"),
-                Peptide.parse("PPLERLHLD"));
+        List.of(Peptide.instance("SGDNDEELL"),
+                Peptide.instance("LKAVRIIKI"),
+                Peptide.instance("KAVRIIKIL"),
+                Peptide.instance("KILYKSNPY"),
+                Peptide.instance("KSNPYPEPK"),
+                Peptide.instance("ARKNRRRRW"),
+                Peptide.instance("QIDSISERI"),
+                Peptide.instance("SERILSTYL"),
+                Peptide.instance("YLGRSTEPV"),
+                Peptide.instance("GRSTEPVPL"),
+                Peptide.instance("STEPVPLQL"),
+                Peptide.instance("PLQLPPLER"),
+                Peptide.instance("PPLERLHLD"));
 
     @Test public void testChop() {
         if (NetChop.isInstalled())

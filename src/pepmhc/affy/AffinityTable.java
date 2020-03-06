@@ -96,7 +96,7 @@ public final class AffinityTable extends SQLTable<Peptide, AffinityRecord> {
     }
 
     @Override public AffinityRecord getRow(ResultSet resultSet) throws SQLException {
-        Peptide peptide    = Peptide.parse(resultSet.getString(1));
+        Peptide peptide    = Peptide.instance(resultSet.getString(1));
         double  affinity   = getDouble(resultSet, 2);
         double  percentile = getDouble(resultSet, 3);
 

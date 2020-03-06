@@ -128,7 +128,7 @@ public abstract class NetParser {
         if (fields.length <= getPercentileFieldIndex())
             throw JamException.runtime("Invalid data line [%s].", line);
 
-        Peptide peptide    = Peptide.parse(fields[getPeptideFieldIndex()]);
+        Peptide peptide    = Peptide.instance(fields[getPeptideFieldIndex()]);
         double  affinity   = Double.valueOf(fields[getAffinityFieldIndex()]);
         double  percentile = Double.valueOf(fields[getPercentileFieldIndex()]);
 

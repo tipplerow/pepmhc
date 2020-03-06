@@ -16,16 +16,16 @@ import static org.junit.Assert.*;
 
 public class AntigenProcessorTest extends NumericTestBase {
     private static final Peptide A3GALT2 =
-        Peptide.parse("MALKEGLRAWKRIFWRQILLTLGLLGLFLYGLPKFRHLEALIPMGVCPSATMSQLRDNFT" +
-                      "GALRPWARPEVLTCTPWGAPIIWDGSFDPDVAKQEARQQNLTIGLTIFAVGRYLEKYLER" +
-                      "FLETAEQHFMAGQSVMYYVFTELPGAVPRVALGPGRRLPVERVARERRWQDVSMARMRTL" +
-                      "HAALGGLPGREAHFMFCMDVDQHFSGTFGPEALAESVAQLHSWHYHWPSWLLPFERDAHS" +
-                      "AAAMAWGQGDFYNHAAVFGGSVAALRGLTAHCAGGLDWDRARGLEARWHDESHLNKFFWL" +
-                      "HKPAKVLSPEFCWSPDIGPRAEIRRPRLLWAPKGYRLLRN");
+        Peptide.instance("MALKEGLRAWKRIFWRQILLTLGLLGLFLYGLPKFRHLEALIPMGVCPSATMSQLRDNFT" +
+                         "GALRPWARPEVLTCTPWGAPIIWDGSFDPDVAKQEARQQNLTIGLTIFAVGRYLEKYLER" +
+                         "FLETAEQHFMAGQSVMYYVFTELPGAVPRVALGPGRRLPVERVARERRWQDVSMARMRTL" +
+                         "HAALGGLPGREAHFMFCMDVDQHFSGTFGPEALAESVAQLHSWHYHWPSWLLPFERDAHS" +
+                         "AAAMAWGQGDFYNHAAVFGGSVAALRGLTAHCAGGLDWDRARGLEARWHDESHLNKFFWL" +
+                         "HKPAKVLSPEFCWSPDIGPRAEIRRPRLLWAPKGYRLLRN");
 
     private static final Peptide BEX4 =
-        Peptide.parse("MESKEELAANNLNGENAQQENEGGEQAPTQNEEESRHLGGGEGQKPGGNIRRGRVRRLVP" +
-                      "NFRWAIPNRHIEHNEARDDVERFVGQMMEIKRKTREQQMRHYMRFQTPEPDNHYDFCLIP");
+        Peptide.instance("MESKEELAANNLNGENAQQENEGGEQAPTQNEEESRHLGGGEGQKPGGNIRRGRVRRLVP" +
+                         "NFRWAIPNRHIEHNEARDDVERFVGQMMEIKRKTREQQMRHYMRFQTPEPDNHYDFCLIP");
 
     @Test public void testNetChopTAPLenient() {
         AntigenProcessor processor =
@@ -46,12 +46,12 @@ public class AntigenProcessorTest extends NumericTestBase {
 
         List<Peptide> fragments = processor.process(BEX4);
 
-        assertEquals(List.of(Peptide.parse("HLGGGEGQK"),
-                             Peptide.parse("AIPNRHIEH"),
-                             Peptide.parse("KRKTREQQM"),
-                             Peptide.parse("QTPEPDNHY"),
-                             Peptide.parse("PNRHIEHNEA"),
-                             Peptide.parse("FQTPEPDNHY")),
+        assertEquals(List.of(Peptide.instance("HLGGGEGQK"),
+                             Peptide.instance("AIPNRHIEH"),
+                             Peptide.instance("KRKTREQQM"),
+                             Peptide.instance("QTPEPDNHY"),
+                             Peptide.instance("PNRHIEHNEA"),
+                             Peptide.instance("FQTPEPDNHY")),
                      fragments);
     }
 

@@ -92,7 +92,7 @@ public final class StabilizedMatrix {
         double logsum = intercept;
 
         for (int index = 0; index < peptide.length(); ++index)
-            logsum += elements.get(index).get(peptide.at(index));
+            logsum += elements.get(index).get(peptide.get(index));
 
         return Math.pow(10.0, logsum);
     }

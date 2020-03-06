@@ -96,7 +96,7 @@ public final class StabilityTable extends SQLTable<Peptide, StabilityRecord> {
     }
 
     @Override public StabilityRecord getRow(ResultSet resultSet) throws SQLException {
-        Peptide peptide    = Peptide.parse(resultSet.getString(1));
+        Peptide peptide    = Peptide.instance(resultSet.getString(1));
         double  halfLife   = getDouble(resultSet, 2);
         double  percentile = getDouble(resultSet, 3);
 
