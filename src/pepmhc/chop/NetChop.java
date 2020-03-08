@@ -20,12 +20,21 @@ import jam.util.RegexUtil;
  * prescribed lengths.
  */
 public final class NetChop {
-    private final int[] lengths;
-    private final double threshold;
+    private final Peptide peptide;
+    private final int[]   lengths;
+    private final double  threshold;
 
-    private Peptide peptide;
     private List<Double> scores;
     private List<Peptide> fragments;
+
+    private NetChop(Peptide peptide, int[] lengths, double threshold) {
+        this.peptide = peptide;
+        this.lengths = lengths;
+        this.threshold = threshold;
+
+        Arrays.sort(this.lengths);
+        THRESHOLD_PROBABILITY_RANGE.validate("Threshold probability", threshold);
+    }
 
     /**
      * Name of the environment variable that defines the absolute path
@@ -56,30 +65,6 @@ public final class NetChop {
      * Default value for the lengths of the cleaved peptides.
      */
     public static final int[] PEPTIDE_LENGTHS_DEFAULT = new int[] { 9, 10 };
-
-    /**
-     * Creates a new {@code netchop} processor with default settings.
-     */
-    public NetChop() {
-        this(PEPTIDE_LENGTHS_DEFAULT, THRESHOLD_PROBABILITY_DEFAULT);
-    }
-
-    /**
-     * Creates a new {@code netchop} processor.
-     *
-     * @param lengths the lengths of the peptide fragments to
-     * produce.
-     *
-     * @param threshold the threshold probability for assigned
-     * cleavage sites.
-     */
-    public NetChop(int[] lengths, double threshold) {
-        this.lengths = lengths;
-        this.threshold = threshold;
-
-        Arrays.sort(this.lengths);
-        THRESHOLD_PROBABILITY_RANGE.validate("Threshold probability", threshold);
-    }
 
     /**
      * Simulates proteasomal processing of a peptide.
@@ -117,8 +102,8 @@ public final class NetChop {
      * @return a list containing the cleaved peptide fragments.
      */
     public static List<Peptide> chop(Peptide peptide, int[] lengths, double threshold) {
-        NetChop chopper = new NetChop(lengths, threshold);
-        return chopper.chop(peptide);
+        NetChop chopper = new NetChop(peptide, lengths, threshold);
+        return chopper.chop();
     }
 
     /**
@@ -164,20 +149,7 @@ public final class NetChop {
             return JamEnv.getRequired(EXECUTABLE_PATH_ENV);
     }
 
-    /**
-     * Simulates proteasomal processing of a peptide.
-     *
-     * <p>Predicts cleavage sites using the assigned threshold
-     * probability and assembles cleaved fragments having the
-     * prescribed lengths.
-     *
-     * @param peptide the peptide to chop.
-     *
-     * @return a list containing the cleaved peptide fragments.
-     */
-    public List<Peptide> chop(Peptide peptide) {
-        this.peptide = peptide;
-
+    private List<Peptide> chop() {
         computeScores();
         assembleFragments();
 
@@ -230,27 +202,5 @@ public final class NetChop {
 
     private Peptide cleavageFragment(int cterm, int fragLen) {
         return peptide.fragment(new IntRange(cterm - fragLen + 1, cterm));
-    }
-
-    /**
-     * Returns the lengths of the cleaved peptides returned by this
-     * simulator.
-     *
-     * @return the lengths of the cleaved peptides returned by this
-     * simulator.
-     */
-    public int[] getLengths() {
-        return Arrays.copyOf(lengths, lengths.length);
-    }
-
-    /**
-     * Returns the threshold probability required to assign a cleavage
-     * site.
-     *
-     * @return the threshold probability required to assign a cleavage
-     * site.
-     */
-    public double getThreshold() {
-        return threshold;
     }
 }

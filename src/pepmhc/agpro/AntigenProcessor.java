@@ -32,7 +32,6 @@ public final class AntigenProcessor {
     private final double tapScoreThreshold;
 
     private final TAP tap;
-    private final NetChop netChop;
 
     private static AntigenProcessor global = null;
 
@@ -50,11 +49,6 @@ public final class AntigenProcessor {
         this.netChopThreshold = netChopThreshold;
         this.tapAlphaShrinkage = tapAlphaShrinkage;
         this.tapScoreThreshold = tapScoreThreshold;
-
-        if (useNetChop)
-            this.netChop = new NetChop(cleavageLength, netChopThreshold);
-        else
-            this.netChop = null;
 
         if (useTAPConsensus)
             this.tap = new TAP(tapAlphaShrinkage, tapScoreThreshold);
@@ -280,15 +274,6 @@ public final class AntigenProcessor {
     }
 
     /**
-     * Returns the active {@code netchop} predictor.
-     *
-     * @return the active {@code netchop} predictor.
-     */
-    public NetChop getNetChop() {
-        return netChop;
-    }
-
-    /**
      * Returns the active TAP predictor.
      *
      * @return the active TAP predictor.
@@ -310,7 +295,7 @@ public final class AntigenProcessor {
 
     private List<Peptide> cleave(Peptide protein) {
         if (useNetChop)
-            return netChop.chop(protein);
+            return NetChop.chop(protein, cleavageLength, netChopThreshold);
         else
             return cleaveNative(protein);
     }

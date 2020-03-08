@@ -31,11 +31,6 @@ public class AntigenProcessorTest extends NumericTestBase {
         AntigenProcessor processor =
             AntigenProcessor.resolve("data/test/NetChop_TAP_Lenient.prop");
 
-        NetChop netChop = processor.getNetChop();
-
-        assertTrue(Arrays.equals(new int[] { 9, 10 }, netChop.getLengths()));
-        assertDouble(0.5, netChop.getThreshold());
-
         TAP tap = processor.getTAP();
 
         assertDouble(0.2, tap.getAlpha());
