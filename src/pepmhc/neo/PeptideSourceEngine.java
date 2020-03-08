@@ -2,8 +2,10 @@
 package pepmhc.neo;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import jam.app.JamLogger;
+import jam.hugo.HugoPeptideList;
 import jam.hugo.HugoPeptideTable;
 import jam.hugo.HugoSymbol;
 import jam.lang.JamException;
@@ -22,11 +24,10 @@ final class PeptideSourceEngine {
     private final MAFFastaList fastaList;
     private final HugoPeptideTable selfPepReference;
 
-    private final AntigenProcessor antigenProcessor =
-        AntigenProcessor.defaultProcessor();
-
     private final Multimap<HugoSymbol, Peptide> neoPeptideMap = HashMultimap.create();
     private final Multimap<HugoSymbol, Peptide> selfPeptideMap = HashMultimap.create();
+
+    private int processed = 0;
 
     private PeptideSourceEngine(TumorBarcode barcode,
                                 MAFFastaList fastaList,
@@ -55,22 +56,40 @@ final class PeptideSourceEngine {
     }
 
     private void processRecords() {
-        for (MAFFastaRecord record : fastaList)
-            processRecord(record);
+        List<HugoPeptideList> fragmentLists =
+            fastaList.parallelStream().map(record -> processRecord(record)).collect(Collectors.toList());
+
+        for (HugoPeptideList fragmentList : fragmentLists)
+            processFragmentList(fragmentList);
     }
 
-    private void processRecord(MAFFastaRecord record) {
-        HugoSymbol symbol = record.getHugoSymbol();
-        JamLogger.info("Processing gene [%s:%s]...", barcode.getKey(), symbol.getKey());
-        
-        List<Peptide> fragments =
-            antigenProcessor.process(record.getPeptide());
+    private HugoPeptideList processRecord(MAFFastaRecord record) {
+        ++processed;
 
-        for (Peptide fragment : fragments)
+        HugoSymbol symbol = record.getHugoSymbol();
+        JamLogger.info("Antigen processing [%s:%s] (%d of %d)...",
+                       barcode.getKey(), symbol.getKey(),
+                       processed, fastaList.size());
+        
+        AntigenProcessor antigenProcessor =
+            AntigenProcessor.defaultProcessor();
+
+        Peptide peptide = record.getPeptide();
+        List<Peptide> fragments = antigenProcessor.process(peptide);
+
+        return HugoPeptideList.wrap(symbol, fragments);
+    }
+
+    private void processFragmentList(HugoPeptideList fragmentList) {
+        HugoSymbol symbol = fragmentList.getSymbol();
+        JamLogger.info("Processing fragment list [%s:%s]...", barcode.getKey(), symbol.getKey());
+
+        for (Peptide fragment : fragmentList) {
             if (isSelfPeptide(fragment))
                 selfPeptideMap.put(symbol, fragment);
             else
                 neoPeptideMap.put(symbol, fragment);
+        }
     }
 
     private boolean isSelfPeptide(Peptide peptide) {
