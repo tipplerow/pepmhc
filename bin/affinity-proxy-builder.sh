@@ -1,12 +1,12 @@
 #!/bin/sh
 ########################################################################
-# Usage: process-peptide-source.sh \
-#        MISSENSE_DIR SELF_PEP_FILE BARCODE_FILE PEP_SOURCE_DIR
+# Usage: affinity-proxy-builder.sh \
+#        ALLELE_FILE PRED_METHOD PEPTIDE_FILE SAMPLE_SIZE
 ########################################################################
 
-if [ $# -lt 4 ]
+if [ $# -ne 4 ]
 then
-    echo "Usage: `basename $0` MISSENSE_DIR SELF_PEP_FILE BARCODE_FILE PEP_SOURCE_DIR [AGPRO_PROP_FILE]"
+    echo "Usage: `basename $0` ALLELE_FILE PRED_METHOD PEPTIDE_FILE SAMPLE_SIZE"
     exit 1
 fi
 
@@ -22,6 +22,4 @@ then
     exit 1
 fi
 
-JVM_FLAGS="-Xmx96g -verbose:gc"
-
-${JAM_HOME}/bin/jam-run.sh $PEPMHC_HOME $JVM_FLAGS pepmhc.neo.PeptideSourceProcessor "$@"
+${JAM_HOME}/bin/jam-run.sh $PEPMHC_HOME pepmhc.stab.AffinityProxyBuilder "$@"
