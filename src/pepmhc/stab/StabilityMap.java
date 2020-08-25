@@ -4,8 +4,9 @@ package pepmhc.stab;
 import java.util.Collection;
 import java.util.HashMap;
 
-import jam.peptide.Peptide;
 import jam.util.IndexView;
+
+import jean.peptide.Peptide;
 
 /**
  * Provides a read-only view of stability records indexed by peptide.

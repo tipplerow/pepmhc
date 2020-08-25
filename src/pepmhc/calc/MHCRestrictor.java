@@ -4,10 +4,10 @@ package pepmhc.calc;
 import java.util.Collection;
 import java.util.HashSet;
 
-import jam.hla.Allele;
-import jam.hla.Genotype;
-import jam.peptide.Peptide;
-import jam.peptide.Peptidome;
+import jean.hla.Allele;
+import jean.hla.Genotype;
+import jean.peptide.Peptide;
+import jean.peptide.Peptidome;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;
@@ -74,7 +74,7 @@ public final class MHCRestrictor {
         Collection<Peptide> binders = new HashSet<Peptide>();
 
         for (Allele allele : genotype)
-            binders.addAll(threshold.getBinders(AffinityCache.instance(method, allele).get(peptides)));
+            binders.addAll(threshold.getBinders(AffinityCache.instance(method, allele).require(peptides)));
         
         return Peptidome.create(binders);
     }

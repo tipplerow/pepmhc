@@ -3,10 +3,11 @@ package pepmhc.junit;
 
 import java.util.List;
 
-import jam.hla.Allele;
-import jam.hla.Genotype;
 import jam.math.JamRandom;
-import jam.peptide.Peptide;
+
+import jean.hla.Allele;
+import jean.hla.Genotype;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;

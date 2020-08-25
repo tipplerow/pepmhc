@@ -8,12 +8,13 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import jam.app.JamLogger;
 import jam.app.JamProperties;
-import jam.hla.Allele;
 import jam.io.LineReader;
-import jam.hugo.HugoPeptideTable;
 import jam.math.JamRandom;
-import jam.peptide.Peptide;
 import jam.util.ListUtil;
+
+import jean.hla.Allele;
+import jean.hugo.HugoPeptideTable;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.AffinityRecord;

@@ -4,10 +4,11 @@ package pepmhc.bind;
 import java.util.Collection;
 import java.util.List;
 
-import jam.hla.Allele;
-import jam.peptide.Peptide;
 import jam.sql.SQLCache;
-import jam.sql.SQLTable;
+import jam.sql.SQLKeyTable;
+
+import jean.hla.Allele;
+import jean.peptide.Peptide;
 
 /**
  * Provides a compute-on-demand service, in-memory caching, and
@@ -36,7 +37,7 @@ public abstract class BindCache<R extends BindRecord> extends SQLCache<Peptide, 
      *
      * @param allele the allele served by this cache.
      */
-    protected BindCache(SQLTable<Peptide, R> table, BindPredictor<R> predictor, Allele allele) {
+    protected BindCache(SQLKeyTable<Peptide, R> table, BindPredictor<R> predictor, Allele allele) {
         super(table);
 
         this.allele = allele;
@@ -80,5 +81,9 @@ public abstract class BindCache<R extends BindRecord> extends SQLCache<Peptide, 
 
     @Override protected List<R> compute(Collection<Peptide> peptides) {
         return predictor.predict(allele, peptides);
+    }
+
+    @Override public Class getKeyClass() {
+        return Peptide.class;
     }
 }

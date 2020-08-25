@@ -10,7 +10,8 @@ import java.util.Set;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.math.IntUtil;
-import jam.peptide.Peptide;
+
+import jean.peptide.Peptide;
 
 /**
  * Generates and maintains sets of peptides sampled from a larger pool.

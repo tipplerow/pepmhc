@@ -2,7 +2,8 @@
 package pepmhc.junit;
 
 import jam.junit.NumericTestBase;
-import jam.peptide.Residue;
+
+import jean.peptide.Residue;
 
 import pepmhc.tap.TAPMatrix;
 import pepmhc.tap.TAPPosition;

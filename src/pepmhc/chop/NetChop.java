@@ -11,8 +11,9 @@ import jam.app.JamProperties;
 import jam.math.DoubleRange;
 import jam.math.IntRange;
 import jam.math.IntUtil;
-import jam.peptide.Peptide;
 import jam.util.RegexUtil;
+
+import jean.peptide.Peptide;
 
 /**
  * Simulates proteasomal processing of a peptide: Predicts cleavage

@@ -1,7 +1,7 @@
 
 package pepmhc.junit;
 
-import jam.peptide.Peptide;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityRecord;
 import pepmhc.affy.AffinityThreshold;

@@ -7,11 +7,12 @@ import java.util.Set;
 
 import jam.app.JamLogger;
 import jam.io.IOUtil;
-import jam.fasta.FastaReader;
-import jam.fasta.FastaRecord;
-import jam.hla.Allele;
 import jam.math.DoubleUtil;
-import jam.peptide.Peptide;
+
+import jean.fasta.FastaPeptideReader;
+import jean.fasta.FastaPeptideRecord;
+import jean.hla.Allele;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.AffinityPredictor;
@@ -23,7 +24,7 @@ public final class AllelePresentCalc {
     private final AffinityMethod method;
 
     private AffinityPredictor predictor;
-    private FastaReader fastaReader;
+    private FastaPeptideReader fastaReader;
     private PrintWriter reportWriter;
     private Set<Peptide> pepFragments;
     private int binderCount;
@@ -56,11 +57,11 @@ public final class AllelePresentCalc {
 
     private void run() {
         predictor    = method.getPredictor();
-        fastaReader  = FastaReader.open(fastIn);
+        fastaReader  = FastaPeptideReader.open(fastIn);
         pepFragments = new HashSet<Peptide>();
         binderCount  = 0;
 
-        for (FastaRecord record : fastaReader)
+        for (FastaPeptideRecord record : fastaReader)
             processPeptide(record.getPeptide());
 
         reportWriter = IOUtil.openWriter(outputFile());

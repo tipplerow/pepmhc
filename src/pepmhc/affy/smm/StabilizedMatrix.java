@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import jam.app.JamEnv;
-import jam.hla.Allele;
 import jam.io.FileUtil;
 import jam.lang.JamException;
-import jam.peptide.Peptide;
-import jam.peptide.Residue;
+
+import jean.hla.Allele;
+import jean.peptide.Peptide;
+import jean.peptide.Residue;
 
 import pepmhc.affy.AffinityMethod;
 

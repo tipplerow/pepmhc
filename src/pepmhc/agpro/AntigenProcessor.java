@@ -9,8 +9,9 @@ import java.util.List;
 import jam.app.JamProperties;
 import jam.app.PropertyList;
 import jam.math.IntUtil;
-import jam.peptide.Peptide;
 import jam.util.RegexUtil;
+
+import jean.peptide.Peptide;
 
 import pepmhc.chop.NetChop;
 import pepmhc.tap.TAP;

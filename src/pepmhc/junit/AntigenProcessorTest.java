@@ -5,7 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import jam.junit.NumericTestBase;
-import jam.peptide.Peptide;
+
+import jean.peptide.Peptide;
 
 import pepmhc.agpro.AntigenProcessor;
 import pepmhc.chop.NetChop;

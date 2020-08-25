@@ -4,8 +4,8 @@ package pepmhc.bind;
 import java.util.Collection;
 import java.util.List;
 
-import jam.hla.Allele;
-import jam.peptide.Peptide;
+import jean.hla.Allele;
+import jean.peptide.Peptide;
 
 /**
  * Defines an interface for computational engines or algorithms that

@@ -3,9 +3,10 @@ package pepmhc.stab.proxy;
 
 import java.util.regex.Pattern;
 
-import jam.hla.Allele;
 import jam.lang.JamException;
 import jam.util.RegexUtil;
+
+import jean.hla.Allele;
 
 import pepmhc.affy.AffinityMethod;
 

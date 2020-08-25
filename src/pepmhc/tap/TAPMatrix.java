@@ -9,7 +9,8 @@ import jam.data.DenseDataMatrix;
 import jam.data.DenseDataMatrixLoader;
 import jam.io.FileUtil;
 import jam.matrix.JamMatrix;
-import jam.peptide.Residue;
+
+import jean.peptide.Residue;
 
 /**
  * Stores the scoring matrices used in the TAP transport predictions.

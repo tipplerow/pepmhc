@@ -4,9 +4,10 @@ package pepmhc.calc;
 import java.util.ArrayList;
 import java.util.List;
 
-import jam.hla.Allele;
-import jam.hla.Genotype;
 import jam.math.StatSummary;
+
+import jean.hla.Allele;
+import jean.hla.Genotype;
 
 import pepmhc.affy.AffinityThreshold;
 import pepmhc.affy.AffinityMethod;

@@ -2,8 +2,9 @@
 package pepmhc.stab;
 
 import jam.app.JamProperties;
-import jam.hla.Allele;
 import jam.util.PairKeyTable;
+
+import jean.hla.Allele;
 
 import pepmhc.bind.BindCache;
 
@@ -105,5 +106,9 @@ public final class StabilityCache extends BindCache<StabilityRecord> {
 
     @Override public StabilityPredictor getPredictor() {
         return (StabilityPredictor) super.predictor;
+    }
+
+    @Override public Class getRecordClass() {
+        return StabilityRecord.class;
     }
 }

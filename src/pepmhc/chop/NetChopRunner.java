@@ -9,10 +9,11 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import jam.app.JamLogger;
-import jam.fasta.FastaRecord;
 import jam.io.IOUtil;
 import jam.lang.JamException;
-import jam.peptide.Peptide;
+
+import jean.fasta.FastaPeptideRecord;
+import jean.peptide.Peptide;
 
 /**
  * Runs the {@code netchop} executable for a single peptide.
@@ -63,7 +64,7 @@ public final class NetChopRunner {
         
     private void writePeptideFile() throws IOException {
         PrintWriter writer = new PrintWriter(peptideFile);
-        FastaRecord record = new FastaRecord(peptideKey(), fastaComment(), peptide);
+        FastaPeptideRecord record = new FastaPeptideRecord(peptideKey(), fastaComment(), peptide);
 
         writer.println(record.format());
         writer.close();

@@ -3,7 +3,7 @@ package pepmhc.junit;
 
 import java.util.List;
 
-import jam.peptide.Peptide;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityRecord;
 import pepmhc.affy.net.NetMHCParser;

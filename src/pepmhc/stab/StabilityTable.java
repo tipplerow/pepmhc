@@ -6,39 +6,54 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import jam.hla.Allele;
 import jam.io.FileUtil;
-import jam.peptide.Peptide;
+import jam.sql.SQLColumn;
 import jam.sql.SQLDb;
 import jam.sql.SQLiteDb;
-import jam.sql.SQLTable;
+
+import jean.hla.Allele;
+import jean.peptide.Peptide;
+
+import pepmhc.bind.BindTable;
 
 /**
  * Maintains a persistent database table of peptide-MHC stability
  * records indexed by peptide.
  */
-public final class StabilityTable extends SQLTable<Peptide, StabilityRecord> {
+public final class StabilityTable extends BindTable<StabilityRecord> {
     private StabilityTable(SQLDb db) {
         super(db);
     }
 
-    private static final String TABLE_NAME = "stability";
-
-    private static final String KEY_NAME = "peptide";
-    private static final String KEY_TYPE = "string";
-
-    private static final String HALF_LIFE_NAME = "half_life";
-    private static final String HALF_LIFE_TYPE = "double";
-
-    private static final String PERCENTILE_NAME = "percentile";
-    private static final String PERCENTILE_TYPE = "double";
+    /**
+     * The name of the {@code stability} table.
+     */
+    public static final String TABLE_NAME = "stability";
 
     /**
-     * Creates a new affinity table in an existing database.
+     * The name of the {@code half_life} column.
+     */
+    public static final String HALF_LIFE_NAME = "half_life";
+
+    /**
+     * Meta-data for the {@code half_life} column.
+     */
+    public static final SQLColumn HALF_LIFE_COLUMN =
+        SQLColumn.create(HALF_LIFE_NAME, "double")
+        .notNull();
+
+    /**
+     * Meta-data for the table columns.
+     */
+    public static final List<SQLColumn> COLUMN_LIST =
+        List.of(PEPTIDE_COLUMN, HALF_LIFE_COLUMN, PERCENTILE_COLUMN);
+
+    /**
+     * Creates a new stability table in an existing database.
      *
      * @param db the database that will contain the new table.
      *
-     * @return a new affinity table contained in the specified
+     * @return a new stability table contained in the specified
      * database.
      */
     public static StabilityTable create(SQLDb db) {
@@ -46,14 +61,14 @@ public final class StabilityTable extends SQLTable<Peptide, StabilityRecord> {
     }
 
     /**
-     * Creates a new affinity table with a dedicated database for
+     * Creates a new stability table with a dedicated database for
      * a fixed allele and prediction method.
      *
-     * @param method the affinity prediction method.
+     * @param method the stability prediction method.
      *
      * @param allele the allele of the binding MHC molecule.
      *
-     * @return a new affinity table for the specified allele and
+     * @return a new stability table for the specified allele and
      * prediction method.
      */
     public static StabilityTable create(StabilityMethod method, Allele allele) {
@@ -83,16 +98,8 @@ public final class StabilityTable extends SQLTable<Peptide, StabilityRecord> {
         return FileUtil.join(dbDir, formatAllele(allele) + ".db");
     }
 
-    private static String formatAllele(Allele allele) {
-        return allele.longKey().replace("*", "-").replace(":", "-");
-    }
-
-    @Override public List<String> getColumnNames() {
-        return List.of(KEY_NAME, HALF_LIFE_NAME, PERCENTILE_NAME);
-    }
-
-    @Override public Peptide getKey(StabilityRecord record) {
-        return record.getPeptide();
+    @Override public List<SQLColumn> getColumns() {
+        return COLUMN_LIST;
     }
 
     @Override public StabilityRecord getRow(ResultSet resultSet) throws SQLException {
@@ -107,16 +114,23 @@ public final class StabilityTable extends SQLTable<Peptide, StabilityRecord> {
         return TABLE_NAME;
     }
 
-    @Override public String getTableSchema() {
-        return String.format("%s %s PRIMARY KEY, %s %s, %s %s",
-                             KEY_NAME, KEY_TYPE,
-                             HALF_LIFE_NAME, HALF_LIFE_TYPE,
-                             PERCENTILE_NAME, PERCENTILE_TYPE);
-    }
+    @Override public void prepareColumn(PreparedStatement statement, int index,
+                                        StabilityRecord record, String columnName) throws SQLException {
+        switch (columnName) {
+        case PEPTIDE_NAME:
+            statement.setString(index, record.getPeptide().formatString());
+            break;
 
-    @Override public void prepareInsert(PreparedStatement statement, StabilityRecord record) throws SQLException {
-        statement.setString(1, record.getPeptide().formatString());
-        statement.setDouble(2, record.getHalfLife());
-        statement.setDouble(3, record.getPercentile());
+        case HALF_LIFE_NAME:
+            statement.setDouble(index, record.getHalfLife());
+            break;
+
+        case PERCENTILE_NAME:
+            statement.setDouble(index, record.getPercentile());
+            break;
+
+        default:
+            throw invalidColumn(columnName);
+        }
     }
 }

@@ -1,8 +1,9 @@
 
 package pepmhc.affy;
 
-import jam.hla.Allele;
 import jam.util.PairKeyTable;
+
+import jean.hla.Allele;
 
 import pepmhc.bind.BindStore;
 

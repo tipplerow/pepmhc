@@ -7,12 +7,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeSet;
 
-import jam.ensembl.EnsemblDb;
-import jam.ensembl.EnsemblRecord;
-import jam.ensembl.TranscriptBiotype;
-import jam.hugo.HugoSymbol;
 import jam.io.IOUtil;
-import jam.peptide.Peptide;
+
+import jean.ensembl.EnsemblProteinDb;
+import jean.ensembl.EnsemblProteinRecord;
+import jean.ensembl.TranscriptBiotype;
+import jean.hugo.HugoSymbol;
+import jean.peptide.Peptide;
 
 import pepmhc.chop.NetChop;
 import pepmhc.tap.TAP;
@@ -23,23 +24,23 @@ import pepmhc.tap.TAP;
  * standard output.
  */
 public final class ChopTAP {
-    private final EnsemblDb db;
     private final PrintWriter writer;
+    private final EnsemblProteinDb db;
 
     private static final int[] PEPTIDE_LENGTHS = new int[] { 9, 10 };
 
-    private ChopTAP(EnsemblDb db, PrintWriter writer) {
+    private ChopTAP(EnsemblProteinDb db, PrintWriter writer) {
         this.db = db;
         this.writer = writer;
     }
 
-    public static void run(EnsemblDb db, PrintWriter writer) {
+    public static void run(EnsemblProteinDb db, PrintWriter writer) {
         ChopTAP chopTAP = new ChopTAP(db, writer);
         chopTAP.run();
     }
 
     public static void run(String fastaFile, String outputFile) {
-        run(EnsemblDb.load(fastaFile), IOUtil.openWriter(outputFile));
+        run(EnsemblProteinDb.load(fastaFile), IOUtil.openWriter(outputFile));
     }
 
     private void run() {
@@ -71,15 +72,15 @@ public final class ChopTAP {
 
     private Collection<String> generatePeptides(HugoSymbol symbol) {
         Collection<String> peptides = new TreeSet<String>();
-        Collection<EnsemblRecord> records = db.get(symbol);
+        Collection<EnsemblProteinRecord> records = db.get(symbol);
 
-        for (EnsemblRecord record : records)
+        for (EnsemblProteinRecord record : records)
             peptides.addAll(generatePeptides(record));
 
         return peptides;
     }
 
-    private Collection<String> generatePeptides(EnsemblRecord record) {
+    private Collection<String> generatePeptides(EnsemblProteinRecord record) {
         if (!record.getTranscriptBiotype().equals(TranscriptBiotype.PROTEIN_CODING))
             return Collections.emptyList();
 

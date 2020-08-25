@@ -1,8 +1,8 @@
 
 package pepmhc.junit;
 
-import jam.hla.Allele;
-import jam.peptide.Peptide;
+import jean.hla.Allele;
+import jean.peptide.Peptide;
 
 import pepmhc.stab.net.NetStab;
 import pepmhc.stab.StabilityCache;
@@ -25,11 +25,11 @@ public class StabilityCacheTest {
             return;
 
         StabilityCache cache = StabilityCache.instance(method, allele);
-        StabilityRecord record = cache.get(Peptide.instance("AEFGPWQTV"));
+        StabilityRecord record = cache.require(Peptide.instance("AEFGPWQTV"));
         System.out.println(record);
 
-        cache.get(Peptide.instance("AEFGPWQTV"));
-        cache.get(Peptide.instance("AEFGPWQTV"));
+        cache.require(Peptide.instance("AEFGPWQTV"));
+        cache.require(Peptide.instance("AEFGPWQTV"));
     }
 
     public static void main(String[] args) {

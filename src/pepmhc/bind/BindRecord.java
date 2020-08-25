@@ -1,7 +1,7 @@
 
 package pepmhc.bind;
 
-import jam.peptide.Peptide;
+import jean.peptide.Peptide;
 
 /**
  * Provides the base class for all binding records managed by the

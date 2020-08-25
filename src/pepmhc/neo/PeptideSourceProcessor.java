@@ -5,12 +5,13 @@ import java.util.List;
 
 import jam.app.JamApp;
 import jam.app.JamLogger;
-import jam.hugo.HugoPeptideTable;
-import jam.hugo.HugoSymbol;
-import jam.maf.MAFFastaList;
-import jam.missense.MissenseManager;
-import jam.peptide.Peptide;
-import jam.tcga.TumorBarcode;
+
+import jean.hugo.HugoPeptideTable;
+import jean.hugo.HugoSymbol;
+import jean.maf.MAFFastaList;
+import jean.missense.MissenseManager;
+import jean.peptide.Peptide;
+import jean.tcga.TumorBarcode;
 
 /**
  * Generates neo-peptides and self-peptides derived from mutated
@@ -22,6 +23,7 @@ public final class PeptideSourceProcessor extends JamApp {
     private final String selfPepFile;
     private final String barcodeFile;
     private final String pepSourceDir;
+    private final String agproPropFile;
 
     private int processed = 0;
     private List<TumorBarcode> barcodes;
@@ -32,11 +34,13 @@ public final class PeptideSourceProcessor extends JamApp {
     private PeptideSourceProcessor(String missenseDir,
                                    String selfPepFile,
                                    String barcodeFile,
-                                   String pepSourceDir) {
+                                   String pepSourceDir,
+                                   String agproPropFile) {
         this.missenseDir = missenseDir;
         this.selfPepFile = selfPepFile;
         this.barcodeFile = barcodeFile;
         this.pepSourceDir = pepSourceDir;
+        this.agproPropFile = agproPropFile;
     }
 
     /**
@@ -53,16 +57,22 @@ public final class PeptideSourceProcessor extends JamApp {
      *
      * @param pepSourceDir the directory where the peptide-source files
      * will be written.
+     *
+     * @param agproPropFile optional property file used to customized
+     * the antigen processor settings ({@code null} to use the default
+     * parameters).
      */
     public static void run(String missenseDir,
                            String selfPepFile,
                            String barcodeFile,
-                           String pepSourceDir) {
+                           String pepSourceDir,
+                           String agproPropFile) {
         PeptideSourceProcessor processor =
             new PeptideSourceProcessor(missenseDir,
                                        selfPepFile,
                                        barcodeFile,
-                                       pepSourceDir);
+                                       pepSourceDir,
+                                       agproPropFile);
         processor.run();
     }
 
@@ -72,8 +82,8 @@ public final class PeptideSourceProcessor extends JamApp {
         missenseManager = MissenseManager.create(missenseDir);
         pepSourceManager = PeptideSourceManager.create(pepSourceDir, selfPeptideRef);
 
-        writeRuntimeEnv("JAM_", "PEPMHC_");
-        writeRuntimeProperties("jam.", "pepmhc.");
+        writeRuntimeEnv("JAM_", "JEAN_", "PEPMHC_");
+        writeRuntimeProperties("jam.", "jean.", "pepmhc.");
 
         processBarcodes();
         JamLogger.info("DONE!");
@@ -101,7 +111,7 @@ public final class PeptideSourceProcessor extends JamApp {
             return;
 
         PeptideSourceView sourceView =
-            PeptideSourceEngine.process(barcode, fastaList, selfPeptideRef);
+            PeptideSourceEngine.process(barcode, fastaList, selfPeptideRef, agproPropFile);
 
         pepSourceManager.store(barcode, sourceView);
     }
@@ -112,19 +122,24 @@ public final class PeptideSourceProcessor extends JamApp {
         System.err.print(" SELF_PEP_FILE");
         System.err.print(" BARCODE_FILE");
         System.err.print(" PEP_SOURCE_DIR");
+        System.err.print(" [AGPRO_PROP_FILE]");
         System.err.println();
         System.exit(1);
     }
 
     public static void main(String[] args) {
-        if (args.length != 4)
+        if (args.length < 4 || args.length > 5)
             usage();
 
         String missenseDir = args[0];
         String selfPepFile = args[1];
         String barcodeFile = args[2];
         String pepSourceDir = args[3];
+        String agproPropFile = null;
 
-        run(missenseDir, selfPepFile, barcodeFile, pepSourceDir);
+        if (args.length == 5)
+            agproPropFile = args[4];
+
+        run(missenseDir, selfPepFile, barcodeFile, pepSourceDir, agproPropFile);
     }
 }

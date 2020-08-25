@@ -4,10 +4,11 @@ package pepmhc.bind;
 import java.util.Collection;
 import java.util.List;
 
-import jam.hla.Allele;
-import jam.peptide.Peptide;
+import jam.sql.SQLKeyTable;
 import jam.sql.SQLStore;
-import jam.sql.SQLTable;
+
+import jean.hla.Allele;
+import jean.peptide.Peptide;
 
 /**
  * Provides a compute-on-demand service and persistent storage for
@@ -36,7 +37,7 @@ public abstract class BindStore<R extends BindRecord> extends SQLStore<Peptide, 
      *
      * @param allele the allele served by this store.
      */
-    protected BindStore(SQLTable<Peptide, R> table, BindPredictor<R> predictor, Allele allele) {
+    protected BindStore(SQLKeyTable<Peptide, R> table, BindPredictor<R> predictor, Allele allele) {
         super(table);
 
         this.allele = allele;

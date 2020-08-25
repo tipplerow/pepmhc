@@ -7,16 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jam.chem.Concentration;
-import jam.hla.PeptideSource;
-import jam.hugo.HugoPeptideTable;
-import jam.hugo.HugoSymbol;
-import jam.peptide.Peptide;
-import jam.peptide.PeptideConcentrationBuilder;
-import jam.peptide.PeptideConcentrationProfile;
-import jam.rna.ConcentrationModel;
-import jam.rna.Expression;
-import jam.rna.ExpressionProfile;
+import jean.chem.Concentration;
+import jean.hla.PeptideSource;
+import jean.hugo.HugoPeptideTable;
+import jean.hugo.HugoSymbol;
+import jean.peptide.Peptide;
+import jean.peptide.PeptideConcentrationBuilder;
+import jean.peptide.PeptideConcentrationProfile;
+import jean.rna.ConcentrationModel;
+import jean.rna.Expression;
+import jean.rna.ExpressionProfile;
 
 /**
  * Stores neo-peptide and self-peptide concentration profiles together

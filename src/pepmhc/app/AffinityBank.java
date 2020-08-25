@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jam.app.JamLogger;
-import jam.hla.Allele;
-import jam.hugo.HugoPeptideTable;
 import jam.io.IOUtil;
 import jam.io.LineReader;
-import jam.peptide.Peptide;
 import jam.util.ListUtil;
+
+import jean.hla.Allele;
+import jean.hugo.HugoPeptideTable;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;
@@ -74,7 +75,7 @@ public final class AffinityBank {
         List<List<Peptide>> subLists = ListUtil.split(peptides, BATCH_SIZE);
 
         for (List<Peptide> subList : subLists)
-            AffinityCache.instance(predMethod, allele).get(subList);
+            AffinityCache.instance(predMethod, allele).require(subList);
     }
 
     public static void main(String[] args) {

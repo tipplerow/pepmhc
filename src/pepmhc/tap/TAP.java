@@ -9,8 +9,9 @@ import jam.app.JamEnv;
 import jam.app.JamProperties;
 import jam.io.FileUtil;
 import jam.math.DoubleRange;
-import jam.peptide.Peptide;
-import jam.peptide.Residue;
+
+import jean.peptide.Peptide;
+import jean.peptide.Residue;
 
 /**
  * Predicts peptides that will be transported into the endoplasmic

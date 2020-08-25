@@ -6,8 +6,9 @@ import java.util.Collection;
 import java.util.List;
 
 import jam.app.JamProperties;
-import jam.hla.Allele;
-import jam.peptide.Peptide;
+
+import jean.hla.Allele;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.AffinityPredictor;

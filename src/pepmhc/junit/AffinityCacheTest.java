@@ -3,8 +3,8 @@ package pepmhc.junit;
 
 import java.io.File;
 
-import jam.hla.Allele;
-import jam.peptide.Peptide;
+import jean.hla.Allele;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;
@@ -44,10 +44,10 @@ public class AffinityCacheTest {
         if (!predictor.isInstalled())
             return;
 
-        AffinityRecord record = AffinityCache.instance(method, allele).get(Peptide.instance("AEFGPWQTV"));
+        AffinityRecord record = AffinityCache.instance(method, allele).require(Peptide.instance("AEFGPWQTV"));
 
-        AffinityCache.instance(method, allele).get(Peptide.instance("AEFGPWQTV"));
-        AffinityCache.instance(method, allele).get(Peptide.instance("AEFGPWQTV"));
+        AffinityCache.instance(method, allele).require(Peptide.instance("AEFGPWQTV"));
+        AffinityCache.instance(method, allele).require(Peptide.instance("AEFGPWQTV"));
     }
 
     public static void main(String[] args) {

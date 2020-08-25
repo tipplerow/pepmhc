@@ -6,8 +6,9 @@ import java.util.List;
 
 import jam.io.TableReader;
 import jam.math.StatUtil;
-import jam.peptide.Peptide;
 import jam.vector.VectorView;
+
+import jean.peptide.Peptide;
 
 import pepmhc.tap.TAP;
 

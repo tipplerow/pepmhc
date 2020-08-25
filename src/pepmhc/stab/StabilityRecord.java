@@ -2,7 +2,8 @@
 package pepmhc.stab;
 
 import jam.math.DoubleRange;
-import jam.peptide.Peptide;
+
+import jean.peptide.Peptide;
 
 import pepmhc.bind.BindRecord;
 

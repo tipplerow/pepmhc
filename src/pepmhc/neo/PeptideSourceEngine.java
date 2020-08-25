@@ -5,14 +5,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import jam.app.JamLogger;
-import jam.hugo.HugoPeptideList;
-import jam.hugo.HugoPeptideTable;
-import jam.hugo.HugoSymbol;
 import jam.lang.JamException;
-import jam.maf.MAFFastaList;
-import jam.maf.MAFFastaRecord;
-import jam.peptide.Peptide;
-import jam.tcga.TumorBarcode;
+
+import jean.hugo.HugoPeptideList;
+import jean.hugo.HugoPeptideTable;
+import jean.hugo.HugoSymbol;
+import jean.maf.MAFFastaList;
+import jean.maf.MAFFastaRecord;
+import jean.peptide.Peptide;
+import jean.tcga.TumorBarcode;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -23,6 +24,7 @@ final class PeptideSourceEngine {
     private final TumorBarcode barcode;
     private final MAFFastaList fastaList;
     private final HugoPeptideTable selfPepReference;
+    private final String agproPropFile;
 
     private final Multimap<HugoSymbol, Peptide> neoPeptideMap = HashMultimap.create();
     private final Multimap<HugoSymbol, Peptide> selfPeptideMap = HashMultimap.create();
@@ -31,17 +33,20 @@ final class PeptideSourceEngine {
 
     private PeptideSourceEngine(TumorBarcode barcode,
                                 MAFFastaList fastaList,
-                                HugoPeptideTable selfPepReference) {
+                                HugoPeptideTable selfPepReference,
+                                String agproPropFile) {
         this.barcode = barcode;
         this.fastaList = fastaList;
+        this.agproPropFile = agproPropFile;
         this.selfPepReference = selfPepReference;
     }
 
     static PeptideSourceView process(TumorBarcode barcode,
                                      MAFFastaList fastaList,
-                                     HugoPeptideTable selfPepReference) {
+                                     HugoPeptideTable selfPepReference,
+                                     String agproPropFile) {
         PeptideSourceEngine engine =
-            new PeptideSourceEngine(barcode, fastaList, selfPepReference);
+            new PeptideSourceEngine(barcode, fastaList, selfPepReference, agproPropFile);
 
         return engine.process();
     }
@@ -72,6 +77,8 @@ final class PeptideSourceEngine {
                        processed, fastaList.size());
         
         AntigenProcessor antigenProcessor =
+            agproPropFile != null ?
+            AntigenProcessor.resolve(agproPropFile) : 
             AntigenProcessor.defaultProcessor();
 
         Peptide peptide = record.getPeptide();

@@ -2,8 +2,9 @@
 package pepmhc.affy;
 
 import jam.app.JamProperties;
-import jam.hla.Allele;
 import jam.util.PairKeyTable;
+
+import jean.hla.Allele;
 
 import pepmhc.bind.BindCache;
 
@@ -85,5 +86,9 @@ public final class AffinityCache extends BindCache<AffinityRecord> {
 
     @Override public AffinityMethod getMethod() {
         return (AffinityMethod) super.getMethod();
+    }
+
+    @Override public Class getRecordClass() {
+        return AffinityRecord.class;
     }
 }

@@ -3,7 +3,8 @@ package pepmhc.junit;
 
 import java.util.List;
 
-import jam.peptide.Peptide;
+import jean.peptide.Peptide;
+
 import pepmhc.chop.NetChop;
 
 import org.junit.*;

@@ -9,15 +9,16 @@ import java.util.regex.Pattern;
 import jam.app.JamApp;
 import jam.app.JamLogger;
 import jam.app.JamProperties;
-import jam.hla.Allele;
-import jam.hla.Genotype;
 import jam.io.IOUtil;
 import jam.io.LineReader;
 import jam.lang.JamException;
-import jam.peptide.Peptide;
-import jam.peptide.Peptidome;
 import jam.report.LineBuilder;
 import jam.util.RegexUtil;
+
+import jean.hla.Allele;
+import jean.hla.Genotype;
+import jean.peptide.Peptide;
+import jean.peptide.Peptidome;
 
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.AffinityThreshold;

@@ -11,8 +11,9 @@ import java.util.regex.Pattern;
 
 import jam.io.IOUtil;
 import jam.lang.JamException;
-import jam.peptide.Residue;
 import jam.util.RegexUtil;
+
+import jean.peptide.Residue;
 
 final class MatrixReader {
     private final String fileName;

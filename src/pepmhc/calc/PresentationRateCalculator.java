@@ -4,10 +4,11 @@ package pepmhc.calc;
 import java.util.Collection;
 import java.util.HashSet;
 
-import jam.hla.Allele;
-import jam.hla.Genotype;
 import jam.math.DoubleUtil;
-import jam.peptide.Peptide;
+
+import jean.hla.Allele;
+import jean.hla.Genotype;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;
@@ -106,7 +107,7 @@ public final class PresentationRateCalculator {
      * allele.
      */
     public double compute(Allele allele) {
-        Collection<AffinityRecord> records = AffinityCache.instance(method, allele).get(peptides);
+        Collection<AffinityRecord> records = AffinityCache.instance(method, allele).require(peptides);
 
         int bound = threshold.countBinders(records);
         int total = peptides.size();
@@ -132,7 +133,7 @@ public final class PresentationRateCalculator {
         Collection<Peptide> binders = new HashSet<Peptide>();
 
         for (Allele allele : genotype.viewUniqueAlleles())
-            binders.addAll(threshold.getBinders(AffinityCache.instance(method, allele).get(peptides)));
+            binders.addAll(threshold.getBinders(AffinityCache.instance(method, allele).require(peptides)));
         
         int bound = binders.size();
         int total = peptides.size();

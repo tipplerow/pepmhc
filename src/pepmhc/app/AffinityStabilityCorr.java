@@ -6,11 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jam.app.JamLogger;
-import jam.hla.Allele;
-import jam.hugo.HugoPeptideTable;
 import jam.io.IOUtil;
-import jam.peptide.Peptide;
 import jam.util.ListUtil;
+
+import jean.hla.Allele;
+import jean.hugo.HugoPeptideTable;
+import jean.peptide.Peptide;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;
@@ -87,8 +88,8 @@ public final class AffinityStabilityCorr {
     }
 
     private void processPeptides() {
-        List<AffinityRecord> affinityRecords = AffinityCache.instance(AFFINITY_METHOD, allele).get(peptides);
-        List<StabilityRecord> stabilityRecords = StabilityCache.instance(STABILITY_METHOD, allele).get(peptides);
+        List<AffinityRecord> affinityRecords = AffinityCache.instance(AFFINITY_METHOD, allele).require(peptides);
+        List<StabilityRecord> stabilityRecords = StabilityCache.instance(STABILITY_METHOD, allele).require(peptides);
 
         for (int index = 0; index < peptides.size(); ++index)
             writeLine(peptides.get(index), affinityRecords.get(index), stabilityRecords.get(index));

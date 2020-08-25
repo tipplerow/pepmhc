@@ -3,7 +3,8 @@ package pepmhc.junit;
 
 import java.util.List;
 
-import jam.peptide.Peptide;
+import jean.peptide.Peptide;
+
 import pepmhc.stab.net.NetStabParser;
 import pepmhc.stab.StabilityRecord;
 

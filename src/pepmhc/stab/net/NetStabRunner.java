@@ -9,10 +9,11 @@ import java.util.Collection;
 import java.util.List;
 
 import jam.app.JamLogger;
-import jam.hla.Allele;
 import jam.io.IOUtil;
 import jam.lang.JamException;
-import jam.peptide.Peptide;
+
+import jean.hla.Allele;
+import jean.peptide.Peptide;
 
 import pepmhc.stab.StabilityRecord;
 

@@ -4,9 +4,10 @@ package pepmhc.stab.net;
 import java.util.Collection;
 import java.util.List;
 
-import jam.hla.Allele;
-import jam.peptide.Peptide;
 import jam.process.BatchProcess;
+
+import jean.hla.Allele;
+import jean.peptide.Peptide;
 
 import pepmhc.stab.StabilityRecord;
 

@@ -10,8 +10,9 @@ import java.util.regex.Pattern;
 
 import jam.io.IOUtil;
 import jam.lang.JamException;
-import jam.peptide.Peptide;
 import jam.util.RegexUtil;
+
+import jean.peptide.Peptide;
 
 import pepmhc.stab.StabilityRecord;
 
