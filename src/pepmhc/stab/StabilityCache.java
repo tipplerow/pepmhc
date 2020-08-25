@@ -22,7 +22,7 @@ public final class StabilityCache extends BindCache<StabilityRecord> {
     /**
      * Name of the environment variable that specifies the directory
      * containing the persistent database store. The system property
-     * {@code pepmhc.stab.cacheDir} will take precedence if both are
+     * {@code pepmhc.stabilityCache} will take precedence if both are
      * specified.
      */
     public static final String CACHE_DIRECTORY_ENV = "PEPMHC_STABILITY_CACHE";
