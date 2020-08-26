@@ -85,6 +85,18 @@ public final class BindRecordMap extends MapWrapper<Peptide, BindRecord> {
             add(record);
     }
 
+    /**
+     * Identifies peptides contained in this map.
+     *
+     * @param peptide a peptide to examine.
+     *
+     * @return {@code true} iff this map contains the specified
+     * peptide.
+     */
+    public boolean contains(Peptide peptide) {
+        return map.containsKey(peptide);
+    }
+
     @Override public String toString() {
         return map.values().toString();
     }
