@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import jam.lang.JamException;
 import jam.util.MapWrapper;
 
 import jean.peptide.Peptide;
@@ -95,6 +96,25 @@ public final class BindRecordMap extends MapWrapper<Peptide, BindRecord> {
      */
     public boolean contains(Peptide peptide) {
         return map.containsKey(peptide);
+    }
+
+    /**
+     * Retrieves a record from this map.
+     *
+     * @param peptide the peptide of the desired record.
+     *
+     * @return the record for the specified peptide.
+     *
+     * @throws RuntimeException unless this map contains a matching
+     * record.
+     */
+    public BindRecord require(Peptide peptide) {
+        BindRecord record = map.get(peptide);
+
+        if (record != null)
+            return record;
+        else
+            throw JamException.runtime("Missing binding record for [%s].", peptide);
     }
 
     @Override public String toString() {
