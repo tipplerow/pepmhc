@@ -53,6 +53,20 @@ public abstract class BindPredictor<R extends BindRecord> {
      *
      * @param peptides the presented peptides.
      *
+     * @return the binding records indexed by the presented peptides.
+     */
+    public BindRecordMap map(Allele allele, Collection<Peptide> peptides) {
+        return BindRecordMap.hash(predict(allele, peptides));
+    }
+
+    /**
+     * Computes binding records for a collection of peptides presented
+     * to an HLA allele.
+     *
+     * @param allele the receiving allele.
+     *
+     * @param peptides the presented peptides.
+     *
      * @return the binding records for the presented peptides (in the
      * order returned by the collection iterator)
      */

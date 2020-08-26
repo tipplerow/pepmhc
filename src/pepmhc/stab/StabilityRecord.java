@@ -1,8 +1,6 @@
 
 package pepmhc.stab;
 
-import jam.math.DoubleRange;
-
 import jean.peptide.Peptide;
 
 import pepmhc.bind.BindRecord;
@@ -12,9 +10,6 @@ import pepmhc.bind.BindRecord;
  * prediction.
  */
 public final class StabilityRecord extends BindRecord {
-    private final double halfLife;
-    private final double percentile;
-
     /**
      * Creates a new stability record with an unset percentile rank.
      *
@@ -23,7 +18,7 @@ public final class StabilityRecord extends BindRecord {
      * @param halfLife the half-life of the MHC-bound state (hours).
      */
     public StabilityRecord(Peptide peptide, double halfLife) {
-        this(peptide, halfLife, Double.NaN);
+        super(peptide, halfLife);
     }
 
     /**
@@ -38,42 +33,15 @@ public final class StabilityRecord extends BindRecord {
      * the same allele).
      */
     public StabilityRecord(Peptide peptide, double halfLife, double percentile) {
-        super(peptide);
-
-        this.halfLife = halfLife;
-        this.percentile = percentile;
-
-        validate();
-    }
-
-    private void validate() {
-        DoubleRange.NON_NEGATIVE.validate("half-life", halfLife);
-
-        if (!Double.isNaN(percentile))
-            DoubleRange.PERCENTILE.validate("percentile rank", percentile);
+        super(peptide, halfLife, percentile);
     }
 
     /**
-     * Returns the half-life of the MHC-bound state (hours).
+     * Returns the half-life of the MHC-bound state (in hours).
      *
-     * @return the half-life of the MHC-bound state (hours).
+     * @return the half-life of the MHC-bound state (in hours).
      */
-    public double getHalfLife() {
-        return halfLife;
-    }
-
-    /**
-     * Returns the percentile rank of the half-life (relative to other
-     * peptides of the same length bound to the same allele).
-     *
-     * @return the percentile rank of the half-life (relative to other
-     * peptides of the same length bound to the same allele).
-     */
-    public double getPercentile() {
-        return percentile;
-    }
-
-    @Override public String toString() {
-        return String.format("StabilityRecord(%s, %.2f, %.2f)", peptide.formatString(), halfLife, percentile);
+    @Override public double getHalfLife() {
+        return strength;
     }
 }
