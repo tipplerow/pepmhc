@@ -1,0 +1,42 @@
+########################################################################
+# Environment variables required to run PEPMHC applications.
+########################################################################
+
+if [ -z "${GITHUB_ROOT}" ]
+then
+    echo "Environment variable GITHUB_ROOT is not set; exiting."
+    exit 1
+fi
+
+if [ -z "${TIPPLEROW_ROOT}" ]
+then
+    echo "Environment variable TIPPLEROW_ROOT is not set; exiting."
+    exit 1
+fi
+
+export NETCHOP_EXE=${TIPPLEROW_ROOT}/netchop-3.1/netchop
+
+if [ -f ${HOME}/local/netMHCpan-4.0/netMHCpan ]
+then
+    export NET_MHC_PAN_EXE=${HOME}/local/netMHCpan-4.0/netMHCpan
+else
+    export NET_MHC_PAN_EXE=${TIPPLEROW_ROOT}/netMHCpan-4.0/netMHCpan
+fi
+
+if [ -f ${HOME}/local/netMHCstabpan-1.0/netMHCstabpan ]
+then
+    export NET_MHC_STAB_PAN_EXE=${HOME}/local/netMHCstabpan-1.0/netMHCstabpan
+else
+    export NET_MHC_STAB_PAN_EXE=${TIPPLEROW_ROOT}/netMHCstabpan-1.0/netMHCstabpan
+fi
+
+# Directory containing the SQLite peptide-MHC affinity database
+export PEPMHC_AFFINITY_CACHE=${HOME}/SimWork/PepMHC/AffinityCache
+
+# Directory containing the SQLite peptide-MHC stability database
+export PEPMHC_STABILITY_CACHE=${HOME}/SimWork/PepMHC/StabilityCache
+
+# ----------------------------------------------------------------------
+# Variables below here are derived and should not need to be changed
+# ----------------------------------------------------------------------
+export PEPMHC_HOME=${GITHUB_ROOT}/pepmhc
