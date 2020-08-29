@@ -14,6 +14,9 @@ then
     exit 1
 fi
 
+# GitHub project directory
+export PEPMHC_HOME=${GITHUB_ROOT}/pepmhc
+
 export NETCHOP_EXE=${TIPPLEROW_ROOT}/netchop-3.1/netchop
 
 if [ -f ${HOME}/local/netMHCpan-4.0/netMHCpan ]
@@ -35,8 +38,3 @@ export PEPMHC_AFFINITY_CACHE=${HOME}/SimWork/PepMHC/AffinityCache
 
 # Directory containing the SQLite peptide-MHC stability database
 export PEPMHC_STABILITY_CACHE=${HOME}/SimWork/PepMHC/StabilityCache
-
-# ----------------------------------------------------------------------
-# Variables below here are derived and should not need to be changed
-# ----------------------------------------------------------------------
-export PEPMHC_HOME=${GITHUB_ROOT}/pepmhc
