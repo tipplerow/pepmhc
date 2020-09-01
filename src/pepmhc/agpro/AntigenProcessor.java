@@ -8,10 +8,10 @@ import java.util.List;
 
 import jam.app.JamProperties;
 import jam.app.PropertyList;
+import jam.io.Delimiter;
 import jam.math.IntUtil;
-import jam.util.RegexUtil;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 import pepmhc.chop.NetChop;
 import pepmhc.tap.TAP;
@@ -195,7 +195,7 @@ public final class AntigenProcessor {
     }
 
     private static int[] resolveCleavageLength() {
-        return IntUtil.parseIntArray(JamProperties.getRequired(CLEAVAGE_LENGTH_PROPERTY), RegexUtil.COMMA);
+        return IntUtil.parseIntArray(JamProperties.getRequired(CLEAVAGE_LENGTH_PROPERTY), Delimiter.COMMA);
     }
 
     private static boolean resolveUseNetChop() {
@@ -235,7 +235,7 @@ public final class AntigenProcessor {
     public static AntigenProcessor resolve(File file) {
         PropertyList properties = JamProperties.parseFile(file);
 
-        int[] cleavageLength = IntUtil.parseIntArray(properties.require(CLEAVAGE_LENGTH_PROPERTY), RegexUtil.COMMA);
+        int[] cleavageLength = IntUtil.parseIntArray(properties.require(CLEAVAGE_LENGTH_PROPERTY), Delimiter.COMMA);
 
         boolean useNetChop      = Boolean.valueOf(properties.require(USE_NETCHOP_PROPERTY));
         boolean useTAPConsensus = Boolean.valueOf(properties.require(USE_TAP_PROPERTY));

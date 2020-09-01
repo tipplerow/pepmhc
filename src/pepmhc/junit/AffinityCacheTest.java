@@ -3,8 +3,8 @@ package pepmhc.junit;
 
 import java.io.File;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;

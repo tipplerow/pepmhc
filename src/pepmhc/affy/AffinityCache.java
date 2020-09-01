@@ -4,7 +4,7 @@ package pepmhc.affy;
 import jam.app.JamProperties;
 import jam.util.PairKeyTable;
 
-import jean.hla.Allele;
+import jene.hla.Allele;
 
 import pepmhc.bind.BindCache;
 

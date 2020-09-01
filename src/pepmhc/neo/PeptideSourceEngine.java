@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 import jam.app.JamLogger;
 import jam.lang.JamException;
 
-import jean.hugo.HugoPeptideList;
-import jean.hugo.HugoPeptideTable;
-import jean.hugo.HugoSymbol;
-import jean.maf.MAFFastaList;
-import jean.maf.MAFFastaRecord;
-import jean.peptide.Peptide;
-import jean.tcga.TumorBarcode;
+import jene.hugo.HugoPeptideList;
+import jene.hugo.HugoPeptideTable;
+import jene.hugo.HugoSymbol;
+import jene.maf.MAFFastaList;
+import jene.maf.MAFFastaRecord;
+import jene.peptide.Peptide;
+import jene.tcga.TumorBarcode;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;

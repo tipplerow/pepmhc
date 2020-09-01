@@ -6,8 +6,8 @@ import java.util.List;
 
 import jam.math.StatSummary;
 
-import jean.hla.Allele;
-import jean.hla.Genotype;
+import jene.hla.Allele;
+import jene.hla.Genotype;
 
 import pepmhc.affy.AffinityThreshold;
 import pepmhc.affy.AffinityMethod;

@@ -12,8 +12,8 @@ import jam.app.JamLogger;
 import jam.io.IOUtil;
 import jam.lang.JamException;
 
-import jean.fasta.FastaPeptideRecord;
-import jean.peptide.Peptide;
+import jene.fasta.FastaPeptideRecord;
+import jene.peptide.Peptide;
 
 /**
  * Runs the {@code netchop} executable for a single peptide.

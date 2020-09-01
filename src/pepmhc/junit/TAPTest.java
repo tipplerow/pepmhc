@@ -8,7 +8,7 @@ import jam.io.TableReader;
 import jam.math.StatUtil;
 import jam.vector.VectorView;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 import pepmhc.tap.TAP;
 

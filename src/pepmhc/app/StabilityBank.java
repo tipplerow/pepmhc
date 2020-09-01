@@ -6,8 +6,8 @@ import java.util.List;
 import jam.app.JamLogger;
 import jam.util.ListUtil;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 import pepmhc.stab.StabilityMethod;
 import pepmhc.stab.StabilityStore;

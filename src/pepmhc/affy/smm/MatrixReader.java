@@ -13,7 +13,7 @@ import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.util.RegexUtil;
 
-import jean.peptide.Residue;
+import jene.peptide.Residue;
 
 final class MatrixReader {
     private final String fileName;

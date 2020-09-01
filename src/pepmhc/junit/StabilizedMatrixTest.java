@@ -1,9 +1,9 @@
 
 package pepmhc.junit;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
-import jean.peptide.Residue;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
+import jene.peptide.Residue;
 
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.smm.StabilizedMatrix;

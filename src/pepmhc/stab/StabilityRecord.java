@@ -1,7 +1,7 @@
 
 package pepmhc.stab;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 import pepmhc.bind.BindRecord;
 

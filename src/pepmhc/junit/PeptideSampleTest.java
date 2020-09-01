@@ -2,7 +2,7 @@
 package pepmhc.junit;
 
 import java.util.Set;
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 import pepmhc.calc.PeptideSample;
 
 import org.junit.*;

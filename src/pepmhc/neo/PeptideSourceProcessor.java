@@ -6,12 +6,12 @@ import java.util.List;
 import jam.app.JamApp;
 import jam.app.JamLogger;
 
-import jean.hugo.HugoPeptideTable;
-import jean.hugo.HugoSymbol;
-import jean.maf.MAFFastaList;
-import jean.missense.MissenseManager;
-import jean.peptide.Peptide;
-import jean.tcga.TumorBarcode;
+import jene.hugo.HugoPeptideTable;
+import jene.hugo.HugoSymbol;
+import jene.maf.MAFFastaList;
+import jene.missense.MissenseManager;
+import jene.peptide.Peptide;
+import jene.tcga.TumorBarcode;
 
 /**
  * Generates neo-peptides and self-peptides derived from mutated
@@ -82,8 +82,8 @@ public final class PeptideSourceProcessor extends JamApp {
         missenseManager = MissenseManager.create(missenseDir);
         pepSourceManager = PeptideSourceManager.create(pepSourceDir, selfPeptideRef);
 
-        writeRuntimeEnv("JAM_", "JEAN_", "PEPMHC_");
-        writeRuntimeProperties("jam.", "jean.", "pepmhc.");
+        writeRuntimeEnv("JAM_", "JENE_", "PEPMHC_");
+        writeRuntimeProperties("jam.", "jene.", "pepmhc.");
 
         processBarcodes();
         JamLogger.info("DONE!");

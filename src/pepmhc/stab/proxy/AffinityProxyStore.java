@@ -3,7 +3,7 @@ package pepmhc.stab.proxy;
 
 import jam.sql.SQLStore;
 
-import jean.hla.Allele;
+import jene.hla.Allele;
 
 import pepmhc.affy.AffinityMethod;
 

@@ -3,7 +3,7 @@ package pepmhc.bind;
 
 import jam.math.DoubleRange;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 /**
  * Provides the base class for all binding records managed by the

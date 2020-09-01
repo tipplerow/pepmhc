@@ -11,8 +11,8 @@ import java.util.List;
 import jam.app.JamProperties;
 import jam.lang.JamException;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 import pepmhc.stab.StabilityRecord;
 

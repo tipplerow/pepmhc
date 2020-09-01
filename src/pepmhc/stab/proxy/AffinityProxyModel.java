@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.AffinityRecord;

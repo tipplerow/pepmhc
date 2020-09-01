@@ -2,7 +2,7 @@
   <path id="classpath.build.pepmhc">
     <path refid="classpath.build.jam"/>
     <pathelement path="${jam.home}/lib/jam.jar"/>
-    <pathelement path="${jean.home}/lib/jean.jar"/>
+    <pathelement path="${jene.home}/lib/jene.jar"/>
     <fileset dir="${dir.jlib}">
       <!-- Just a placeholder for now... -->
     </fileset>

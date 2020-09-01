@@ -12,8 +12,8 @@ import jam.app.JamLogger;
 import jam.io.IOUtil;
 import jam.lang.JamException;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 import pepmhc.affy.AffinityRecord;
 

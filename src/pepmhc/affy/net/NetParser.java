@@ -11,7 +11,7 @@ import jam.io.IOUtil;
 import jam.lang.JamException;
 import jam.util.RegexUtil;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 import pepmhc.affy.AffinityRecord;
 

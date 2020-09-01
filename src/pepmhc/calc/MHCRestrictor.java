@@ -4,10 +4,10 @@ package pepmhc.calc;
 import java.util.Collection;
 import java.util.HashSet;
 
-import jean.hla.Allele;
-import jean.hla.Genotype;
-import jean.peptide.Peptide;
-import jean.peptide.Peptidome;
+import jene.hla.Allele;
+import jene.hla.Genotype;
+import jene.peptide.Peptide;
+import jene.peptide.Peptidome;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;

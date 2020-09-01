@@ -13,7 +13,7 @@ import jam.sql.SQLDb;
 import jam.sql.SQLiteDb;
 import jam.sql.SQLKeyTable;
 
-import jean.hla.Allele;
+import jene.hla.Allele;
 
 import pepmhc.affy.AffinityMethod;
 

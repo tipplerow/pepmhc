@@ -9,7 +9,7 @@ import java.util.TreeMap;
 import jam.lang.JamException;
 import jam.util.MapWrapper;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 /**
  * Provides a map of binding records.

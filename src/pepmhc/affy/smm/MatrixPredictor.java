@@ -7,8 +7,8 @@ import java.util.List;
 
 import jam.util.PairKeyTable;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 import pepmhc.affy.AffinityPredictor;
 import pepmhc.affy.AffinityRecord;

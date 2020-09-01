@@ -6,7 +6,7 @@ import java.util.HashMap;
 
 import jam.util.IndexView;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 /**
  * Provides a read-only view of stability records indexed by peptide.

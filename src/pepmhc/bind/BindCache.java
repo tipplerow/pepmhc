@@ -7,8 +7,8 @@ import java.util.List;
 import jam.sql.SQLCache;
 import jam.sql.SQLKeyTable;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 /**
  * Provides a compute-on-demand service, in-memory caching, and

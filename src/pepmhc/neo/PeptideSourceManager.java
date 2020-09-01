@@ -3,8 +3,8 @@ package pepmhc.neo;
 
 import java.io.File;
 
-import jean.hugo.HugoPeptideTable;
-import jean.tcga.TumorBarcode;
+import jene.hugo.HugoPeptideTable;
+import jene.tcga.TumorBarcode;
 
 /**
  * Maintains collections of neo-peptide and self-peptide fragments

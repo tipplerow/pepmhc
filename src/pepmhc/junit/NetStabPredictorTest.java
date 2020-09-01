@@ -1,8 +1,8 @@
 
 package pepmhc.junit;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 import pepmhc.stab.StabilityPredictor;
 import pepmhc.stab.net.NetStabPredictor;

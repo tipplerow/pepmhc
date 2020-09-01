@@ -9,10 +9,10 @@ import jam.app.JamLogger;
 import jam.io.IOUtil;
 import jam.math.DoubleUtil;
 
-import jean.fasta.FastaPeptideReader;
-import jean.fasta.FastaPeptideRecord;
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.fasta.FastaPeptideReader;
+import jene.fasta.FastaPeptideRecord;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.AffinityPredictor;

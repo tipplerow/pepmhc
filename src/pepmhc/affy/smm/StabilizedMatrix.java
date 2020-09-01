@@ -8,9 +8,9 @@ import jam.app.JamEnv;
 import jam.io.FileUtil;
 import jam.lang.JamException;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
-import jean.peptide.Residue;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
+import jene.peptide.Residue;
 
 import pepmhc.affy.AffinityMethod;
 

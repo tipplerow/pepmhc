@@ -9,11 +9,11 @@ import java.util.TreeSet;
 
 import jam.io.IOUtil;
 
-import jean.ensembl.EnsemblProteinDb;
-import jean.ensembl.EnsemblProteinRecord;
-import jean.ensembl.TranscriptBiotype;
-import jean.hugo.HugoSymbol;
-import jean.peptide.Peptide;
+import jene.ensembl.EnsemblProteinDb;
+import jene.ensembl.EnsemblProteinRecord;
+import jene.ensembl.TranscriptBiotype;
+import jene.hugo.HugoSymbol;
+import jene.peptide.Peptide;
 
 import pepmhc.chop.NetChop;
 import pepmhc.tap.TAP;

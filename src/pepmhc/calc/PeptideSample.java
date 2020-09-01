@@ -11,7 +11,7 @@ import jam.app.JamLogger;
 import jam.app.JamProperties;
 import jam.math.IntUtil;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 /**
  * Generates and maintains sets of peptides sampled from a larger pool.

@@ -11,8 +11,8 @@ import jam.sql.SQLColumn;
 import jam.sql.SQLDb;
 import jam.sql.SQLiteDb;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 import pepmhc.bind.BindTable;
 

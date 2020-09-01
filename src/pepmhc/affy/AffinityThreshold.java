@@ -7,7 +7,7 @@ import java.util.Set;
 
 import jam.app.JamProperties;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 /**
  * Defines a threshold for peptide-MHC binding in terms of absolute

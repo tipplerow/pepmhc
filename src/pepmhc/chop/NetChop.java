@@ -13,7 +13,7 @@ import jam.math.IntRange;
 import jam.math.IntUtil;
 import jam.util.RegexUtil;
 
-import jean.peptide.Peptide;
+import jene.peptide.Peptide;
 
 /**
  * Simulates proteasomal processing of a peptide: Predicts cleavage
@@ -202,6 +202,6 @@ public final class NetChop {
     }
 
     private Peptide cleavageFragment(int cterm, int fragLen) {
-        return peptide.fragment(new IntRange(cterm - fragLen + 1, cterm));
+        return peptide.fragment(IntRange.instance(cterm - fragLen + 1, cterm));
     }
 }

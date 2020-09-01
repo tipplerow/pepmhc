@@ -9,8 +9,8 @@ import jam.sql.SQLColumn;
 import jam.sql.SQLDb;
 import jam.sql.SQLKeyTable;
 
-import jean.hla.Allele;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.peptide.Peptide;
 
 /**
  * Provides a base class for persistent database tables of binding

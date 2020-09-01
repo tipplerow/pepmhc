@@ -6,9 +6,9 @@ import java.util.HashSet;
 
 import jam.math.DoubleUtil;
 
-import jean.hla.Allele;
-import jean.hla.Genotype;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.hla.Genotype;
+import jene.peptide.Peptide;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;

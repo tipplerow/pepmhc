@@ -9,9 +9,9 @@ import jam.io.IOUtil;
 import jam.io.LineReader;
 import jam.util.ListUtil;
 
-import jean.hla.Allele;
-import jean.hugo.HugoPeptideTable;
-import jean.peptide.Peptide;
+import jene.hla.Allele;
+import jene.hugo.HugoPeptideTable;
+import jene.peptide.Peptide;
 
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;

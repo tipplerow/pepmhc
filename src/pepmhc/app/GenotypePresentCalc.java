@@ -15,10 +15,10 @@ import jam.lang.JamException;
 import jam.report.LineBuilder;
 import jam.util.RegexUtil;
 
-import jean.hla.Allele;
-import jean.hla.Genotype;
-import jean.peptide.Peptide;
-import jean.peptide.Peptidome;
+import jene.hla.Allele;
+import jene.hla.Genotype;
+import jene.peptide.Peptide;
+import jene.peptide.Peptidome;
 
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.AffinityThreshold;
