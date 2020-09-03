@@ -112,6 +112,15 @@ public abstract class BindRecord {
     }
 
     /**
+     * Returns the binding strength (the affinity or stability metric).
+     *
+     * @return the binding strength (the affinity or stability metric).
+     */
+    public final double getStrength() {
+        return strength;
+    }
+
+    /**
      * Identifies records with a valid affinity.
      *
      * @return {@code false} iff the affinity is {@code Double.NaN}.

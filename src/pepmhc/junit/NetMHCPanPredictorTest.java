@@ -26,7 +26,7 @@ public class NetMHCPanPredictorTest {
         if (!predictor.isInstalled())
             return;
 
-        assertEquals( 8706.7, predictor.predict(A0201, Peptide.instance("AEFGPWQTV")).getAffinity(), 0.1);
+        assertEquals( 8706.7, predictor.predict(A0201, Peptide.instance("AEFGPWQTV")).getStrength(), 0.1);
         assertEquals(33803.5, predictor.predict(A0101, Peptide.instance("AEFGPWQTV")).getAffinity(), 0.1);
     }
 
