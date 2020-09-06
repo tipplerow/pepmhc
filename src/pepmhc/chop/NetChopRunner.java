@@ -11,6 +11,7 @@ import java.util.List;
 import jam.app.JamLogger;
 import jam.io.IOUtil;
 import jam.lang.JamException;
+import jam.math.Probability;
 
 import jene.fasta.FastaPeptideRecord;
 import jene.peptide.Peptide;
@@ -22,26 +23,27 @@ public final class NetChopRunner {
     private final Peptide peptide;
 
     private File peptideFile;
-    private List<Double> cleavageScores;
+    private List<Probability> cleavageScores;
 
     private NetChopRunner(Peptide peptide) {
         this.peptide = peptide;
     }
 
     /**
-     * Runs the {@code netchop} executable for a single peptide.
+     * Runs the {@code netchop} executable for a single peptide to
+     * compute the cleavage probabilities at each site in the peptide.
      *
-     * @param peptide the peptide to chop.
+     * @param peptide the peptide to score.
      *
-     * @return a list containing the zero-based indexes of the
-     * predicted cleavage sites.
+     * @return a list containing the cleavage probabilities at each
+     * site in the input peptide.
      */
-    public static List<Double> chop(Peptide peptide) {
+    public static List<Probability> score(Peptide peptide) {
         NetChopRunner runner = new NetChopRunner(peptide);
-        return runner.chop();
+        return runner.score();
     }
 
-    private List<Double> chop() {
+    private List<Probability> score() {
         try {
             initPeptideFile();
             writePeptideFile();

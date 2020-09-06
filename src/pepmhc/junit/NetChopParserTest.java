@@ -3,6 +3,8 @@ package pepmhc.junit;
 
 import java.util.List;
 
+import jam.math.Probability;
+
 import pepmhc.chop.NetChopParser;
 
 import org.junit.*;
@@ -13,15 +15,15 @@ public class NetChopParserTest {
     private static final String NETCHOP_FILE = "data/test/netchop.out";
 
     @Test public void testParse() {
-        List<Double> scores = NetChopParser.parse(NETCHOP_FILE);
+        List<Probability> scores = NetChopParser.parse(NETCHOP_FILE);
         assertEquals(123, scores.size());
 
-        assertEquals(0.760600, scores.get(0), TOLERANCE);
-        assertEquals(0.483380, scores.get(1), TOLERANCE);
-        assertEquals(0.088514, scores.get(2), TOLERANCE);
+        assertTrue(scores.get(0).equals(0.760600, TOLERANCE));
+        assertTrue(scores.get(1).equals(0.483380, TOLERANCE));
+        assertTrue(scores.get(2).equals(0.088514, TOLERANCE));
 
-        assertEquals(0.958277, scores.get(121), TOLERANCE);
-        assertEquals(0.177359, scores.get(122), TOLERANCE);
+        assertTrue(scores.get(121).equals(0.958277, TOLERANCE));
+        assertTrue(scores.get(122).equals(0.177359, TOLERANCE));
     }
 
     public static void main(String[] args) {

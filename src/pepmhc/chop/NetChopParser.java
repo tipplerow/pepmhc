@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import jam.io.IOUtil;
 import jam.lang.JamException;
+import jam.math.Probability;
 import jam.util.RegexUtil;
 
 /**
@@ -18,7 +19,7 @@ import jam.util.RegexUtil;
  */
 public final class NetChopParser {
     private final BufferedReader reader;
-    private final List<Double> scores = new ArrayList<Double>();
+    private final List<Probability> scores = new ArrayList<Probability>();
 
     private static final String DASHED_LINE_MATCH = "--------------------";
     private static final Pattern DATA_LINE_DELIM = RegexUtil.MULTI_WHITE_SPACE;
@@ -40,7 +41,7 @@ public final class NetChopParser {
      *
      * @throws RuntimeException if any I/O errors occur.
      */
-    public static List<Double> parse(File file) {
+    public static List<Probability> parse(File file) {
         return parse(IOUtil.openReader(file));
     }
 
@@ -54,7 +55,7 @@ public final class NetChopParser {
      *
      * @throws RuntimeException if any I/O errors occur.
      */
-    public static List<Double> parse(String fileName) {
+    public static List<Probability> parse(String fileName) {
         return parse(IOUtil.openReader(fileName));
     }
 
@@ -70,12 +71,12 @@ public final class NetChopParser {
      *
      * @throws RuntimeException if any I/O errors occur.
      */
-    public static List<Double> parse(BufferedReader reader) {
+    public static List<Probability> parse(BufferedReader reader) {
         NetChopParser parser = new NetChopParser(reader);
         return parser.parse();
     }
 
-    private List<Double> parse() {
+    private List<Probability> parse() {
         try {
             skipHeader();
             parseData();
@@ -132,6 +133,6 @@ public final class NetChopParser {
         if (fields.length != FIELD_COUNT)
             throw JamException.runtime("Invalid data line [%s].", line);
 
-        scores.add(Double.parseDouble(fields[SCORE_INDEX]));
+        scores.add(Probability.parse(fields[SCORE_INDEX]));
     }
 }

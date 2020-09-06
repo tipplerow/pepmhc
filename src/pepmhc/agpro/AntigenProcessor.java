@@ -10,6 +10,7 @@ import jam.app.JamProperties;
 import jam.app.PropertyList;
 import jam.io.Delimiter;
 import jam.math.IntUtil;
+import jam.math.Probability;
 
 import jene.peptide.Peptide;
 
@@ -207,7 +208,7 @@ public final class AntigenProcessor {
     }
 
     private static double resolveNetChopThreshold() {
-        return JamProperties.getRequiredDouble(NETCHOP_THRESHOLD_PROPERTY, NetChop.THRESHOLD_PROBABILITY_RANGE);
+        return JamProperties.getRequiredDouble(NETCHOP_THRESHOLD_PROPERTY);
     }
 
     private static double resolveTAPAlphaShrinkage() {
@@ -296,7 +297,7 @@ public final class AntigenProcessor {
 
     private List<Peptide> cleave(Peptide protein) {
         if (useNetChop)
-            return NetChop.chop(protein, cleavageLength, netChopThreshold);
+            return NetChop.chop(protein, cleavageLength, Probability.valueOf(netChopThreshold));
         else
             return cleaveNative(protein);
     }
