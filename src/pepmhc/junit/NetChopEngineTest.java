@@ -50,14 +50,14 @@ public class NetChopEngineTest {
         assertTrue(engine.getCTerminusCleavageProb(UnitIndex.instance(1)).equals(0.7606, TOLERANCE));
         assertTrue(engine.getCTerminusCleavageProb(UnitIndex.instance(2)).equals(0.4834, TOLERANCE));
         assertTrue(engine.getCTerminusCleavageProb(UnitIndex.instance(3)).equals(0.0885, TOLERANCE));
-
+        /*
         for (UnitIndex index = UnitIndex.first(); PEPTIDE.contains(index); index = index.next()) {
             double score = engine.getCTerminusCleavageProb(index).doubleValue();
             String symbol = score > 0.5 ? "*" : "";
 
             System.out.println(String.format("%s: %6.4f %s", index, score, symbol));
         }
-
+        */
         assertTrue(engine.computeCleavageProb(UnitIndexRange.instance(1, 9)).equals(0.0229, TOLERANCE));
         assertTrue(engine.computeCleavageProb(UnitIndexRange.instance(2, 10)).equals(0.7606 * 0.0249, TOLERANCE));
     }

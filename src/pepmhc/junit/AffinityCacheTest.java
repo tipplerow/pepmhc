@@ -40,7 +40,6 @@ public class AffinityCacheTest {
     }
 
     @Test public void testNetMHC() {
-        System.out.println(predictor.isInstalled());
         if (!predictor.isInstalled())
             return;
 

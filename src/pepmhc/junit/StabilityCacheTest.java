@@ -26,7 +26,6 @@ public class StabilityCacheTest {
 
         StabilityCache cache = StabilityCache.instance(method, allele);
         StabilityRecord record = cache.require(Peptide.instance("AEFGPWQTV"));
-        System.out.println(record);
 
         cache.require(Peptide.instance("AEFGPWQTV"));
         cache.require(Peptide.instance("AEFGPWQTV"));
