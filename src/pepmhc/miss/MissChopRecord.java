@@ -69,7 +69,8 @@ public class MissChopRecord extends TumorGeneRecord {
 
     /**
      * A comparator that orders records by tumor barcode first, HUGO
-     * symbol second, and neo-peptide mutation position third.
+     * symbol second, mutation position in the native protein third,
+     * and neo-peptide mutation position fourth.
      */
     public static final Comparator<MissChopRecord> COMPARATOR =
         new Comparator<MissChopRecord>() {
@@ -78,6 +79,13 @@ public class MissChopRecord extends TumorGeneRecord {
 
                 if (barcodeSymbolCmp != 0)
                     return barcodeSymbolCmp;
+
+                int proteinChangeCmp =
+                    ProteinChange.POSITION_COMPARATOR.compare(rec1.getProteinChange(),
+                                                              rec2.getProteinChange());
+
+                if (proteinChangeCmp != 0)
+                    return proteinChangeCmp;
                 else
                     return rec1.neoPepMissPos.compareTo(rec2.neoPepMissPos);
             }
