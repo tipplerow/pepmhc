@@ -160,6 +160,7 @@ public final class MissChopEngine {
 
     private List<MissChopRecord> generate(MissenseRecord missenseRecord) {
         ProteinChange proteinChange = missenseRecord.getProteinChange();
+        int proteinChangePosition = proteinChange.getPosition().getUnitIndex();
 
         List<MissChopRecord> missChopRecords =
             new ArrayList<MissChopRecord>(peptideLength);
@@ -172,11 +173,14 @@ public final class MissChopEngine {
             // in the original protein.  Then, the lower index of
             // the neo-peptide is P - (K - 1).
             //
-            UnitIndex neoPepLower = proteinChange.getPosition().minus(neoPepMissPos - 1);
-            UnitIndexRange neoPepRange = UnitIndexRange.forward(neoPepLower, peptideLength);
+            int neoPepLower = proteinChangePosition - neoPepMissPos + 1;
+            int neoPepUpper = neoPepLower + peptideLength - 1;
 
-            if (!nativeProtein.contains(neoPepRange))
+            if (neoPepLower < 1 || neoPepUpper > nativeProtein.length())
                 continue;
+
+            UnitIndexRange neoPepRange =
+                UnitIndexRange.instance(neoPepLower, neoPepUpper);
 
             NeoPeptide neoPeptide = NeoPeptide.instance(mutatedProtein.fragment(neoPepRange));
             SelfPeptide selfPeptide = SelfPeptide.instance(nativeProtein.fragment(neoPepRange));
