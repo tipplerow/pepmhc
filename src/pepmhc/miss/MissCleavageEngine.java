@@ -29,7 +29,7 @@ import pepmhc.chop.NetChopEngine;
  * Generates the self/neo-peptide pairs corresponding to missense
  * mutations and computes their proteasomal cleavage probabilities.
  */
-public final class MissChopEngine {
+public final class MissCleavageEngine {
     private final int peptideLength;
     private final HugoSymbol hugoSymbol;
     private final TumorBarcode tumorBarcode;
@@ -44,7 +44,7 @@ public final class MissChopEngine {
     private static HugoMaster hugoMaster = null;
     private static EnsemblProteinDb ensemblDb = null;
 
-    private MissChopEngine(MissenseGroup missenseGroup, int peptideLength) {
+    private MissCleavageEngine(MissenseGroup missenseGroup, int peptideLength) {
         this.missenseGroup = missenseGroup;
         this.peptideLength = peptideLength;
 
@@ -62,8 +62,8 @@ public final class MissChopEngine {
      * @param ensemblDb the Ensembl protein database.
      */
     public static void initialize(HugoMaster hugoMaster, EnsemblProteinDb ensemblDb) {
-        MissChopEngine.ensemblDb = ensemblDb;
-        MissChopEngine.hugoMaster = hugoMaster;
+        MissCleavageEngine.ensemblDb = ensemblDb;
+        MissCleavageEngine.hugoMaster = hugoMaster;
     }
 
     /**
@@ -84,12 +84,12 @@ public final class MissChopEngine {
      * master have not been initialized or if the native peptide
      * cannot be resolved.
      */
-    public static List<MissChopRecord> generate(MissenseGroup missenseGroup, int peptideLength) {
+    public static List<MissCleavageRecord> generate(MissenseGroup missenseGroup, int peptideLength) {
         if (!isInitialized())
-            throw new IllegalStateException("The MissChopEngine has not been initialized.");
+            throw new IllegalStateException("The MissCleavageEngine has not been initialized.");
 
-        MissChopEngine engine =
-            new MissChopEngine(missenseGroup, peptideLength);
+        MissCleavageEngine engine =
+            new MissCleavageEngine(missenseGroup, peptideLength);
 
         try {
             return engine.generate();
@@ -118,26 +118,26 @@ public final class MissChopEngine {
      * master have not been initialized or if any native peptides
      * cannot be resolved.
      */
-    public static List<MissChopRecord> generate(MissenseTable missenseTable, int peptideLength) {
+    public static List<MissCleavageRecord> generate(MissenseTable missenseTable, int peptideLength) {
         List<MissenseGroup> missenseGroups = missenseTable.group();
 
-        List<List<MissChopRecord>> groupRecords =
+        List<List<MissCleavageRecord>> groupRecords =
             StreamUtil.applyParallel(missenseGroups, group -> generate(group, peptideLength));
 
-        List<MissChopRecord> missChopRecords =
+        List<MissCleavageRecord> missCleavageRecords =
             ListUtil.cat(groupRecords);
 
         JamLogger.info("Sorting missense records...");
-        missChopRecords.sort(MissChopRecord.COMPARATOR);
+        missCleavageRecords.sort(MissCleavageRecord.COMPARATOR);
 
-        return missChopRecords;
+        return missCleavageRecords;
     }
 
     private static boolean isInitialized() {
         return ensemblDb != null && hugoMaster != null;
     }
 
-    private List<MissChopRecord> generate() {
+    private List<MissCleavageRecord> generate() {
         JamLogger.info("Generating missense-chop records: [%s, %s]...",
                        tumorBarcode.getKey(), hugoSymbol.getKey());
 
@@ -149,21 +149,21 @@ public final class MissChopEngine {
         nativeChopEngine = NetChopEngine.run(nativeProtein);
         mutatedChopEngine = NetChopEngine.run(mutatedProtein);
 
-        List<MissChopRecord> missChopRecords =
-            new ArrayList<MissChopRecord>();
+        List<MissCleavageRecord> missCleavageRecords =
+            new ArrayList<MissCleavageRecord>();
 
         for (MissenseRecord missenseRecord : missenseGroup)
-            missChopRecords.addAll(generate(missenseRecord));
+            missCleavageRecords.addAll(generate(missenseRecord));
 
-        return missChopRecords;
+        return missCleavageRecords;
     }
 
-    private List<MissChopRecord> generate(MissenseRecord missenseRecord) {
+    private List<MissCleavageRecord> generate(MissenseRecord missenseRecord) {
         ProteinChange proteinChange = missenseRecord.getProteinChange();
         int proteinChangePosition = proteinChange.getPosition().getUnitIndex();
 
-        List<MissChopRecord> missChopRecords =
-            new ArrayList<MissChopRecord>(peptideLength);
+        List<MissCleavageRecord> missCleavageRecords =
+            new ArrayList<MissCleavageRecord>(peptideLength);
         
         for (int neoPepMissPos = 1; neoPepMissPos <= peptideLength; ++neoPepMissPos) {
             //
@@ -188,8 +188,8 @@ public final class MissChopEngine {
             Probability neoCleaveProb = mutatedChopEngine.computeCleavageProb(neoPepRange);
             Probability selfCleaveProb = nativeChopEngine.computeCleavageProb(neoPepRange);
 
-            MissChopRecord missChopRecord =
-                MissChopRecord.create(tumorBarcode,
+            MissCleavageRecord missCleavageRecord =
+                MissCleavageRecord.create(tumorBarcode,
                                       hugoSymbol,
                                       proteinChange,
                                       UnitIndex.instance(neoPepMissPos),
@@ -199,9 +199,9 @@ public final class MissChopEngine {
                                       neoCleaveProb,
                                       selfCleaveProb);
 
-            missChopRecords.add(missChopRecord);
+            missCleavageRecords.add(missCleavageRecord);
         }
 
-        return missChopRecords;
+        return missCleavageRecords;
     }
 }

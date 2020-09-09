@@ -19,11 +19,11 @@ import jene.tcga.CellFraction;
  * the neo-peptides and their corresponding self-peptides, and writes
  * the records to an output file.
  */
-public final class MissChopDriver extends JamApp {
+public final class MissCleavageDriver extends JamApp {
     private final int peptideLength;
-    private final String missChopFile;
     private final String hugoMasterFile;
     private final String missenseMAFFile;
+    private final String missCleavageFile;
     private final String ensemblProteomeFile;
     private final String ensemblSecondaryProteome;
     private final CellFraction ccfThreshold;
@@ -32,16 +32,16 @@ public final class MissChopDriver extends JamApp {
     private EnsemblProteinDb ensemblDb;
 
     private MissenseTable missenseTable;
-    private List<MissChopRecord> missChopRecords;
+    private List<MissCleavageRecord> missCleavageRecords;
 
-    private MissChopDriver(String... propFiles) {
+    private MissCleavageDriver(String... propFiles) {
         super(propFiles);
 
         this.ccfThreshold = resolveCCFThreshold();
-        this.missChopFile = resolveMissChopFile();
         this.peptideLength = resolvePeptideLength();
         this.hugoMasterFile = resolveHugoMasterFile();
         this.missenseMAFFile = resolveMissenseMAFFile();
+        this.missCleavageFile = resolveMissCleavageFile();
         this.ensemblProteomeFile = resolveEnsemblProteomeFile();
         this.ensemblSecondaryProteome = resolveEnsemblSecondaryProteome();
     }
@@ -54,12 +54,12 @@ public final class MissChopDriver extends JamApp {
         return JamProperties.getRequired(HUGO_MASTER_FILE);
     }
 
-    private static String resolveMissChopFile() {
-        return JamProperties.getRequired(MISS_CHOP_FILE_PROPERTY);
-    }
-
     private static String resolveMissenseMAFFile() {
         return JamProperties.getRequired(MISSENSE_MAF_FILE_PROPERTY);
+    }
+
+    private static String resolveMissCleavageFile() {
+        return JamProperties.getRequired(MISS_CHOP_FILE_PROPERTY);
     }
 
     private static String resolveEnsemblProteomeFile() {
@@ -78,43 +78,43 @@ public final class MissChopDriver extends JamApp {
      * Name of the system property that specifies the minimum cancer
      * cell fraction required to process a missense mutation.
      */
-    public static final String CCF_THRESHOLD_PROPERTY = "MissChopDriver.ccfThreshold";
+    public static final String CCF_THRESHOLD_PROPERTY = "MissCleavageDriver.ccfThreshold";
 
     /**
      * Name of the system property that specifies the full path name
      * of the primary Ensembl protein database file.
      */
-    public static final String ENSEMBL_PROTEOME_FILE = "MissChopDriver.ensemblProteomeFile";
+    public static final String ENSEMBL_PROTEOME_FILE = "MissCleavageDriver.ensemblProteomeFile";
 
     /**
      * Name of the system property that specifies the full path name
      * of the secondary Ensembl protein database file.
      */
-    public static final String ENSEMBL_SECONDARY_PROTEOME = "MissChopDriver.ensemblSecondaryProteome";
+    public static final String ENSEMBL_SECONDARY_PROTEOME = "MissCleavageDriver.ensemblSecondaryProteome";
 
     /**
      * Name of the system property that specifies the full path name
      * of the HUGO master file.
      */
-    public static final String HUGO_MASTER_FILE = "MissChopDriver.hugoMasterFile";
+    public static final String HUGO_MASTER_FILE = "MissCleavageDriver.hugoMasterFile";
 
     /**
      * Name of the system property that specifies the full path name
      * of the missense-chop output file.
      */
-    public static final String MISS_CHOP_FILE_PROPERTY = "MissChopDriver.missChopFile";
+    public static final String MISS_CHOP_FILE_PROPERTY = "MissCleavageDriver.missCleavageFile";
 
     /**
      * Name of the system property that specifies the full path name
      * of the missense mutation MAF file.
      */
-    public static final String MISSENSE_MAF_FILE_PROPERTY = "MissChopDriver.missenseMAFFile";
+    public static final String MISSENSE_MAF_FILE_PROPERTY = "MissCleavageDriver.missenseMAFFile";
 
     /**
      * Name of the system property that specifies the length of the
      * peptide fragments to generate.
      */
-    public static final String PEPTIDE_LENGTH_PROPERTY = "MissChopDriver.peptideLength";
+    public static final String PEPTIDE_LENGTH_PROPERTY = "MissCleavageDriver.peptideLength";
 
     /**
      * Processes a MAF file, generates the neo-peptides corresponding to
@@ -128,7 +128,7 @@ public final class MissChopDriver extends JamApp {
      * @throws RuntimeException if any errors occur.
      */
     public static void run(String... propFiles) {
-        MissChopDriver driver = new MissChopDriver(propFiles);
+        MissCleavageDriver driver = new MissCleavageDriver(propFiles);
         driver.run();
     }
 
@@ -136,7 +136,7 @@ public final class MissChopDriver extends JamApp {
         initializeEngine();
         loadMissenseTable();
         processMissenseTable();
-        writeMissChopRecords();
+        writeMissCleavageRecords();
 
         JamLogger.info("DONE!");
     }
@@ -145,7 +145,7 @@ public final class MissChopDriver extends JamApp {
         ensemblDb = EnsemblProteinDb.load(ensemblProteomeFile, ensemblSecondaryProteome);
         hugoMaster = HugoMaster.load(hugoMasterFile);
 
-        MissChopEngine.initialize(hugoMaster, ensemblDb);
+        MissCleavageEngine.initialize(hugoMaster, ensemblDb);
     }
 
     private void loadMissenseTable() {
@@ -153,16 +153,16 @@ public final class MissChopDriver extends JamApp {
     }
 
     private void processMissenseTable() {
-        missChopRecords = MissChopEngine.generate(missenseTable, peptideLength);
+        missCleavageRecords = MissCleavageEngine.generate(missenseTable, peptideLength);
     }
 
-    private void writeMissChopRecords() {
-        IOUtil.writeLines(missChopFile, false, MissChopRecord.header());
-        IOUtil.writeObjects(missChopFile, true, missChopRecords, record -> record.format());
+    private void writeMissCleavageRecords() {
+        IOUtil.writeLines(missCleavageFile, false, MissCleavageRecord.header());
+        IOUtil.writeObjects(missCleavageFile, true, missCleavageRecords, record -> record.format());
     }
 
     private static void usage() {
-        System.err.println("Usage: jam.neo.MissChopDriver PROP_FILE1 [PROP_FILE2 ...]");
+        System.err.println("Usage: jam.neo.MissCleavageDriver PROP_FILE1 [PROP_FILE2 ...]");
         System.exit(1);
     }
 

@@ -18,11 +18,11 @@ import jene.tcga.TumorBarcode;
 /**
  * Indexes missense-chop records by tumor barcode and HUGO symbol.
  */
-public final class MissChopTable {
+public final class MissCleavageTable {
     //
     // Class-specific container...
     //
-    private static final class RecordList extends ArrayList<MissChopRecord> {}
+    private static final class RecordList extends ArrayList<MissCleavageRecord> {}
 
     // All records indexed by barcode (outer) and symbol (inner)...
     private final PairKeyTable<TumorBarcode, HugoSymbol, RecordList> table = PairKeyTable.hash();
@@ -30,16 +30,16 @@ public final class MissChopTable {
     // Total number of records in the table...
     private int count = 0;
 
-    private MissChopTable(Collection<MissChopRecord> records) {
+    private MissCleavageTable(Collection<MissCleavageRecord> records) {
         fillMap(records);
     }
 
-    private void fillMap(Collection<MissChopRecord> records) {
-        for (MissChopRecord record : records)
+    private void fillMap(Collection<MissCleavageRecord> records) {
+        for (MissCleavageRecord record : records)
             addRecord(record);
     }
 
-    private void addRecord(MissChopRecord record) {
+    private void addRecord(MissCleavageRecord record) {
         HugoSymbol   symbol  = record.getHugoSymbol();
         TumorBarcode barcode = record.getTumorBarcode();
 
@@ -68,7 +68,7 @@ public final class MissChopTable {
      * @throws RuntimeException unless the file can be opened for
      * reading and contains properly formatted records.
      */
-    public static MissChopTable load(String fileName) {
+    public static MissCleavageTable load(String fileName) {
         return load(new File(fileName));
     }
 
@@ -82,19 +82,19 @@ public final class MissChopTable {
      * @throws RuntimeException unless the file can be opened for
      * reading and contains properly formatted records.
      */
-    public static MissChopTable load(File file) {
-        List<MissChopRecord> records =
-            new ArrayList<MissChopRecord>();
+    public static MissCleavageTable load(File file) {
+        List<MissCleavageRecord> records =
+            new ArrayList<MissCleavageRecord>();
 
         try (LineReader reader = LineReader.open(file)) {
             // Skip header line...
             reader.next();
 
             for (String line : reader)
-                records.add(MissChopRecord.parse(line));
+                records.add(MissCleavageRecord.parse(line));
         }
 
-        JamLogger.info("MissChopTable: Loaded [%d] records.", records.size());
+        JamLogger.info("MissCleavageTable: Loaded [%d] records.", records.size());
         return load(records);
     }
 
@@ -105,8 +105,8 @@ public final class MissChopTable {
      *
      * @return a table containing all records in the given collection.
      */
-    public static MissChopTable load(Collection<MissChopRecord> records) {
-        return new MissChopTable(records);
+    public static MissCleavageTable load(Collection<MissCleavageRecord> records) {
+        return new MissCleavageTable(records);
     }
 
     /**
@@ -174,9 +174,9 @@ public final class MissChopTable {
      * for the specified tumor (an empty list if there are no matching
      * records).
      */
-    public List<MissChopRecord> lookup(TumorBarcode barcode) {
-        List<MissChopRecord> records =
-            new ArrayList<MissChopRecord>();
+    public List<MissCleavageRecord> lookup(TumorBarcode barcode) {
+        List<MissCleavageRecord> records =
+            new ArrayList<MissCleavageRecord>();
 
         for (HugoSymbol symbol : viewSymbols(barcode))
             records.addAll(lookup(barcode, symbol));
@@ -195,7 +195,7 @@ public final class MissChopTable {
      * for the specified tumor and gene (or an empty list if there are
      * no matching records).
      */
-    public List<MissChopRecord> lookup(TumorBarcode barcode, HugoSymbol symbol) {
+    public List<MissCleavageRecord> lookup(TumorBarcode barcode, HugoSymbol symbol) {
         RecordList recordList = table.get(barcode, symbol);
 
         if (recordList != null)
