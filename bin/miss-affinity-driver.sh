@@ -1,6 +1,6 @@
 #!/bin/sh
 ########################################################################
-# Usage: miss-driver-driver.sh [JVM OPTIONS] PROP_FILE1 [PROP_FILE2 ...]
+# Usage: miss-affinity-driver.sh [JVM OPTIONS] PROP_FILE1 [PROP_FILE2 ...]
 ########################################################################
 
 if [ $# -lt 1 ]
@@ -15,4 +15,4 @@ then
     exit 1
 fi
 
-${PEPMHC_HOME}/bin/pepmhc-run.sh pepmhc.miss.MissDriverDriver "$@"
+${PEPMHC_HOME}/bin/pepmhc-run.sh pepmhc.miss.MissAffinityDriver "$@"
