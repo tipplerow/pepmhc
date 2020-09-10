@@ -12,6 +12,7 @@ import jene.hla.Allele;
 import jene.peptide.Peptide;
 import jene.peptide.Residue;
 
+import pepmhc.affy.Affinity;
 import pepmhc.affy.AffinityMethod;
 
 /**
@@ -86,7 +87,7 @@ public final class StabilizedMatrix {
      *
      * @return the predicted binding affinity for the given peptide.
      */
-    public double computeIC50(Peptide peptide) {
+    public Affinity computeIC50(Peptide peptide) {
         if (peptide.length() != elements.size())
             throw new IllegalArgumentException("Invalid peptide length.");
 
@@ -95,7 +96,7 @@ public final class StabilizedMatrix {
         for (int index = 0; index < peptide.length(); ++index)
             logsum += elements.get(index).get(peptide.get(index));
 
-        return Math.pow(10.0, logsum);
+        return Affinity.valueOf(Math.pow(10.0, logsum));
     }
 
     /**

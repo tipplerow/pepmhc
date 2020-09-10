@@ -1,6 +1,9 @@
 
 package pepmhc.stab;
 
+import jam.math.Percentile;
+
+import jene.chem.HalfLife;
 import jene.peptide.Peptide;
 
 import pepmhc.bind.BindRecord;
@@ -10,6 +13,8 @@ import pepmhc.bind.BindRecord;
  * prediction.
  */
 public final class StabilityRecord extends BindRecord {
+    private final HalfLife halfLife;
+
     /**
      * Creates a new stability record with an unset percentile rank.
      *
@@ -17,8 +22,8 @@ public final class StabilityRecord extends BindRecord {
      *
      * @param halfLife the half-life of the MHC-bound state (hours).
      */
-    public StabilityRecord(Peptide peptide, double halfLife) {
-        super(peptide, halfLife);
+    public StabilityRecord(Peptide peptide, HalfLife halfLife) {
+        this(peptide, halfLife, null);
     }
 
     /**
@@ -32,8 +37,9 @@ public final class StabilityRecord extends BindRecord {
      * (relative to other peptides of the same length bound to
      * the same allele).
      */
-    public StabilityRecord(Peptide peptide, double halfLife, double percentile) {
-        super(peptide, halfLife, percentile);
+    public StabilityRecord(Peptide peptide, HalfLife halfLife, Percentile percentile) {
+        super(peptide, percentile);
+        this.halfLife = halfLife;
     }
 
     /**
@@ -41,7 +47,16 @@ public final class StabilityRecord extends BindRecord {
      *
      * @return the half-life of the MHC-bound state (in hours).
      */
-    @Override public double getHalfLife() {
-        return strength;
+    @Override public HalfLife getHalfLife() {
+        return halfLife;
+    }
+
+    /**
+     * Returns the binding strength (the half-life).
+     *
+     * @return the binding strength (the half-life).
+     */
+    @Override public double getStrength() {
+        return halfLife.doubleValue();
     }
 }

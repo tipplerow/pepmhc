@@ -9,6 +9,7 @@ import jene.hla.Allele;
 import jene.hla.Genotype;
 import jene.peptide.Peptide;
 
+import pepmhc.affy.Affinity;
 import pepmhc.affy.AffinityCache;
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.AffinityPredictor;
@@ -30,7 +31,7 @@ public class PresentationRateCalculatorTest {
     private final Allele B4002 = Allele.instance("HLA-B*40:02");
     private final AffinityMethod method = AffinityMethod.NET_MHC;
     private final List<Peptide> peptides = Peptide.newNative(9, 1000);
-    private final AffinityThreshold threshold = AffinityThreshold.forAffinity(500.0);
+    private final AffinityThreshold threshold = AffinityThreshold.create(Affinity.valueOf(500.0), null);
 
     @Test public void testNetMHC() {
         if (!method.getPredictor().isInstalled())

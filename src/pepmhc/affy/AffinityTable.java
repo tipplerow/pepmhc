@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import jam.io.FileUtil;
+import jam.math.Percentile;
 import jam.sql.SQLColumn;
 import jam.sql.SQLDb;
 import jam.sql.SQLiteDb;
@@ -103,9 +104,9 @@ public final class AffinityTable extends BindTable<AffinityRecord> {
     }
 
     @Override public AffinityRecord getRow(ResultSet resultSet) throws SQLException {
-        Peptide peptide    = Peptide.instance(resultSet.getString(1));
-        double  affinity   = getDouble(resultSet, 2);
-        double  percentile = getDouble(resultSet, 3);
+        Peptide peptide = Peptide.instance(resultSet.getString(1));
+        Affinity affinity = Affinity.valueOf(getDouble(resultSet, 2));
+        Percentile percentile = Percentile.valueOf(getDouble(resultSet, 3));
 
         return new AffinityRecord(peptide, affinity, percentile);
     }
@@ -122,11 +123,11 @@ public final class AffinityTable extends BindTable<AffinityRecord> {
             break;
 
         case AFFINITY_NAME:
-            statement.setDouble(index, record.getAffinity());
+            statement.setDouble(index, record.getAffinity().doubleValue());
             break;
 
         case PERCENTILE_NAME:
-            statement.setDouble(index, record.getPercentile());
+            statement.setDouble(index, record.getPercentile().doubleValue());
             break;
 
         default:

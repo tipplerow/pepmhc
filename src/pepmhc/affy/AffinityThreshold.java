@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import jam.app.JamProperties;
+import jam.math.Percentile;
 
 import jene.peptide.Peptide;
 
@@ -14,12 +15,12 @@ import jene.peptide.Peptide;
  * affinity, percentile rank, or both.
  */
 public final class AffinityThreshold {
-    private double affinityThreshold;
-    private double percentileThreshold;
+    private Affinity affinityThreshold;
+    private Percentile percentileThreshold;
 
     private static AffinityThreshold global = null;
 
-    private AffinityThreshold(double affinityThreshold, double percentileThreshold) {
+    private AffinityThreshold(Affinity affinityThreshold, Percentile percentileThreshold) {
         this.affinityThreshold = affinityThreshold;
         this.percentileThreshold = percentileThreshold;
         validate();
@@ -43,6 +44,41 @@ public final class AffinityThreshold {
     public static final String PERCENTILE_THRESHOLD_PROPERTY = "pepmhc.percentileThreshold";
 
     /**
+     * The standard affinity threshold that is usually applied.
+     */
+    public static final Affinity AFFINITY_THRESHOLD_STANDARD = Affinity.valueOf(500.0);
+
+    /**
+     * The standard percentile threshold that is usually applied.
+     */
+    public static final Percentile PERCENTILE_THRESHOLD_STANDARD = Percentile.valueOf(2.0);
+
+    /**
+     * The standard affinity and percentile thresholds that are
+     * usually applied.
+     */
+    public static final AffinityThreshold STANDARD =
+        AffinityThreshold.create(AFFINITY_THRESHOLD_STANDARD,
+                                 PERCENTILE_THRESHOLD_STANDARD);
+
+    /**
+     * Creates a new affinity threshold with fixed attributes.
+     *
+     * @param affinity the affinity threshold (may be {@code null} to
+     * apply only a percentile threshold).
+     *
+     * @param percentile the percentile threshold (may be {@code null} to
+     * apply only an affinity threshold).
+     *
+     * @return a new affinity threshold with the specfied parameters.
+     *
+     * @throws RuntimeException if both thresholds are {@code null}.
+     */
+    public static AffinityThreshold create(Affinity affinity, Percentile percentile) {
+        return new AffinityThreshold(affinity, percentile);
+    }
+
+    /**
      * Returns the global affinity threshold defined by system
      * properties.
      *
@@ -57,68 +93,16 @@ public final class AffinityThreshold {
     }
 
     private static void resolveGlobal() {
-        double affinity = JamProperties.getOptionalDouble(AFFINITY_THRESHOLD_PROPERTY, Double.NaN);
-        double percentile = JamProperties.getOptionalDouble(PERCENTILE_THRESHOLD_PROPERTY, Double.NaN);
+        Affinity affinity = null;
+        Percentile percentile = null;
+
+        if (JamProperties.isSet(AFFINITY_THRESHOLD_PROPERTY))
+            affinity = Affinity.valueOf(JamProperties.getRequiredDouble(AFFINITY_THRESHOLD_PROPERTY));
+
+        if (JamProperties.isSet(PERCENTILE_THRESHOLD_PROPERTY))
+            percentile = Percentile.valueOf(JamProperties.getRequiredDouble(PERCENTILE_THRESHOLD_PROPERTY));
 
         global = new AffinityThreshold(affinity, percentile);
-    }
-
-    /**
-     * Returns an object with a specified affinity threshold and an
-     * unset percentile rank threshold.
-     *
-     * @param affinityThreshold the desired affinity threshold.
-     *
-     * @return an object with the specified affinity threshold and an
-     * unset percentile rank threshold.
-     */
-    public static AffinityThreshold forAffinity(double affinityThreshold) {
-        return new AffinityThreshold(affinityThreshold, Double.NaN);
-    }
-
-    /**
-     * Returns an object with a specified percentile rank threshold
-     * and an unset affinity threshold.
-     *
-     * @param percentileThreshold the desired percentile threshold.
-     *
-     * @return an object with the specified percentile rank threshold
-     * and an unset affinity threshold.
-     */
-    public static AffinityThreshold forPercentile(double percentileThreshold) {
-        return new AffinityThreshold(Double.NaN, percentileThreshold);
-    }
-
-    /**
-     * Returns a new object with the percentile rank threshold of this
-     * object and a specified affinity threshold.
-     *
-     * @param affinityThreshold the desired affinity threshold.
-     *
-     * @return a new object with the percentile rank threshold of this
-     * object and the specified affinity threshold.
-     */
-    public AffinityThreshold andAffinity(double affinityThreshold) {
-        if (isAffinityThresholdSet())
-            throw new IllegalStateException("Affinity threshold is already set.");
-
-        return new AffinityThreshold(affinityThreshold, this.percentileThreshold);
-    }
-
-    /**
-     * Returns a new object with the affinity threshold of this object
-     * and a specified percentile rank threshold.
-     *
-     * @param percentileThreshold the desired percentile threshold.
-     *
-     * @return a new object with the affinity threshold of this object
-     * and the specified percentile rank threshold.
-     */
-    public AffinityThreshold andPercentile(double percentileThreshold) {
-        if (isPercentileThresholdSet())
-            throw new IllegalStateException("Percentile threshold is already set.");
-
-        return new AffinityThreshold(this.affinityThreshold, percentileThreshold);
     }
 
     /**
@@ -171,13 +155,12 @@ public final class AffinityThreshold {
      */
     public boolean isBound(AffinityRecord record) {
         if (isAffinityThresholdSet()
-            && record.isAffinitySet()
-            && record.getAffinity() <= affinityThreshold)
+            && record.getAffinity().LE(affinityThreshold))
             return true;
 
         if (isPercentileThresholdSet()
-            && record.isPercentileSet()
-            && record.getPercentile() <= percentileThreshold)
+            && record.hasPercentile()
+            && record.getPercentile().LE(percentileThreshold))
             return true;
 
         return false;
@@ -188,7 +171,7 @@ public final class AffinityThreshold {
      *
      * @return the absolute affinity threshold.
      */
-    public double getAffinityThreshold() {
+    public Affinity getAffinityThreshold() {
         return affinityThreshold;
     }
 
@@ -197,7 +180,7 @@ public final class AffinityThreshold {
      *
      * @return the percentile rank threshold.
      */
-    public double getPercentileThreshold() {
+    public Percentile getPercentileThreshold() {
         return percentileThreshold;
     }
 
@@ -207,7 +190,7 @@ public final class AffinityThreshold {
      * @return {@code true} iff the affinity threshold has been set.
      */
     public boolean isAffinityThresholdSet() {
-        return !Double.isNaN(affinityThreshold);
+        return affinityThreshold != null;
     }
 
     /**
@@ -218,7 +201,7 @@ public final class AffinityThreshold {
      * been set.
      */
     public boolean isPercentileThresholdSet() {
-        return !Double.isNaN(percentileThreshold);
+        return percentileThreshold != null;
     }
 }
 

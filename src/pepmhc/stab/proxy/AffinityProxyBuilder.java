@@ -151,8 +151,8 @@ public final class AffinityProxyBuilder {
             //
             // The linear regression model is: log(H) = intercept + coeff * log(A)
             //
-            double affinity = affinityRecords.get(k).getAffinity();
-            double halfLife = stabilityRecords.get(k).getHalfLife();
+            double affinity = affinityRecords.get(k).getAffinity().doubleValue();
+            double halfLife = stabilityRecords.get(k).getHalfLife().doubleValue();
 
             if (affinity <= 1.0E-08)
                 continue;

@@ -89,7 +89,7 @@ public final class AllelePresentCalc {
         if (pepFragments.contains(fragment))
             return;
 
-        double ic50 = predictor.predict(allele, fragment).getAffinity();
+        double ic50 = predictor.predict(allele, fragment).getAffinity().doubleValue();
 
         if (ic50 < BINDING_THRESHOLD)
             ++binderCount;

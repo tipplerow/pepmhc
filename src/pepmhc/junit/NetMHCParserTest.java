@@ -23,11 +23,11 @@ public class NetMHCParserTest {
         assertEquals(Peptide.instance("AAAWYLWEV"), records.get(0).getPeptide());
         assertEquals(Peptide.instance("AEFGPWQTV"), records.get(9).getPeptide());
         
-        assertEquals(   10.65, records.get(0).getAffinity(), 0.01);
-        assertEquals(12361.73, records.get(9).getAffinity(), 0.01);
+        assertEquals(   10.65, records.get(0).getAffinity().doubleValue(), 0.01);
+        assertEquals(12361.73, records.get(9).getAffinity().doubleValue(), 0.01);
 
-        assertEquals( 0.12, records.get(0).getPercentile(), 0.01);
-        assertEquals(18.00, records.get(9).getPercentile(), 0.01);
+        assertEquals( 0.12, records.get(0).getPercentile().doubleValue(), 0.01);
+        assertEquals(18.00, records.get(9).getPercentile().doubleValue(), 0.01);
     }
 
     @Test public void testNetMHCPan() {
@@ -38,11 +38,11 @@ public class NetMHCParserTest {
         assertEquals(Peptide.instance("AAAWYLWEV"), records.get(0).getPeptide());
         assertEquals(Peptide.instance("AEFGPWQTV"), records.get(9).getPeptide());
         
-        assertEquals(   7.1, records.get(0).getAffinity(), 0.1);
-        assertEquals(8706.7, records.get(9).getAffinity(), 0.1);
+        assertEquals(   7.1, records.get(0).getAffinity().doubleValue(), 0.1);
+        assertEquals(8706.7, records.get(9).getAffinity().doubleValue(), 0.1);
 
-        assertEquals( 0.0687, records.get(0).getPercentile(), 0.0001);
-        assertEquals(13.2114, records.get(9).getPercentile(), 0.0001);
+        assertEquals( 0.0687, records.get(0).getPercentile().doubleValue(), 0.0001);
+        assertEquals(13.2114, records.get(9).getPercentile().doubleValue(), 0.0001);
     }
 
     public static void main(String[] args) {

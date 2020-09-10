@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import jene.chem.HalfLife;
 import jene.hla.Allele;
 import jene.peptide.Peptide;
 
+import pepmhc.affy.Affinity;
 import pepmhc.affy.AffinityMethod;
 import pepmhc.affy.AffinityRecord;
 import pepmhc.affy.AffinityStore;
@@ -123,16 +125,13 @@ public final class AffinityProxyModel {
      *
      * @throws IllegalArgumentException unless the affinity is positive.
      */
-    public double halfLife(double affinity) {
+    public HalfLife halfLife(Affinity affinity) {
         //
         // Recall that the regression model is:
         //
         //     log(halfLife) = intercept + coefficient * log(affinity)
         //
-        if (affinity <= 0.0)
-            throw new IllegalArgumentException("Negative affinity.");
-
-        return Math.exp(intercept + coefficient * Math.log(affinity));
+        return HalfLife.valueOf(Math.exp(intercept + coefficient * Math.log(affinity.doubleValue())));
     }
 
     /**

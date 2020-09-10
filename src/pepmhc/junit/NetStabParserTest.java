@@ -22,11 +22,11 @@ public class NetStabParserTest {
         assertEquals(Peptide.instance("AAAWYLWEV"), records.get(0).getPeptide());
         assertEquals(Peptide.instance("AEFGPWQTV"), records.get(9).getPeptide());
         
-        assertEquals(7.61, records.get(0).getHalfLife(), 0.01);
-        assertEquals(0.50, records.get(9).getHalfLife(), 0.01);
+        assertEquals(7.61, records.get(0).getHalfLife().doubleValue(), 0.01);
+        assertEquals(0.50, records.get(9).getHalfLife().doubleValue(), 0.01);
 
-        assertEquals(0.30, records.get(0).getPercentile(), 0.01);
-        assertEquals(9.00, records.get(9).getPercentile(), 0.01);
+        assertEquals(0.30, records.get(0).getPercentile().doubleValue(), 0.01);
+        assertEquals(9.00, records.get(9).getPercentile().doubleValue(), 0.01);
     }
 
     public static void main(String[] args) {

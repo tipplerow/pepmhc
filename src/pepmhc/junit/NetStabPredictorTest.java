@@ -27,10 +27,10 @@ public class NetStabPredictorTest {
             return;
 
         assertEquals(0.43, predictor.predict(A0101, Peptide.instance("AAAWYLWEV")).getStrength(), 0.01);
-        assertEquals(0.11, predictor.predict(A0101, Peptide.instance("AEFGPWQTV")).getHalfLife(), 0.01);
+        assertEquals(0.11, predictor.predict(A0101, Peptide.instance("AEFGPWQTV")).getHalfLife().doubleValue(), 0.01);
 
         assertEquals(7.61, predictor.predict(A0201, Peptide.instance("AAAWYLWEV")).getStrength(), 0.01);
-        assertEquals(0.50, predictor.predict(A0201, Peptide.instance("AEFGPWQTV")).getHalfLife(), 0.01);
+        assertEquals(0.50, predictor.predict(A0201, Peptide.instance("AEFGPWQTV")).getHalfLife().doubleValue(), 0.01);
     }
 
     public static void main(String[] args) {

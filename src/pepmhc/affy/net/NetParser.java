@@ -9,10 +9,12 @@ import java.util.regex.Pattern;
 
 import jam.io.IOUtil;
 import jam.lang.JamException;
+import jam.math.Percentile;
 import jam.util.RegexUtil;
 
 import jene.peptide.Peptide;
 
+import pepmhc.affy.Affinity;
 import pepmhc.affy.AffinityRecord;
 
 /**
@@ -129,9 +131,9 @@ public abstract class NetParser {
         if (fields.length <= getPercentileFieldIndex())
             throw JamException.runtime("Invalid data line [%s].", line);
 
-        Peptide peptide    = Peptide.instance(fields[getPeptideFieldIndex()]);
-        double  affinity   = Double.valueOf(fields[getAffinityFieldIndex()]);
-        double  percentile = Double.valueOf(fields[getPercentileFieldIndex()]);
+        Peptide peptide = Peptide.instance(fields[getPeptideFieldIndex()]);
+        Affinity affinity = Affinity.parse(fields[getAffinityFieldIndex()]);
+        Percentile percentile = Percentile.parse(fields[getPercentileFieldIndex()]);
 
         records.add(new AffinityRecord(peptide, affinity, percentile));
     }

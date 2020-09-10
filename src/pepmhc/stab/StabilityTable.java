@@ -7,10 +7,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 import jam.io.FileUtil;
+import jam.math.Percentile;
 import jam.sql.SQLColumn;
 import jam.sql.SQLDb;
 import jam.sql.SQLiteDb;
 
+import jene.chem.HalfLife;
 import jene.hla.Allele;
 import jene.peptide.Peptide;
 
@@ -103,9 +105,9 @@ public final class StabilityTable extends BindTable<StabilityRecord> {
     }
 
     @Override public StabilityRecord getRow(ResultSet resultSet) throws SQLException {
-        Peptide peptide    = Peptide.instance(resultSet.getString(1));
-        double  halfLife   = getDouble(resultSet, 2);
-        double  percentile = getDouble(resultSet, 3);
+        Peptide peptide = Peptide.instance(resultSet.getString(1));
+        HalfLife halfLife = HalfLife.valueOf(getDouble(resultSet, 2));
+        Percentile percentile = Percentile.valueOf(getDouble(resultSet, 3));
 
         return new StabilityRecord(peptide, halfLife, percentile);
     }
@@ -122,11 +124,11 @@ public final class StabilityTable extends BindTable<StabilityRecord> {
             break;
 
         case HALF_LIFE_NAME:
-            statement.setDouble(index, record.getHalfLife());
+            statement.setDouble(index, record.getHalfLife().doubleValue());
             break;
 
         case PERCENTILE_NAME:
-            statement.setDouble(index, record.getPercentile());
+            statement.setDouble(index, record.getPercentile().doubleValue());
             break;
 
         default:
