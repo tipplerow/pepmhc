@@ -1,0 +1,11 @@
+########################################################################
+# Sample property file for the MissAffinityDriver application.
+########################################################################
+
+MissAffinityDriver.affinityMethod = NET_MHC_PAN
+
+MissAffinityDriver.missAffinityFile = data/test/miss-affinity-test.txt
+MissAffinityDriver.missCleavageFile = data/test/miss-cleavage.txt
+
+MissAffinityDriver.tumorPatientFile = data/test/tumor-patient.txt
+MissAffinityDriver.patientGenotypeFile = data/test/patient-genotype.csv

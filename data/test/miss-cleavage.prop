@@ -1,13 +1,13 @@
 ########################################################################
-# Sample property file for the MissChopDriver application.
+# Sample property file for the MissCleavageDriver application.
 ########################################################################
 
-MissChopDriver.ensemblProteomeFile = ${JENE_HOME}/data/test/ensembl_test2.fa
-MissChopDriver.ensemblSecondaryProteome = ${JENE_HOME}/data/test/ensembl_test2.fa
+MissCleavageDriver.ensemblProteomeFile = ${JENE_HOME}/data/test/ensembl_test2.fa
+MissCleavageDriver.ensemblSecondaryProteome = ${JENE_HOME}/data/test/ensembl_test2.fa
 
-MissChopDriver.hugoMasterFile  = ${JENE_HOME}/data/test/hugo_master_test.tsv
-MissChopDriver.missenseMAFFile = ${JENE_HOME}/data/test/ppe_missense.maf
-MissChopDriver.ccfThreshold    = 0.75
+MissCleavageDriver.hugoMasterFile  = ${JENE_HOME}/data/test/hugo_master_test.tsv
+MissCleavageDriver.missenseMAFFile = ${JENE_HOME}/data/test/ppe_missense.maf
+MissCleavageDriver.ccfThreshold    = 0.75
 
-MissChopDriver.peptideLength = 9
-MissChopDriver.missChopFile  = data/test/miss-chop-test.txt
+MissCleavageDriver.peptideLength = 9
+MissCleavageDriver.missCleavageFile = data/test/miss-cleavage-test.txt

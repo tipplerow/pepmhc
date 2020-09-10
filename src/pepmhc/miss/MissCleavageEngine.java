@@ -71,13 +71,13 @@ public final class MissCleavageEngine {
      * of missense mutations and computes their proteasomal cleavage
      * probabilities.
      *
-     * @param missenseGroup a group of missense mutations observed in
-     * the same tumor sample and gene.
+     * @param missenseGroup a group of missense mutations observed
+     * in the same tumor sample and gene.
      *
-     * @param peptideLength the desired length of the self-peptide and
-     * neo-peptide fragments.
+     * @param peptideLength the desired length of the self-peptide
+     * and neo-peptide fragments.
      *
-     * @return a list of missense-chop records for the input mutation
+     * @return a list of cleavage records for the input mutation
      * group.
      *
      * @throws RuntimeException if the Ensembl database and HUGO
@@ -105,13 +105,13 @@ public final class MissCleavageEngine {
      * group of missense mutations in a patient cohort and computes
      * their proteasomal cleavage probabilities.
      *
-     * @param missenseTable a table of missense mutations observed in
-     * a patient cohort.
+     * @param missenseTable a table of missense mutations observed
+     * in a patient cohort.
      *
-     * @param peptideLength the desired length of the self-peptide and
-     * neo-peptide fragments.
+     * @param peptideLength the desired length of the self-peptide
+     * and neo-peptide fragments.
      *
-     * @return a list of missense-chop records for the input mutation
+     * @return a list of cleavage records for the input mutation
      * table.
      *
      * @throws RuntimeException if the Ensembl database and HUGO
@@ -127,7 +127,7 @@ public final class MissCleavageEngine {
         List<MissCleavageRecord> missCleavageRecords =
             ListUtil.cat(groupRecords);
 
-        JamLogger.info("Sorting missense records...");
+        JamLogger.info("Sorting cleavage records...");
         missCleavageRecords.sort(MissCleavageRecord.COMPARATOR);
 
         return missCleavageRecords;
@@ -138,7 +138,7 @@ public final class MissCleavageEngine {
     }
 
     private List<MissCleavageRecord> generate() {
-        JamLogger.info("Generating missense-chop records: [%s, %s]...",
+        JamLogger.info("Generating cleavage records: [%s, %s]...",
                        tumorBarcode.getKey(), hugoSymbol.getKey());
 
         nativeProtein = missenseGroup.resolveNative(ensemblDb, hugoMaster);

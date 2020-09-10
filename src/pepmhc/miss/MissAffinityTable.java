@@ -12,10 +12,10 @@ import jam.io.LineReader;
 import jene.tcga.TumorGeneRecordTable;
 
 /**
- * Indexes missense-cleavage records by tumor barcode and HUGO symbol.
+ * Indexes missense-chop records by tumor barcode and HUGO symbol.
  */
-public final class MissCleavageTable extends TumorGeneRecordTable<MissCleavageRecord> {
-    private MissCleavageTable(Collection<MissCleavageRecord> records) {
+public final class MissAffinityTable extends TumorGeneRecordTable<MissAffinityRecord> {
+    private MissAffinityTable(Collection<MissAffinityRecord> records) {
         super(records);
     }
 
@@ -26,8 +26,8 @@ public final class MissCleavageTable extends TumorGeneRecordTable<MissCleavageRe
      *
      * @return a table containing all records in the given collection.
      */
-    public static MissCleavageTable create(Collection<MissCleavageRecord> records) {
-        return new MissCleavageTable(records);
+    public static MissAffinityTable create(Collection<MissAffinityRecord> records) {
+        return new MissAffinityTable(records);
     }
 
     /**
@@ -40,7 +40,7 @@ public final class MissCleavageTable extends TumorGeneRecordTable<MissCleavageRe
      * @throws RuntimeException unless the file can be opened for
      * reading and contains properly formatted records.
      */
-    public static MissCleavageTable load(String fileName) {
+    public static MissAffinityTable load(String fileName) {
         return load(new File(fileName));
     }
 
@@ -54,19 +54,19 @@ public final class MissCleavageTable extends TumorGeneRecordTable<MissCleavageRe
      * @throws RuntimeException unless the file can be opened for
      * reading and contains properly formatted records.
      */
-    public static MissCleavageTable load(File file) {
-        List<MissCleavageRecord> records =
-            new ArrayList<MissCleavageRecord>();
+    public static MissAffinityTable load(File file) {
+        List<MissAffinityRecord> records =
+            new ArrayList<MissAffinityRecord>();
 
         try (LineReader reader = LineReader.open(file)) {
             // Skip header line...
             reader.next();
 
             for (String line : reader)
-                records.add(MissCleavageRecord.parse(line));
+                records.add(MissAffinityRecord.parse(line));
         }
 
-        JamLogger.info("MissCleavageTable: Loaded [%d] records.", records.size());
+        JamLogger.info("MissAffinityTable: Loaded [%d] records.", records.size());
         return create(records);
     }
 }

@@ -59,7 +59,7 @@ public final class MissCleavageDriver extends JamApp {
     }
 
     private static String resolveMissCleavageFile() {
-        return JamProperties.getRequired(MISS_CHOP_FILE_PROPERTY);
+        return JamProperties.getRequired(MISS_CLEAVAGE_FILE_PROPERTY);
     }
 
     private static String resolveEnsemblProteomeFile() {
@@ -100,9 +100,9 @@ public final class MissCleavageDriver extends JamApp {
 
     /**
      * Name of the system property that specifies the full path name
-     * of the missense-chop output file.
+     * of the cleavage record output file.
      */
-    public static final String MISS_CHOP_FILE_PROPERTY = "MissCleavageDriver.missCleavageFile";
+    public static final String MISS_CLEAVAGE_FILE_PROPERTY = "MissCleavageDriver.missCleavageFile";
 
     /**
      * Name of the system property that specifies the full path name
